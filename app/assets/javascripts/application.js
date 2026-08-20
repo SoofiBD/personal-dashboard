@@ -6,20 +6,20 @@
   const animateDashboard = () => {
     if (motionQuery.matches || typeof window.gsap === "undefined") return;
 
-    const timeline = window.gsap.timeline({ defaults: { ease: "power1.out" } });
+    const timeline = window.gsap.timeline({ defaults: { ease: "power1.out", clearProps: "all" } });
     const sidebar = document.querySelector(".sidebar");
     const header = document.querySelector(".page-header");
     const cards = document.querySelectorAll(".metric-card");
     const panels = document.querySelectorAll(".panel");
-    const items = document.querySelectorAll(".finance-list article");
+    const items = document.querySelectorAll(".finance-list article, .card-item");
     const flashes = document.querySelectorAll(".flash");
 
-    if (sidebar) timeline.from(sidebar, { x: -12, autoAlpha: 0, duration: 0.28 });
-    if (header) timeline.from(header, { y: 12, autoAlpha: 0, duration: 0.32 }, "-=0.12");
-    if (cards.length) timeline.from(cards, { y: 12, autoAlpha: 0, duration: 0.3, stagger: 0.055 }, "-=0.12");
-    if (panels.length) timeline.from(panels, { y: 10, autoAlpha: 0, duration: 0.3, stagger: 0.045 }, "-=0.18");
-    if (items.length) timeline.from(items, { y: 8, autoAlpha: 0, duration: 0.24, stagger: 0.025 }, "-=0.2");
-    if (flashes.length) timeline.from(flashes, { y: -8, autoAlpha: 0, duration: 0.22 }, 0);
+    if (sidebar) timeline.from(sidebar, { x: -12, opacity: 0, duration: 0.28 });
+    if (header) timeline.from(header, { y: 12, opacity: 0, duration: 0.32 }, "-=0.12");
+    if (cards.length) timeline.from(cards, { y: 12, opacity: 0, duration: 0.3, stagger: 0.055 }, "-=0.12");
+    if (panels.length) timeline.from(panels, { y: 10, opacity: 0, duration: 0.3, stagger: 0.045 }, "-=0.18");
+    if (items.length) timeline.from(items, { y: 8, opacity: 0, duration: 0.24, stagger: 0.025 }, "-=0.2");
+    if (flashes.length) timeline.from(flashes, { y: -8, opacity: 0, duration: 0.22 }, 0);
   };
 
   const initBudgetSelector = () => {
@@ -128,9 +128,45 @@
     });
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const initBudgetCalculator = () => {
+    const totalDisplay = document.getElementById("budget-total-planned-display");
+    const limitInputs = document.querySelectorAll(".budget-limit-input");
+    if (!totalDisplay || !limitInputs.length) return;
+
+    const userCurrency = document.querySelector(".workspace-currency")?.textContent?.trim() || "TRY";
+    const formatCurrency = (val) => {
+      const num = Number(val) || 0;
+      return `${num.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${userCurrency}`;
+    };
+
+    const calculateTotal = () => {
+      let total = 0;
+      limitInputs.forEach((input) => {
+        const val = parseFloat(input.value) || 0;
+        total += val;
+      });
+      totalDisplay.value = formatCurrency(total);
+    };
+
+    limitInputs.forEach((input) => {
+      input.addEventListener("input", calculateTotal);
+      input.addEventListener("change", calculateTotal);
+    });
+
+    calculateTotal();
+  };
+
+  const init = () => {
     animateDashboard();
     initBudgetSelector();
-  }, { once: true });
+    initBudgetCalculator();
+  };
+
+  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("turbo:load", () => {
+    if (document.readyState !== "loading") {
+      init();
+    }
+  });
 })();
 

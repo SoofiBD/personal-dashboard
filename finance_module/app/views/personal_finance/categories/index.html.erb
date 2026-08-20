@@ -10,26 +10,20 @@
   <% end %>
 </header>
 
-<section class="panel">
-  <% if @categories.any? %>
-    <div class="finance-list">
-      <% @categories.each do |category| %>
-        <article class="finance-item-row">
-          <div class="transaction-left">
-            <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background-color: <%= category.color.presence || '#3B82F6' %>; box-shadow: 0 0 8px <%= category.color.presence || '#3B82F6' %>80;"></span>
-            <div class="transaction-meta">
-              <span class="transaction-category"><%= category.name %></span>
-              <span class="transaction-submeta">
-                <span class="badge-pill badge-pill-subtle">
-                  <%= t("transactions.kinds.#{category.kind}", default: category.kind.humanize) %>
-                </span>
-                <% if category.parent %>
-                  <span><%= t("categories.parent_category", default: "Üst Kategori") %>: <%= category.parent.name %></span>
-                <% end %>
+<% if @categories.any? %>
+  <div class="card-grid">
+    <% @categories.each do |category| %>
+      <div class="card-item">
+        <div class="card-item-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="display: inline-block; width: 16px; height: 16px; border-radius: 50%; background-color: <%= category.color.presence || '#3B82F6' %>; box-shadow: 0 0 10px <%= category.color.presence || '#3B82F6' %>80; flex-shrink: 0;"></span>
+            <div>
+              <div class="card-item-title"><%= category.name %></div>
+              <span class="badge-pill badge-pill-subtle" style="margin-top: 0.35rem;">
+                <%= t("transactions.kinds.#{category.kind}", default: category.kind.humanize) %>
               </span>
             </div>
           </div>
-
           <div class="transaction-actions">
             <%= link_to edit_finance_category_path(category), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
@@ -38,15 +32,23 @@
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>
-        </article>
-      <% end %>
-    </div>
-  <% else %>
+        </div>
+
+        <% if category.parent %>
+          <div style="margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-muted);">
+            <span><%= t("categories.parent_category", default: "Üst Kategori") %>: <strong><%= category.parent.name %></strong></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <section class="panel">
     <div class="empty-state">
       <p><%= t("categories.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir kategori bulunmuyor.")) %></p>
       <%= link_to t("categories.add_first", default: t("categories.new_title", default: "İlk Kategoriyi Ekle")), new_finance_category_path, class: "button button-secondary button-sm" %>
     </div>
-  <% end %>
-</section>
+  </section>
+<% end %>
 
 

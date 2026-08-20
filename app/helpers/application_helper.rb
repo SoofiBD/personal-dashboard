@@ -100,9 +100,9 @@ module ApplicationHelper
       end
     when "trash"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
-        tag.path(d: "3 6h18") +
-        tag.path(d: "19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6") +
-        tag.path(d: "8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2")
+        tag.path(d: "M3 6h18") +
+        tag.path(d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6") +
+        tag.path(d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2")
       end
     when "vault", "logo"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
