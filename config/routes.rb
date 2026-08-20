@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
+  get "up" => "rails/health#show", :as => :rails_health_check
 
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"
@@ -20,4 +20,3 @@ Rails.application.routes.draw do
 
   root to: redirect("/finance")
 end
-

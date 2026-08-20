@@ -5,7 +5,7 @@ class PersonalFinance::DashboardControllerTest < ActionDispatch::IntegrationTest
     get finance_root_path
 
     assert_response :success
-    assert_select "h1", "This month's overview"
+    assert_select "h1", I18n.t("dashboard.title")
     assert_equal 1, User.count
   end
 end

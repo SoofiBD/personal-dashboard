@@ -7,10 +7,10 @@ module PersonalFinance
     has_many :children, class_name: "PersonalFinance::Category", foreign_key: :parent_id, dependent: :restrict_with_error
     has_many :transactions, class_name: "PersonalFinance::Transaction", dependent: :nullify
 
-    enum :kind, { income: "income", expense: "expense", transfer: "transfer" }, validate: true
+    enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
 
-    validates :name, presence: true, length: { maximum: 80 }, uniqueness: { scope: :user_id }
-    validates :color, format: { with: /\A#[0-9A-Fa-f]{6}\z/ }
+    validates :name, presence: true, length: {maximum: 80}, uniqueness: {scope: :user_id}
+    validates :color, format: {with: /\A#[0-9A-Fa-f]{6}\z/}
     validate :parent_belongs_to_same_user_and_kind
 
     def full_name
