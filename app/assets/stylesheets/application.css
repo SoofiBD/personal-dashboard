@@ -1104,7 +1104,6 @@ textarea:focus-visible {
 .budget-chip:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--border-hover);
-  transform: translateY(-1px);
 }
 
 .budget-chip.is-active {

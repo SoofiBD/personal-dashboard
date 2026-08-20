@@ -18,13 +18,21 @@
 </header>
 
 <section class="panel form-panel">
-  <%= form_with url: finance_budget_path(@budget.starts_on.strftime("%Y-%m")), method: :patch do |form| %>
-    <%= fields_for :budget_period, @budget do |budget_form| %>
-      <div class="form-group">
-        <%= budget_form.label :planned_income, t("budgets.planned_income", default: "Planlanan Toplam Gelir") %>
-        <%= budget_form.number_field :planned_income, step: 0.01, min: 0, placeholder: "0.00" %>
+  <%= form_with url: finance_budget_path(@budget.starts_on.strftime("%Y-%m")), method: :patch, id: "budget-edit-form" do |form| %>
+    <div class="form-group">
+      <%= form.label :planned_income, t("budgets.planned_income", default: "Planlanan Toplam Bütçe") %>
+      <div style="position: relative;">
+        <input type="text"
+               id="budget-total-planned-display"
+               class="form-control"
+               style="font-size: 1.15rem; font-weight: 700; color: #60A5FA; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.35); cursor: default;"
+               value="<%= dashboard_currency @budget.planned_spending %>"
+               readonly />
       </div>
-    <% end %>
+      <small style="display: block; margin-top: 0.35rem; color: var(--text-muted); font-size: 0.8rem;">
+        <%= t("budgets.planned_income_auto_note", default: "Kategori bazlı harcama limitlerinin toplamından otomatik olarak hesaplanır.") %>
+      </small>
+    </div>
 
     <div style="margin: 2rem 0 1rem;">
       <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;"><%= t("budgets.category_limits", default: "Kategori Bazlı Harcama Limitleri") %></h3>

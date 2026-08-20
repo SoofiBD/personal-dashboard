@@ -18,8 +18,11 @@ module PersonalFinance
 
     def update
       BudgetPeriod.transaction do
-        @budget.update!(budget_params)
-        Array(params[:allocations]).each do |allocation|
+        allocations_data = Array(params[:allocations])
+        total_planned = allocations_data.sum { |a| a[:planned_amount].to_f }
+
+        @budget.update!(planned_income: total_planned)
+        allocations_data.each do |allocation|
           category = owned(Category).expense.find(allocation[:category_id])
           record = @budget.allocations.find_or_initialize_by(category: category)
           record.update!(planned_amount: allocation[:planned_amount])
