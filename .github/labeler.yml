@@ -1,0 +1,38 @@
+# Auto-label PRs based on changed file paths
+# Used by .github/workflows/auto-label.yml
+
+"module: finance":
+  - changed-files:
+      - any-glob-to-any-file: "finance_module/**"
+
+"type: test":
+  - changed-files:
+      - any-glob-to-any-file: "test/**"
+
+"type: ci":
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+"type: docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "docs/**"
+
+"type: config":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "config/**"
+          - "Gemfile"
+          - "Gemfile.lock"
+          - "compose.yaml"
+          - "Dockerfile*"
+
+"type: migration":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/db/migrate/**"
+
+"design-system":
+  - changed-files:
+      - any-glob-to-any-file: "design-system/**"
