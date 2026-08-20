@@ -1,6 +1,6 @@
 class User < ApplicationRecord
-  validates :name, presence: true, length: { maximum: 80 }
-  validates :currency, presence: true, length: { is: 3 }
+  validates :name, presence: true, length: {maximum: 80}
+  validates :currency, presence: true, length: {is: 3}
   validates :time_zone, presence: true
 
   def self.dashboard_owner

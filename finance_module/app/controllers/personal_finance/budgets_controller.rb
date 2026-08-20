@@ -47,12 +47,14 @@ module PersonalFinance
     end
 
     private
+
     def set_budget
       month = Date.strptime(params[:month], "%Y-%m").beginning_of_month
       @budget = owned(BudgetPeriod).find_or_create_by!(starts_on: month) { |budget| budget.ends_on = month.end_of_month }
     rescue ArgumentError
       raise ActiveRecord::RecordNotFound
     end
+
     def budget_params
       params.require(:budget_period).permit(:planned_income)
     end

@@ -4,9 +4,9 @@ module PersonalFinance
 
     belongs_to :user, class_name: "::User"
     belongs_to :savings_goal, class_name: "PersonalFinance::SavingsGoal", optional: true
-    validates :name, presence: true, length: { maximum: 100 }
-    validates :price, numericality: { greater_than: 0 }
-    validates :down_payment, :monthly_cost, numericality: { greater_than_or_equal_to: 0 }
+    validates :name, presence: true, length: {maximum: 100}
+    validates :price, numericality: {greater_than: 0}
+    validates :down_payment, :monthly_cost, numericality: {greater_than_or_equal_to: 0}
     validate :goal_owned_by_user
 
     def assessment
