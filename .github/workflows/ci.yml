@@ -1,0 +1,160 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RAILS_ENV: test
+  RUBY_VERSION: "3.3.6"
+  POSTGRES_DB: personal_dashboard_test
+  POSTGRES_USER: personal_dashboard
+  POSTGRES_PASSWORD: test-ci-password
+  DATABASE_URL: postgresql://personal_dashboard:test-ci-password@localhost:5432/personal_dashboard_test
+  DASHBOARD_CURRENCY: TRY
+  DASHBOARD_TIME_ZONE: Europe/Istanbul
+
+jobs:
+  # ──────────────────────────────────────────────
+  # 1. Lint & Static Analysis
+  # ──────────────────────────────────────────────
+  lint:
+    name: Lint & Static Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Run StandardRB (Ruby linter)
+        run: bundle exec standardrb --no-fix
+
+      - name: Run Brakeman (security scanner)
+        run: bundle exec brakeman --no-pager --quiet --confidence-level 2
+
+      - name: Run Bundler Audit (dependency vulnerabilities)
+        run: |
+          bundle exec bundler-audit check --update
+
+  # ──────────────────────────────────────────────
+  # 2. Tests
+  # ──────────────────────────────────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U personal_dashboard -d personal_dashboard_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Prepare database
+        run: |
+          bin/rails db:create
+          bin/rails db:migrate
+
+      - name: Run tests
+        run: |
+          bin/rails test
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            tmp/screenshots/
+            log/test.log
+          retention-days: 7
+
+  # ──────────────────────────────────────────────
+  # 3. Security Checks
+  # ──────────────────────────────────────────────
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Check for secrets in code
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+      - name: Run Brakeman (detailed report)
+        run: |
+          bundle exec brakeman --no-pager --format json --output tmp/brakeman-report.json || true
+          bundle exec brakeman --no-pager --quiet
+
+      - name: Upload Brakeman report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brakeman-report
+          path: tmp/brakeman-report.json
+          retention-days: 30
+
+  # ──────────────────────────────────────────────
+  # 4. PR Status Gate
+  # ──────────────────────────────────────────────
+  pr-status:
+    name: PR Status Check
+    runs-on: ubuntu-latest
+    needs: [lint, test, security]
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.security.result }}" != "success" ]; then
+            echo "❌ One or more checks failed:"
+            echo "  Lint:     ${{ needs.lint.result }}"
+            echo "  Test:     ${{ needs.test.result }}"
+            echo "  Security: ${{ needs.security.result }}"
+            exit 1
+          fi
+          echo "✅ All checks passed!"
