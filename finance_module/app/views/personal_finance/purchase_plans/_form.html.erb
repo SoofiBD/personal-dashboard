@@ -2,33 +2,32 @@
   <%= render "personal_finance/shared/errors", record: @purchase_plan %>
 
   <div class="form-group">
-    <%= form.label :name, "Satın Alma Adı" %>
-    <%= form.text_field :name, maxlength: 100, placeholder: "Örn: Yeni Bilgisayar, Ev Eşyası, Tatil Paketi", required: true %>
+    <%= form.label :name, t("purchase_plans.name", default: "Satın Alma Adı") %>
+    <%= form.text_field :name, maxlength: 100, placeholder: t("purchase_plans.name_placeholder", default: "Örn: Yeni Bilgisayar, Ev Eşyası, Tatil Paketi"), required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :price, "Toplam Fiyat" %>
+    <%= form.label :price, t("purchase_plans.price", default: "Toplam Fiyat") %>
     <%= form.number_field :price, step: 0.01, min: 0.01, placeholder: "0.00", required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :down_payment, "Peşinat Tutarı" %>
+    <%= form.label :down_payment, t("purchase_plans.down_payment", default: "Peşinat Tutarı") %>
     <%= form.number_field :down_payment, step: 0.01, min: 0, placeholder: "0.00" %>
   </div>
 
   <div class="form-group">
-    <%= form.label :monthly_cost, "Aylık Taksit / Ödeme Tutarı" %>
+    <%= form.label :monthly_cost, t("purchase_plans.monthly_cost", default: "Aylık Taksit / Ödeme Tutarı") %>
     <%= form.number_field :monthly_cost, step: 0.01, min: 0, placeholder: "0.00" %>
   </div>
 
   <div class="form-group">
-    <%= form.label :planned_on, "Hedeflenen Satın Alma Tarihi" %>
+    <%= form.label :planned_on, t("purchase_plans.planned_on", default: "Hedeflenen Satın Alma Tarihi") %>
     <%= form.date_field :planned_on %>
   </div>
 
   <div class="form-actions">
-    <%= form.submit @purchase_plan.persisted? ? "Planı Güncelle" : "Planı Değerlendir ve Kaydet", class: "button button-primary" %>
-    <%= link_to "İptal", finance_purchase_plans_path, class: "button button-secondary" %>
+    <%= form.submit @purchase_plan.persisted? ? t("purchase_plans.update", default: "Planı Güncelle") : t("purchase_plans.save", default: "Planı Değerlendir ve Kaydet"), class: "button button-primary" %>
+    <%= link_to t("app.common.cancel", default: "İptal"), finance_purchase_plans_path, class: "button button-secondary" %>
   </div>
 <% end %>
-

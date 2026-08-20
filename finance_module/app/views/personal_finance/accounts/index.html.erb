@@ -44,8 +44,8 @@
 <% else %>
   <section class="panel">
     <div class="empty-state">
-      <p><%= t("app.common.empty_state", default: "Kayıtlı bir hesap bulunmuyor.") %></p>
-      <%= link_to t("accounts.new_title", default: "İlk Hesabı Ekle"), new_finance_account_path, class: "button button-secondary button-sm" %>
+      <p><%= t("accounts.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir hesap bulunmuyor.")) %></p>
+      <%= link_to t("accounts.add_first", default: t("accounts.new_title", default: "İlk Hesabı Ekle")), new_finance_account_path, class: "button button-secondary button-sm" %>
     </div>
   </section>
 <% end %>

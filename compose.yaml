@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.dev
     command: >-
       sh -c 'export DATABASE_URL=postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@db:5432/$$POSTGRES_DB;
+      rm -f tmp/pids/server.pid;
       ./bin/rails db:prepare && exec ./bin/rails server -b 0.0.0.0'
     volumes:
       - .:/rails

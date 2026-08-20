@@ -13,7 +13,7 @@
   <% end %>
 </header>
 
-<section class="finance-cards" aria-label="Aylık Finans Kartları">
+<section class="finance-cards" aria-label="<%= t('dashboard.cards_aria_label', default: 'Aylık Finans Kartları') %>">
   <!-- Gelir -->
   <article class="metric-card">
     <div class="metric-card-top">
@@ -87,7 +87,7 @@
     </div>
     <% maximum = @monthly_cash_flow.flat_map { |month| [month[:income], month[:expenses]] }.max.to_f %>
     <% if maximum.positive? %>
-      <div class="bar-chart" role="img" aria-label="Son altı ayın gelir ve gider tablosu">
+      <div class="bar-chart" role="img" aria-label="<%= t('dashboard.chart_aria_label', default: 'Son altı ayın gelir ve gider tablosu') %>">
         <% @monthly_cash_flow.each do |month| %>
           <div class="bar-group">
             <div class="bar-pair">
@@ -105,7 +105,7 @@
     <% else %>
       <div class="empty-state">
         <p><%= t("app.common.empty_state", default: "Grafiği görüntülemek için henüz işlem kaydı bulunmuyor.") %></p>
-        <%= link_to t("dashboard.add_transaction", default: "İlk işlemi ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
+        <%= link_to t("dashboard.first_transaction", default: "İlk işlemi ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
       </div>
     <% end %>
   </article>
@@ -120,24 +120,113 @@
       <%= link_to t("dashboard.manage_budget", default: "Bütçeyi Yönet"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "text-link" %>
     </div>
     <% if @budget %>
-      <% percent = @budget.planned_spending.positive? ? [(@budget.actual_spending / @budget.planned_spending * 100).round, 100].min : 0 %>
-      <div class="budget-value">
-        <strong><%= dashboard_currency @budget.actual_spending %></strong>
-        <span> / <%= dashboard_currency @budget.planned_spending %></span>
+      <% total_percent = @budget.planned_spending.positive? ? [(@budget.actual_spending / @budget.planned_spending * 100).round, 100].min : 0 %>
+      <% total_raw_percent = @budget.planned_spending.positive? ? (@budget.actual_spending / @budget.planned_spending * 100).round : 0 %>
+      
+      <!-- Kategori Seçim Dropdown'ı -->
+      <div class="budget-select-wrapper">
+        <div class="custom-budget-select-container">
+          <span class="dropdown-category-dot" id="budget-active-dot" style="background-color: #10B981;"></span>
+          <select id="budget-category-selector" class="budget-category-dropdown" aria-label="<%= t('dashboard.select_category', default: 'Kategori Seç') %>">
+            <option value="all" 
+                    data-name="<%= t('dashboard.total_budget', default: 'Tüm Bütçe (Genel Toplam)') %>"
+                    data-color="#10B981"
+                    data-spent="<%= @budget.actual_spending %>"
+                    data-planned="<%= @budget.planned_spending %>"
+                    data-remaining="<%= @budget.remaining %>"
+                    data-percent="<%= total_percent %>"
+                    data-raw-percent="<%= total_raw_percent %>"
+                    data-is-over="<%= @budget.remaining.negative? %>"
+                    data-badge="<%= @budget.remaining.negative? ? t('dashboard.budget_over', default: 'Aşıldı') : t('dashboard.budget_left', default: 'Kalan') %>"
+                    data-note="<%= @budget.remaining.negative? ? t('dashboard.budget_over_note', default: 'bütçe aşıldı') : t('dashboard.budget_left_note', default: 'kullanılabilir bütçe') %>">
+              🌐 <%= t("dashboard.total_budget", default: "Tüm Bütçe (Genel Toplam)") %>
+            </option>
+            <% if @budget_allocations_data.present? %>
+              <optgroup label="<%= t('dashboard.category_budgets', default: 'Kategori Bütçeleri') %>">
+                <% @budget_allocations_data.each do |cat_data| %>
+                  <option value="cat-<%= cat_data[:id] %>"
+                          data-name="<%= cat_data[:name] %>"
+                          data-color="<%= cat_data[:color] %>"
+                          data-spent="<%= cat_data[:spent] %>"
+                          data-planned="<%= cat_data[:planned] %>"
+                          data-remaining="<%= cat_data[:remaining] %>"
+                          data-percent="<%= cat_data[:percent] %>"
+                          data-raw-percent="<%= cat_data[:raw_percent] %>"
+                          data-is-over="<%= cat_data[:is_over] %>"
+                          data-badge="<%= cat_data[:is_over] ? t('dashboard.budget_over', default: 'Aşıldı') : t('dashboard.budget_left', default: 'Kalan') %>"
+                          data-note="<%= cat_data[:is_over] ? t('dashboard.budget_over_note', default: 'bütçe aşıldı') : t('dashboard.budget_left_note', default: 'kullanılabilir bütçe') %>">
+                    <%= cat_data[:name] %> (<%= dashboard_currency cat_data[:planned] %>)
+                  </option>
+                <% end %>
+              </optgroup>
+            <% end %>
+          </select>
+          <svg class="dropdown-chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
       </div>
-      <div class="progress-track" aria-label="Bütçe kullanımı: %<%= percent %>">
-        <span class="progress-fill <%= "is-over" if @budget.actual_spending > @budget.planned_spending %>" style="width: <%= percent %>%"></span>
+
+      <!-- Dinamik Bütçe Göstergesi -->
+      <div class="budget-active-display" id="budget-active-display">
+        <div class="budget-active-top">
+          <div class="budget-title-wrap">
+            <span class="budget-category-tag" id="budget-display-tag">
+              <span class="tag-dot" id="budget-tag-dot" style="background-color: #10B981;"></span>
+              <span id="budget-display-name"><%= t("dashboard.total_budget", default: "Tüm Bütçe (Genel Toplam)") %></span>
+            </span>
+          </div>
+          <span class="budget-percent-pill <%= "is-over" if @budget.remaining.negative? %>" id="budget-display-percent-pill">
+            %<span id="budget-display-percent-num"><%= total_raw_percent %></span>
+          </span>
+        </div>
+
+        <div class="budget-value">
+          <strong id="budget-display-spent"><%= dashboard_currency @budget.actual_spending %></strong>
+          <span id="budget-display-planned"> / <%= dashboard_currency @budget.planned_spending %></span>
+        </div>
+
+        <div class="progress-track" id="budget-progress-track" aria-label="<%= t('dashboard.budget_progress_aria_label', percent: total_percent, default: "Bütçe kullanımı: %#{total_percent}") %>">
+          <span id="budget-display-progress" class="progress-fill <%= "is-over" if @budget.actual_spending > @budget.planned_spending %>" style="width: <%= total_percent %>%;"></span>
+        </div>
+
+        <div class="budget-footer-info">
+          <span id="budget-display-badge" class="badge-pill <%= @budget.remaining.negative? ? "badge-status-defer" : "badge-status-comfortable" %>">
+            <%= @budget.remaining.negative? ? t("dashboard.budget_over", default: "Aşıldı") : t("dashboard.budget_left", default: "Kalan") %>
+          </span>
+          <span class="budget-note-text">
+            <strong id="budget-display-remaining"><%= dashboard_currency @budget.remaining.abs %></strong>
+            <span id="budget-display-note"><%= @budget.remaining.negative? ? t("dashboard.budget_over_note", default: "bütçe aşıldı") : t("dashboard.budget_left_note", default: "kullanılabilir bütçe") %></span>
+          </span>
+        </div>
       </div>
-      <p class="metric-note" style="margin-top: 0.85rem;">
-        <span class="badge-pill <%= @budget.remaining.negative? ? "badge-status-defer" : "badge-status-comfortable" %>">
-          <%= @budget.remaining.negative? ? t("dashboard.budget_over", default: "Aşıldı") : t("dashboard.budget_left", default: "Kalan") %>
-        </span>
-        <%= dashboard_currency @budget.remaining.abs %> <%= @budget.remaining.negative? ? t("dashboard.budget_over_note", default: "bütçe aşıldı") : t("dashboard.budget_left_note", default: "kullanılabilir bütçe") %>
-      </p>
+
+      <!-- Kategori Limitleri Hızlı Liste / Dağılım -->
+      <% if @budget_allocations_data.present? %>
+        <div class="budget-categories-breakdown">
+          <div class="breakdown-header">
+            <h4><%= t("dashboard.category_budgets", default: "Kategori Bütçe Dağılımı") %></h4>
+            <span class="category-count-badge"><%= @budget_allocations_data.size %></span>
+          </div>
+          <div class="budget-chips-container">
+            <button type="button" class="budget-chip is-active" data-category-target="all" title="<%= t('dashboard.total_budget', default: 'Tüm Bütçe (Genel Toplam)') %>">
+              <span class="chip-color-dot" style="background-color: #10B981;"></span>
+              <span class="chip-name"><%= t("dashboard.filter_all", default: "Tümü") %></span>
+              <span class="chip-percent"><%= total_raw_percent %>%</span>
+            </button>
+            <% @budget_allocations_data.each do |item| %>
+              <button type="button" class="budget-chip <%= 'is-over' if item[:is_over] %>" data-category-target="cat-<%= item[:id] %>" title="<%= item[:name] %>: <%= dashboard_currency item[:spent] %> / <%= dashboard_currency item[:planned] %>">
+                <span class="chip-color-dot" style="background-color: <%= item[:color] %>;"></span>
+                <span class="chip-name"><%= item[:short_name] %></span>
+                <span class="chip-percent"><%= item[:raw_percent] %>%</span>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
     <% else %>
       <div class="empty-state">
         <p><%= t("dashboard.no_budget_note", default: "Bu ay için henüz bir harcama limiti belirlemediniz.") %></p>
-        <%= link_to t("dashboard.manage_budget", default: "Bütçe Oluştur"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary button-sm" %>
+        <%= link_to t("dashboard.create_budget", default: "Bütçe Oluştur"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary button-sm" %>
       </div>
     <% end %>
   </article>

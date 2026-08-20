@@ -28,7 +28,7 @@
             </span>
             <span style="font-weight: 700; color: var(--accent);">%<%= percent %></span>
           </div>
-          <div class="progress-track" aria-label="Hedef tamamlama: %<%= percent %>">
+          <div class="progress-track" aria-label="<%= t('savings_goals.progress_aria_label', percent: percent, default: "Hedef tamamlama: %#{percent}") %>">
             <span class="progress-fill" style="width: <%= percent %>%"></span>
           </div>
         </div>
@@ -41,7 +41,7 @@
     <% end %>
   <% else %>
     <div class="empty-state">
-      <p><%= t("app.common.empty_state", default: "Kayıtlı bir tasarruf hedefi bulunmuyor.") %></p>
+      <p><%= t("savings_goals.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir tasarruf hedefi bulunmuyor.")) %></p>
       <%= link_to t("savings_goals.new_title", default: "Yeni Hedef Ekle"), new_finance_savings_goal_path, class: "button button-secondary button-sm" %>
     </div>
   <% end %>

@@ -1,12 +1,11 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">FİNANSAL PLANLAMA</p>
-    <h1>Yeni Satın Alma Planı</h1>
-    <p class="page-subtitle">Almayı düşündüğünüz ürün veya hizmetin finansal fizibilitesini değerlendirin.</p>
+    <p class="eyebrow"><%= t("purchase_plans.eyebrow", default: "FİNANSAL PLANLAMA") %></p>
+    <h1><%= t("purchase_plans.new_title", default: "Yeni Satın Alma Planı") %></h1>
+    <p class="page-subtitle"><%= t("purchase_plans.new_subtitle", default: "Almayı düşündüğünüz ürün veya hizmetin finansal fizibilitesini değerlendirin.") %></p>
   </div>
 </header>
 
 <section class="panel form-panel">
   <%= render "form" %>
 </section>
-

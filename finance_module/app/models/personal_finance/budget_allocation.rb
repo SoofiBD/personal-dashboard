@@ -9,8 +9,18 @@ module PersonalFinance
     validates :planned_amount, numericality: { greater_than_or_equal_to: 0 }
     validate :expense_category_owned_by_budget_user
 
+    def target_category_ids
+      category ? category.self_and_descendant_ids : [category_id]
+    end
+
     def spent
-      PersonalFinance::Transaction.where(user_id: budget_period.user_id, category_id: category_id, kind: "expense", occurred_on: budget_period.starts_on..budget_period.ends_on).sum(:amount)
+      return 0 unless budget_period && category
+      PersonalFinance::Transaction.where(
+        user_id: budget_period.user_id,
+        category_id: target_category_ids,
+        kind: "expense",
+        occurred_on: budget_period.starts_on..budget_period.ends_on
+      ).sum(:amount)
     end
 
     def remaining

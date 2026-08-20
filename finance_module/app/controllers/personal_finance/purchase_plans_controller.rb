@@ -18,7 +18,7 @@ module PersonalFinance
     end
     def destroy
       @purchase_plan.destroy!
-      redirect_to finance_purchase_plans_path, notice: "Plan deleted."
+      redirect_to finance_purchase_plans_path, notice: t("purchase_plans.flash.deleted", default: "Plan deleted.")
     end
     private
     def set_plan
@@ -28,7 +28,7 @@ module PersonalFinance
       params.require(:purchase_plan).permit(:name, :price, :planned_on, :down_payment, :monthly_cost, :savings_goal_id, :notes)
     end
     def save_or_render
-      @purchase_plan.save ? redirect_to(finance_purchase_plans_path, notice: "Purchase plan saved.") : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
+      @purchase_plan.save ? redirect_to(finance_purchase_plans_path, notice: t("purchase_plans.flash.saved", default: "Purchase plan saved.")) : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
     end
   end
 end

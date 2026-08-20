@@ -18,7 +18,7 @@ module PersonalFinance
     end
     def destroy
       @savings_goal.destroy!
-      redirect_to finance_savings_goals_path, notice: "Goal deleted."
+      redirect_to finance_savings_goals_path, notice: t("savings_goals.flash.deleted", default: "Goal deleted.")
     end
     private
     def set_goal
@@ -28,7 +28,7 @@ module PersonalFinance
       params.require(:savings_goal).permit(:name, :target_amount, :target_date, :starting_amount, :monthly_contribution, :status)
     end
     def save_or_render
-      @savings_goal.save ? redirect_to(finance_savings_goals_path, notice: "Goal saved.") : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
+      @savings_goal.save ? redirect_to(finance_savings_goals_path, notice: t("savings_goals.flash.saved", default: "Goal saved.")) : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
     end
   end
 end

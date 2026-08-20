@@ -1,12 +1,11 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">FİNANSAL TEMELLER</p>
-    <h1>Hesabı Düzenle</h1>
-    <p class="page-subtitle">Hesap adını veya başlangıç bakiyesini güncelleyin.</p>
+    <p class="eyebrow"><%= t("accounts.eyebrow", default: "FİNANSAL TEMELLER") %></p>
+    <h1><%= t("accounts.edit_title", default: "Hesabı Düzenle") %></h1>
+    <p class="page-subtitle"><%= t("accounts.edit_subtitle", default: "Hesap adını veya başlangıç bakiyesini güncelleyin.") %></p>
   </div>
 </header>
 
 <section class="panel form-panel">
   <%= render "form" %>
 </section>
-

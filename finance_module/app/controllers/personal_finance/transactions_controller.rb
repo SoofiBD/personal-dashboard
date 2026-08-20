@@ -19,7 +19,7 @@ module PersonalFinance
     end
     def destroy
       @transaction.destroy!
-      redirect_to finance_transactions_path, notice: "Transaction deleted."
+      redirect_to finance_transactions_path, notice: t("transactions.flash.deleted", default: "Transaction deleted.")
     end
 
     private
@@ -31,7 +31,7 @@ module PersonalFinance
       params.require(:transaction).permit(:financial_account_id, :category_id, :kind, :amount, :occurred_on, :note, :is_recurring)
     end
     def save_or_render
-      @transaction.save ? redirect_to(finance_transactions_path, notice: "Transaction saved.") : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
+      @transaction.save ? redirect_to(finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved.")) : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
     end
   end
 end

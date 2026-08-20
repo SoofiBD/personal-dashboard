@@ -41,7 +41,7 @@
     <% end %>
   <% else %>
     <div class="empty-state">
-      <p><%= t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.") %></p>
+      <p><%= t("transactions.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.")) %></p>
       <%= link_to t("dashboard.add_transaction", default: "Yeni İşlem Ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
     </div>
   <% end %>
