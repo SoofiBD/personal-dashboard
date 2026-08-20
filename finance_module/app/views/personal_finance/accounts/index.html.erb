@@ -1,1 +1,52 @@
-<header class="page-header"><div><p class="eyebrow">FOUNDATIONS</p><h1>Accounts</h1><p class="page-subtitle">Keep your balances organized in one place.</p></div><%= link_to "Add account", new_finance_account_path, class: "button button-primary" %></header><section class="panel"><div class="finance-list"><% @accounts.each do |account| %><article><span><%= account.name %> · <%= account.kind.humanize %></span><strong><%= number_to_currency account.current_balance %></strong></article><% end %></div></section>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">FİNANSAL TEMELLER</p>
+    <h1>Hesaplar</h1>
+    <p class="page-subtitle">Tüm banka, kredi kartı ve nakit bakiyelerinizi tek bir yerden yönetin.</p>
+  </div>
+  <%= link_to new_finance_account_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %>
+    <span>Yeni Hesap Ekle</span>
+  <% end %>
+</header>
+
+<% if @accounts.any? %>
+  <div class="card-grid">
+    <% @accounts.each do |account| %>
+      <div class="card-item">
+        <div class="card-item-header">
+          <div>
+            <div class="card-item-title"><%= account.name %></div>
+            <span class="badge-pill badge-pill-subtle" style="margin-top: 0.35rem;">
+              <%= { "cash" => "Nakit", "bank" => "Banka Hesabı", "card" => "Kredi Kartı", "savings" => "Birikim Hesabı" }[account.kind] || account.kind.humanize %>
+            </span>
+          </div>
+          <div class="transaction-actions">
+            <%= link_to edit_finance_account_path(account), class: "action-btn", title: "Düzenle" do %>
+              <%= finance_svg_icon("edit") %>
+            <% end %>
+            <%= button_to finance_account_path(account), method: :delete, data: { turbo_confirm: "Bu hesabı silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+              <%= finance_svg_icon("trash") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="metric-label">Mevcut Bakiye</span>
+          <div class="card-item-balance <%= account.current_balance >= 0 ? "value-positive" : "value-negative" %>">
+            <%= dashboard_currency account.current_balance %>
+          </div>
+          <p class="metric-note">Açılış bakiyesi: <%= dashboard_currency account.opening_balance %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <section class="panel">
+    <div class="empty-state">
+      <p>Kayıtlı bir hesap bulunmuyor.</p>
+      <%= link_to "İlk Hesabı Ekle", new_finance_account_path, class: "button button-secondary button-sm" %>
+    </div>
+  </section>
+<% end %>
+

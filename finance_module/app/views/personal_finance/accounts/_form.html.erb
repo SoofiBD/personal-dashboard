@@ -1,1 +1,24 @@
-<%= form_with model: @account, url: @account.persisted? ? finance_account_path(@account) : finance_accounts_path do |form| %><%= render "personal_finance/shared/errors", record: @account %><%= form.label :name, "Account name" %><%= form.text_field :name, maxlength: 80 %><%= form.label :kind, "Account type" %><%= form.select :kind, PersonalFinance::Account.kinds.keys.map { |kind| [kind.humanize, kind] } %><%= form.label :opening_balance, "Opening balance" %><%= form.number_field :opening_balance, step: 0.01 %><%= form.submit "Save account", class: "button button-primary" %><% end %>
+<%= form_with model: @account, scope: :account, url: @account.persisted? ? finance_account_path(@account) : finance_accounts_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @account %>
+
+  <div class="form-group">
+    <%= form.label :name, "Hesap Adı" %>
+    <%= form.text_field :name, maxlength: 80, placeholder: "Örn: Garanti Vadesiz, Nakit Cüzdan, Bonus Kart", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :kind, "Hesap Türü" %>
+    <%= form.select :kind, [["Banka Hesabı", "bank"], ["Kredi Kartı", "card"], ["Nakit Cüzdan", "cash"], ["Birikim Hesabı", "savings"]] %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :opening_balance, "Açılış Bakiyesi" %>
+    <%= form.number_field :opening_balance, step: 0.01, placeholder: "0.00", required: true %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit @account.persisted? ? "Hesabı Güncelle" : "Hesabı Kaydet", class: "button button-primary" %>
+    <%= link_to "İptal", finance_accounts_path, class: "button button-secondary" %>
+  </div>
+<% end %>
+

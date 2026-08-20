@@ -1,1 +1,39 @@
-<%= form_with model: @savings_goal, url: @savings_goal.persisted? ? finance_savings_goal_path(@savings_goal) : finance_savings_goals_path do |form| %><%= render "personal_finance/shared/errors", record: @savings_goal %><%= form.label :name, "Goal name" %><%= form.text_field :name, maxlength: 100 %><%= form.label :target_amount, "Target amount" %><%= form.number_field :target_amount, step: 0.01, min: 0.01 %><%= form.label :monthly_contribution, "Monthly contribution" %><%= form.number_field :monthly_contribution, step: 0.01, min: 0 %><%= form.label :target_date, "Target date" %><%= form.date_field :target_date %><%= form.submit "Save goal", class: "button button-primary" %><% end %>
+<%= form_with model: @savings_goal, scope: :savings_goal, url: @savings_goal.persisted? ? finance_savings_goal_path(@savings_goal) : finance_savings_goals_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @savings_goal %>
+
+  <div class="form-group">
+    <%= form.label :name, "Hedef Adı" %>
+    <%= form.text_field :name, maxlength: 100, placeholder: "Örn: Acil Durum Fonu, Tatil Birikimi, Yeni Araba", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :target_amount, "Hedeflenen Tutar" %>
+    <%= form.number_field :target_amount, step: 0.01, min: 0.01, placeholder: "0.00", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :starting_amount, "Başlangıç Tutarı (Varsa)" %>
+    <%= form.number_field :starting_amount, step: 0.01, min: 0, placeholder: "0.00" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :monthly_contribution, "Planlanan Aylık Katkı Tutarı" %>
+    <%= form.number_field :monthly_contribution, step: 0.01, min: 0, placeholder: "0.00" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :target_date, "Hedef Tarihi (İsteğe bağlı)" %>
+    <%= form.date_field :target_date %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :status, "Durum" %>
+    <%= form.select :status, [["Aktif", "active"], ["Durduruldu", "paused"], ["Tamamlandı", "completed"], ["Arşivlendi", "archived"]] %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit @savings_goal.persisted? ? "Hedefi Güncelle" : "Hedefi Kaydet", class: "button button-primary" %>
+    <%= link_to "İptal", finance_savings_goals_path, class: "button button-secondary" %>
+  </div>
+<% end %>
+

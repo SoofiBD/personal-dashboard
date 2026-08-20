@@ -1,1 +1,51 @@
-<header class="page-header"><div><p class="eyebrow">ORGANIZATION</p><h1>Categories</h1><p class="page-subtitle">Give every transaction a clear home.</p></div><%= link_to "Add category", new_finance_category_path, class: "button button-primary" %></header><section class="panel"><div class="finance-list"><% @categories.each do |category| %><article><span><%= category.name %> · <%= category.kind.humanize %></span><%= link_to "Edit", edit_finance_category_path(category), class: "text-link" %></article><% end %></div></section>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">ORGANİZASYON</p>
+    <h1>Kategoriler</h1>
+    <p class="page-subtitle">Harcamalarınızı ve gelirlerinizi kategorize ederek düzenli tutun.</p>
+  </div>
+  <%= link_to new_finance_category_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %>
+    <span>Yeni Kategori Ekle</span>
+  <% end %>
+</header>
+
+<section class="panel">
+  <% if @categories.any? %>
+    <div class="finance-list">
+      <% @categories.each do |category| %>
+        <article class="finance-item-row">
+          <div class="transaction-left">
+            <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background-color: <%= category.color.presence || '#3B82F6' %>; box-shadow: 0 0 8px <%= category.color.presence || '#3B82F6' %>80;"></span>
+            <div class="transaction-meta">
+              <span class="transaction-category"><%= category.name %></span>
+              <span class="transaction-submeta">
+                <span class="badge-pill badge-pill-subtle">
+                  <%= { "expense" => "Gider", "income" => "Gelir", "transfer" => "Transfer" }[category.kind] || category.kind.humanize %>
+                </span>
+                <% if category.parent %>
+                  <span>Üst Kategori: <%= category.parent.name %></span>
+                <% end %>
+              </span>
+            </div>
+          </div>
+
+          <div class="transaction-actions">
+            <%= link_to edit_finance_category_path(category), class: "action-btn", title: "Düzenle" do %>
+              <%= finance_svg_icon("edit") %>
+            <% end %>
+            <%= button_to finance_category_path(category), method: :delete, data: { turbo_confirm: "Bu kategoriyi silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+              <%= finance_svg_icon("trash") %>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p>Kayıtlı bir kategori bulunmuyor.</p>
+      <%= link_to "İlk Kategoriyi Ekle", new_finance_category_path, class: "button button-secondary button-sm" %>
+    </div>
+  <% end %>
+</section>
+

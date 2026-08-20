@@ -1,39 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
   <head>
-    <title>Personal Dashboard</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="utf-8">
+    <title>Personal Dashboard · Financial Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Kişisel finans ve bütçe yönetim paneli.">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
     <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js", defer: true %>
+    <%= javascript_tag nonce: true, defer: true do %>
+      (() => {
+        const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        document.addEventListener("DOMContentLoaded", () => {
+          if (motionQuery.matches || typeof window.gsap === "undefined") return;
+
+          const timeline = window.gsap.timeline({ defaults: { ease: "power2.out" } });
+          const sidebar = document.querySelector(".sidebar");
+          const header = document.querySelector(".page-header");
+          const cards = document.querySelectorAll(".metric-card");
+          const panels = document.querySelectorAll(".panel");
+          const items = document.querySelectorAll(".finance-list article, .finance-table-row");
+          const flashes = document.querySelectorAll(".flash");
+
+          if (sidebar) timeline.from(sidebar, { x: -16, opacity: 0, duration: 0.35 });
+          if (header) timeline.from(header, { y: 12, opacity: 0, duration: 0.35 }, "-=0.15");
+          if (cards.length) timeline.from(cards, { y: 14, opacity: 0, duration: 0.35, stagger: 0.05 }, "-=0.2");
+          if (panels.length) timeline.from(panels, { y: 12, opacity: 0, duration: 0.35, stagger: 0.06 }, "-=0.2");
+          if (items.length) timeline.from(items, { y: 8, opacity: 0, duration: 0.25, stagger: 0.02 }, "-=0.2");
+          if (flashes.length) timeline.from(flashes, { y: -10, opacity: 0, duration: 0.25 }, 0);
+        }, { once: true });
+      })();
+    <% end %>
   </head>
 
   <body>
-    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <a class="skip-link" href="#main-content">Ana içeriğe atla</a>
     <div class="app-shell">
-      <aside class="sidebar" aria-label="Primary navigation">
-        <%= link_to "Personal Dashboard", finance_root_path, class: "brand" %>
-        <p class="sidebar-label">PERSONAL FINANCE</p>
-        <nav class="sidebar-nav">
-          <%= finance_navigation_item "Overview", finance_root_path %>
-          <%= finance_navigation_item "Transactions", finance_transactions_path %>
-          <%= finance_navigation_item "Accounts", finance_accounts_path %>
-          <%= finance_navigation_item "Categories", finance_categories_path %>
-          <%= finance_navigation_item "Budget", finance_budget_path(Date.current.strftime("%Y-%m")) %>
-          <%= finance_navigation_item "Savings goals", finance_savings_goals_path %>
-          <%= finance_navigation_item "Purchase plans", finance_purchase_plans_path %>
-        </nav>
-        <div class="sidebar-footer"><span>Private workspace</span><strong><%= User.dashboard_owner.currency %></strong></div>
+      <aside class="sidebar" aria-label="Ana Navigasyon">
+        <div class="brand-wrapper">
+          <%= link_to finance_root_path, class: "brand" do %>
+            <div class="brand-icon">
+              <%= finance_svg_icon("vault", class: "icon-brand") %>
+            </div>
+            <div class="brand-text">
+              <span class="brand-title">Personal</span>
+              <span class="brand-subtitle">Finance</span>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="sidebar-section">
+          <p class="sidebar-label">FINANS MODÜLÜ</p>
+          <nav class="sidebar-nav">
+            <%= finance_navigation_item "Genel Bakış", finance_root_path, "dashboard" %>
+            <%= finance_navigation_item "İşlemler", finance_transactions_path, "transactions" %>
+            <%= finance_navigation_item "Hesaplar", finance_accounts_path, "accounts" %>
+            <%= finance_navigation_item "Kategoriler", finance_categories_path, "categories" %>
+            <%= finance_navigation_item "Aylık Bütçe", finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
+            <%= finance_navigation_item "Tasarruf Hedefleri", finance_savings_goals_path, "savings_goals" %>
+            <%= finance_navigation_item "Satın Alma Planları", finance_purchase_plans_path, "purchase_plans" %>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="workspace-pill">
+            <div class="status-indicator-dot"></div>
+            <div class="workspace-details">
+              <span class="workspace-title">Çalışma Alanı</span>
+              <span class="workspace-currency"><%= current_panel_user.currency %></span>
+            </div>
+          </div>
+        </div>
       </aside>
+
       <div class="page-frame">
         <% if notice.present? || alert.present? %>
           <div class="flash-stack" aria-live="polite">
-            <% if notice.present? %><p class="flash flash-notice"><%= notice %></p><% end %>
-            <% if alert.present? %><p class="flash flash-alert"><%= alert %></p><% end %>
+            <% if notice.present? %>
+              <div class="flash flash-notice">
+                <svg class="flash-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                <span><%= notice %></span>
+              </div>
+            <% end %>
+            <% if alert.present? %>
+              <div class="flash flash-alert">
+                <svg class="flash-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                </svg>
+                <span><%= alert %></span>
+              </div>
+            <% end %>
           </div>
         <% end %>
-        <main id="main-content" class="page-content" tabindex="-1"><%= yield %></main>
+        
+        <main id="main-content" class="page-content" tabindex="-1">
+          <%= yield %>
+        </main>
       </div>
     </div>
   </body>

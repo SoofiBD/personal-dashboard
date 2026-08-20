@@ -1,1 +1,69 @@
-<header class="page-header"><div><p class="eyebrow">PLANNING</p><h1>Purchase plans</h1><p class="page-subtitle">Make major purchases with confidence.</p></div><%= link_to "Add plan", new_finance_purchase_plan_path, class: "button button-primary" %></header><section class="panel"><div class="finance-list"><% @purchase_plans.each do |plan| %><article><span><%= plan.name %> · <%= number_to_currency plan.price %></span><strong><%= { comfortable: "Comfortable", plan: "Plan ahead", defer: "Defer" }[plan.assessment.status] %></strong></article><% end %></div></section>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">FİNANSAL PLANLAMA</p>
+    <h1>Satın Alma Planları</h1>
+    <p class="page-subtitle">Büyük harcamaları bütçenizi zorlamadan, güvenle planlayın.</p>
+  </div>
+  <%= link_to new_finance_purchase_plan_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %>
+    <span>Yeni Plan Ekle</span>
+  <% end %>
+</header>
+
+<% if @purchase_plans.any? %>
+  <div class="card-grid">
+    <% @purchase_plans.each do |plan| %>
+      <% status = plan.assessment.status %>
+      <div class="card-item">
+        <div class="card-item-header">
+          <div>
+            <div class="card-item-title"><%= plan.name %></div>
+            <span class="badge-pill <%= status == :comfortable ? 'badge-status-comfortable' : (status == :plan ? 'badge-status-plan' : 'badge-status-defer') %>" style="margin-top: 0.35rem;">
+              <%= { comfortable: "Uygun (Rahatça Alınabilir)", plan: "Plan Yapılmalı", defer: "Ertelenmeli" }[status] || status.to_s.humanize %>
+            </span>
+          </div>
+          <div class="transaction-actions">
+            <%= link_to edit_finance_purchase_plan_path(plan), class: "action-btn", title: "Düzenle" do %>
+              <%= finance_svg_icon("edit") %>
+            <% end %>
+            <%= button_to finance_purchase_plan_path(plan), method: :delete, data: { turbo_confirm: "Bu planı silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+              <%= finance_svg_icon("trash") %>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <span class="metric-label">Toplam Fiyat</span>
+          <div class="card-item-balance">
+            <%= dashboard_currency plan.price %>
+          </div>
+        </div>
+
+        <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Peşinat:</span>
+            <strong style="color: var(--text-main); font-variant-numeric: tabular-nums;"><%= dashboard_currency plan.down_payment %></strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>Aylık Taksit:</span>
+            <strong style="color: var(--text-main); font-variant-numeric: tabular-nums;"><%= dashboard_currency plan.monthly_cost %></strong>
+          </div>
+          <% if plan.planned_on %>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Hedef Tarihi:</span>
+              <strong style="color: var(--text-main);"><%= l(plan.planned_on, format: "%d %b %Y") rescue plan.planned_on %></strong>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <section class="panel">
+    <div class="empty-state">
+      <p>Kayıtlı bir satın alma planı bulunmuyor.</p>
+      <%= link_to "İlk Planı Ekle", new_finance_purchase_plan_path, class: "button button-secondary button-sm" %>
+    </div>
+  </section>
+<% end %>
+
