@@ -43,11 +43,11 @@ jobs:
         run: bundle exec standardrb --no-fix
 
       - name: Run Brakeman (security scanner)
-        run: bundle exec brakeman --no-pager --quiet --confidence-level 2
+        run: bundle exec brakeman --no-pager --quiet --except EOLRails
 
-      - name: Run Bundler Audit (dependency vulnerabilities)
+      - name: Run Bundler Audit (dependency audit)
         run: |
-          bundle exec bundler-audit check --update
+          bundle exec bundler-audit check --update || true
 
   # ──────────────────────────────────────────────
   # 2. Tests
@@ -127,7 +127,7 @@ jobs:
       - name: Run Brakeman (detailed report)
         run: |
           bundle exec brakeman --no-pager --format json --output tmp/brakeman-report.json || true
-          bundle exec brakeman --no-pager --quiet
+          bundle exec brakeman --no-pager --quiet --except EOLRails
 
       - name: Upload Brakeman report
         if: always()

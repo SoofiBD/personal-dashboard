@@ -9,7 +9,9 @@ module PersonalFinance
         redirect_to finance_savings_goals_path, alert: contribution.errors.full_messages.to_sentence
       end
     end
+
     private
+
     def contribution_params
       params.require(:goal_contribution).permit(:amount, :contributed_on, :note, :transaction_id)
     end

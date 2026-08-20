@@ -6,8 +6,8 @@ module PersonalFinance
     has_many :allocations, class_name: "PersonalFinance::BudgetAllocation", foreign_key: :budget_period_id, dependent: :destroy
 
     validates :starts_on, :ends_on, presence: true
-    validates :starts_on, uniqueness: { scope: :user_id }
-    validates :planned_income, numericality: { greater_than_or_equal_to: 0 }
+    validates :starts_on, uniqueness: {scope: :user_id}
+    validates :planned_income, numericality: {greater_than_or_equal_to: 0}
     validate :whole_month
 
     def expenses

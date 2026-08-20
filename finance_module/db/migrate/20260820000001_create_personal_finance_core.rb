@@ -11,7 +11,7 @@ class CreatePersonalFinanceCore < ActiveRecord::Migration[7.1]
 
     create_table :finance_categories, id: :uuid do |t|
       t.references :user, null: false, type: :uuid, index: true, foreign_key: true
-      t.references :parent, type: :uuid, foreign_key: { to_table: :finance_categories }
+      t.references :parent, type: :uuid, foreign_key: {to_table: :finance_categories}
       t.string :name, null: false
       t.string :kind, null: false
       t.string :color, null: false, default: "#2563EB"
@@ -24,7 +24,7 @@ class CreatePersonalFinanceCore < ActiveRecord::Migration[7.1]
     create_table :finance_transactions, id: :uuid do |t|
       t.references :user, null: false, type: :uuid, index: true, foreign_key: true
       t.references :financial_account, null: false, type: :uuid, foreign_key: true
-      t.references :category, type: :uuid, foreign_key: { to_table: :finance_categories }
+      t.references :category, type: :uuid, foreign_key: {to_table: :finance_categories}
       t.string :kind, null: false
       t.decimal :amount, null: false, precision: 14, scale: 2
       t.date :occurred_on, null: false
