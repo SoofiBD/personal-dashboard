@@ -18,7 +18,7 @@ module PersonalFinance
     end
     def destroy
       @account.destroy!
-      redirect_to finance_accounts_path, notice: "Account deleted."
+      redirect_to finance_accounts_path, notice: t("accounts.flash.deleted", default: "Account deleted.")
     end
     private
     def set_account
@@ -28,7 +28,7 @@ module PersonalFinance
       params.require(:account).permit(:name, :kind, :opening_balance, :is_active)
     end
     def save_or_render
-      @account.save ? redirect_to(finance_accounts_path, notice: "Account saved.") : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
+      @account.save ? redirect_to(finance_accounts_path, notice: t("accounts.flash.saved", default: "Account saved.")) : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
     end
   end
 end

@@ -18,7 +18,7 @@ module PersonalFinance
     end
     def destroy
       @category.destroy!
-      redirect_to finance_categories_path, notice: "Category deleted."
+      redirect_to finance_categories_path, notice: t("categories.flash.deleted", default: "Category deleted.")
     end
     private
     def set_category
@@ -28,7 +28,7 @@ module PersonalFinance
       params.require(:category).permit(:name, :kind, :color, :icon, :parent_id, :sort_order)
     end
     def save_or_render
-      @category.save ? redirect_to(finance_categories_path, notice: "Category saved.") : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
+      @category.save ? redirect_to(finance_categories_path, notice: t("categories.flash.saved", default: "Category saved.")) : render(action_name == "update" ? :edit : :new, status: :unprocessable_entity)
     end
   end
 end

@@ -24,7 +24,7 @@
                   <%= t("transactions.kinds.#{category.kind}", default: category.kind.humanize) %>
                 </span>
                 <% if category.parent %>
-                  <span>Üst Kategori: <%= category.parent.name %></span>
+                  <span><%= t("categories.parent_category", default: "Üst Kategori") %>: <%= category.parent.name %></span>
                 <% end %>
               </span>
             </div>
@@ -43,8 +43,8 @@
     </div>
   <% else %>
     <div class="empty-state">
-      <p><%= t("app.common.empty_state", default: "Kayıtlı bir kategori bulunmuyor.") %></p>
-      <%= link_to t("categories.new_title", default: "İlk Kategoriyi Ekle"), new_finance_category_path, class: "button button-secondary button-sm" %>
+      <p><%= t("categories.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir kategori bulunmuyor.")) %></p>
+      <%= link_to t("categories.add_first", default: t("categories.new_title", default: "İlk Kategoriyi Ekle")), new_finance_category_path, class: "button button-secondary button-sm" %>
     </div>
   <% end %>
 </section>

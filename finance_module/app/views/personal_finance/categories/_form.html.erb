@@ -2,23 +2,22 @@
   <%= render "personal_finance/shared/errors", record: @category %>
 
   <div class="form-group">
-    <%= form.label :name, "Kategori Adı" %>
-    <%= form.text_field :name, maxlength: 80, placeholder: "Örn: Market, Kira, Maaş, Ulaşım", required: true %>
+    <%= form.label :name, t("categories.name", default: "Kategori Adı") %>
+    <%= form.text_field :name, maxlength: 80, placeholder: t("categories.name_placeholder", default: "Örn: Market, Kira, Maaş, Ulaşım"), required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :kind, "Kategori Türü" %>
-    <%= form.select :kind, [["Gider (Expense)", "expense"], ["Gelir (Income)", "income"], ["Transfer", "transfer"]] %>
+    <%= form.label :kind, t("categories.kind", default: "Kategori Türü") %>
+    <%= form.select :kind, [[t("transactions.kinds.expense", default: "Gider"), "expense"], [t("transactions.kinds.income", default: "Gelir"), "income"], [t("transactions.kinds.transfer", default: "Transfer"), "transfer"]] %>
   </div>
 
   <div class="form-group">
-    <%= form.label :color, "Renk Rozeti" %>
+    <%= form.label :color, t("categories.color", default: "Renk Rozeti") %>
     <%= form.color_field :color, value: @category.color.presence || "#3B82F6" %>
   </div>
 
   <div class="form-actions">
-    <%= form.submit @category.persisted? ? "Kategoriyi Güncelle" : "Kategoriyi Kaydet", class: "button button-primary" %>
-    <%= link_to "İptal", finance_categories_path, class: "button button-secondary" %>
+    <%= form.submit @category.persisted? ? t("categories.update", default: "Kategoriyi Güncelle") : t("categories.save", default: "Kategoriyi Kaydet"), class: "button button-primary" %>
+    <%= link_to t("app.common.cancel", default: "İptal"), finance_categories_path, class: "button button-secondary" %>
   </div>
 <% end %>
-

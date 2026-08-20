@@ -5669,3 +5669,935 @@ Processing by PersonalFinance::DashboardController#show as HTML
 Completed 200 OK in 51ms (Views: 22.4ms | ActiveRecord: 3.9ms | Allocations: 38966)
 
 
+  [1m[36mActiveRecord::SchemaMigration Load (0.9ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.5ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/finance/" for 172.18.0.1 at 2026-08-20 13:07:26 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.4ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.4ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.7ms | Allocations: 1879)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.6ms | Allocations: 1837)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 53.4ms | Allocations: 26158)
+  Rendered layout layouts/application.html.erb (Duration: 66.5ms | Allocations: 32370)
+Completed 200 OK in 120ms (Views: 67.5ms | ActiveRecord: 6.9ms | Allocations: 67584)
+
+
+Started GET "/finance/transactions/new" for 172.18.0.1 at 2026-08-20 13:07:30 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::TransactionsController#new as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/transactions/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.9ms | Allocations: 189)
+  [1m[36mPersonalFinance::Account Load (0.3ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 AND "financial_accounts"."is_active" = $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["is_active", true]]
+  [1m[36mPersonalFinance::Category Load (0.4ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  Rendered finance_module/app/views/personal_finance/transactions/_form.html.erb (Duration: 19.0ms | Allocations: 11955)
+  Rendered finance_module/app/views/personal_finance/transactions/new.html.erb within layouts/application (Duration: 21.2ms | Allocations: 12209)
+  Rendered layout layouts/application.html.erb (Duration: 24.9ms | Allocations: 14774)
+Completed 200 OK in 35ms (Views: 25.3ms | ActiveRecord: 3.6ms | Allocations: 19892)
+
+
+Started GET "/finance/transactions" for 172.18.0.1 at 2026-08-20 13:07:50 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::TransactionsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 2.0ms | Allocations: 1224)
+  Rendered finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application (Duration: 3.8ms | Allocations: 1732)
+  Rendered layout layouts/application.html.erb (Duration: 10.2ms | Allocations: 4306)
+Completed 200 OK in 16ms (Views: 10.7ms | ActiveRecord: 0.9ms | Allocations: 5545)
+
+
+Started GET "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:07:51 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Account Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application (Duration: 3.3ms | Allocations: 1987)
+  Rendered layout layouts/application.html.erb (Duration: 9.4ms | Allocations: 4574)
+Completed 200 OK in 15ms (Views: 10.5ms | ActiveRecord: 0.6ms | Allocations: 6006)
+
+
+Started GET "/finance/accounts/new" for 172.18.0.1 at 2026-08-20 13:07:53 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#new as HTML
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 14)
+  Rendered finance_module/app/views/personal_finance/accounts/_form.html.erb (Duration: 2.9ms | Allocations: 896)
+  Rendered finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application (Duration: 5.3ms | Allocations: 1151)
+  Rendered layout layouts/application.html.erb (Duration: 11.0ms | Allocations: 3730)
+Completed 200 OK in 26ms (Views: 12.0ms | ActiveRecord: 2.0ms | Allocations: 7868)
+
+
+Started GET "/locale/tr" for 172.18.0.1 at 2026-08-20 13:07:58 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by LocalesController#update as HTML
+  Parameters: {"locale"=>"tr"}
+Redirected to http://localhost:3000/finance/accounts/new
+Completed 302 Found in 3ms (ActiveRecord: 0.0ms | Allocations: 617)
+
+
+Started GET "/finance/accounts/new" for 172.18.0.1 at 2026-08-20 13:07:58 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#new as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 13)
+  Rendered finance_module/app/views/personal_finance/accounts/_form.html.erb (Duration: 0.9ms | Allocations: 584)
+  Rendered finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application (Duration: 1.3ms | Allocations: 646)
+  Rendered layout layouts/application.html.erb (Duration: 5.4ms | Allocations: 3226)
+Completed 200 OK in 8ms (Views: 6.1ms | ActiveRecord: 0.2ms | Allocations: 4406)
+
+
+Started GET "/locale/en" for 172.18.0.1 at 2026-08-20 13:08:00 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by LocalesController#update as HTML
+  Parameters: {"locale"=>"en"}
+Redirected to http://localhost:3000/finance/accounts/new
+Completed 302 Found in 3ms (ActiveRecord: 0.0ms | Allocations: 523)
+
+
+Started GET "/finance/accounts/new" for 172.18.0.1 at 2026-08-20 13:08:00 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#new as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 13)
+  Rendered finance_module/app/views/personal_finance/accounts/_form.html.erb (Duration: 1.4ms | Allocations: 584)
+  Rendered finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application (Duration: 1.7ms | Allocations: 646)
+  Rendered layout layouts/application.html.erb (Duration: 7.4ms | Allocations: 3208)
+Completed 200 OK in 12ms (Views: 8.5ms | ActiveRecord: 0.4ms | Allocations: 4356)
+
+
+Started POST "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:08:14 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#create as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "account"=>{"name"=>"Garanti", "kind"=>"card", "opening_balance"=>"250000"}, "commit"=>"Hesabı Kaydet"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Account Create (1.3ms)[0m  [1m[32mINSERT INTO "financial_accounts" ("user_id", "name", "kind", "opening_balance", "is_active", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["name", "Garanti"], ["kind", "card"], ["opening_balance", "250000.0"], ["is_active", true], ["created_at", "2026-08-20 13:08:14.286842"], ["updated_at", "2026-08-20 13:08:14.286842"]]
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/accounts
+Completed 302 Found in 13ms (ActiveRecord: 2.9ms | Allocations: 5803)
+
+
+Started GET "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:08:14 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Account Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Account Load (0.2ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 ORDER BY "financial_accounts"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  Rendered finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application (Duration: 12.2ms | Allocations: 8349)
+  Rendered layout layouts/application.html.erb (Duration: 15.1ms | Allocations: 10925)
+Completed 200 OK in 18ms (Views: 15.1ms | ActiveRecord: 0.9ms | Allocations: 12105)
+
+
+Started GET "/finance/accounts/new" for 172.18.0.1 at 2026-08-20 13:08:16 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#new as HTML
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 13)
+  Rendered finance_module/app/views/personal_finance/accounts/_form.html.erb (Duration: 1.5ms | Allocations: 584)
+  Rendered finance_module/app/views/personal_finance/accounts/new.html.erb within layouts/application (Duration: 2.0ms | Allocations: 646)
+  Rendered layout layouts/application.html.erb (Duration: 8.3ms | Allocations: 3208)
+Completed 200 OK in 14ms (Views: 9.2ms | ActiveRecord: 0.5ms | Allocations: 4348)
+
+
+Started POST "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:08:27 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#create as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "account"=>{"name"=>"Ing Bank", "kind"=>"card", "opening_balance"=>"250000"}, "commit"=>"Hesabı Kaydet"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Account Create (0.4ms)[0m  [1m[32mINSERT INTO "financial_accounts" ("user_id", "name", "kind", "opening_balance", "is_active", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING "id"[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["name", "Ing Bank"], ["kind", "card"], ["opening_balance", "250000.0"], ["is_active", true], ["created_at", "2026-08-20 13:08:27.991764"], ["updated_at", "2026-08-20 13:08:27.991764"]]
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/accounts
+Completed 302 Found in 15ms (ActiveRecord: 1.8ms | Allocations: 5242)
+
+
+Started GET "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:08:28 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#index as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Account Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Account Load (0.2ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 ORDER BY "financial_accounts"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "87b553ce-5832-42d4-8a56-58c238ad45e7"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "87b553ce-5832-42d4-8a56-58c238ad45e7"]]
+  Rendered finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application (Duration: 8.8ms | Allocations: 8409)
+  Rendered layout layouts/application.html.erb (Duration: 13.6ms | Allocations: 11005)
+Completed 200 OK in 17ms (Views: 13.4ms | ActiveRecord: 1.1ms | Allocations: 12147)
+
+
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:09:00 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#index as HTML
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.6ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.1ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" = $1[0m  [["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 11.4ms | Allocations: 6050)
+  Rendered layout layouts/application.html.erb (Duration: 16.0ms | Allocations: 8624)
+Completed 200 OK in 26ms (Views: 16.1ms | ActiveRecord: 1.5ms | Allocations: 10087)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:09:02 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.4ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 18.5ms | Allocations: 10881)
+  Rendered layout layouts/application.html.erb (Duration: 24.3ms | Allocations: 13470)
+Completed 200 OK in 32ms (Views: 24.5ms | ActiveRecord: 1.6ms | Allocations: 16110)
+
+
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:09:14 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" = $1[0m  [["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 7.4ms | Allocations: 4195)
+  Rendered layout layouts/application.html.erb (Duration: 14.0ms | Allocations: 6785)
+Completed 200 OK in 20ms (Views: 14.1ms | ActiveRecord: 1.3ms | Allocations: 7932)
+
+
+Started GET "/finance/categories/new" for 172.18.0.1 at 2026-08-20 13:09:17 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#new as HTML
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 14)
+  Rendered finance_module/app/views/personal_finance/categories/_form.html.erb (Duration: 2.8ms | Allocations: 844)
+  Rendered finance_module/app/views/personal_finance/categories/new.html.erb within layouts/application (Duration: 5.2ms | Allocations: 1098)
+  Rendered layout layouts/application.html.erb (Duration: 11.8ms | Allocations: 3661)
+Completed 200 OK in 20ms (Views: 12.8ms | ActiveRecord: 0.5ms | Allocations: 4911)
+
+
+Started POST "/finance/categories" for 172.18.0.1 at 2026-08-20 13:09:22 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#create as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "category"=>{"name"=>"Market", "kind"=>"expense", "color"=>"#2563eb"}, "commit"=>"Kategoriyi Kaydet"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."name" = $1 AND "finance_categories"."user_id" = $2 LIMIT $3[0m  [["name", "Market"], ["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Create (1.0ms)[0m  [1m[32mINSERT INTO "finance_categories" ("user_id", "parent_id", "name", "kind", "color", "icon", "sort_order", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING "id"[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["parent_id", nil], ["name", "Market"], ["kind", "expense"], ["color", "#2563eb"], ["icon", "circle"], ["sort_order", 0], ["created_at", "2026-08-20 13:09:22.590610"], ["updated_at", "2026-08-20 13:09:22.590610"]]
+  [1m[36mTRANSACTION (0.7ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/categories
+Completed 302 Found in 14ms (ActiveRecord: 2.7ms | Allocations: 6861)
+
+
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:09:22 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#index as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" IN ($1, $2)[0m  [["parent_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 5.6ms | Allocations: 4609)
+  Rendered layout layouts/application.html.erb (Duration: 9.8ms | Allocations: 7189)
+Completed 200 OK in 13ms (Views: 9.6ms | ActiveRecord: 1.1ms | Allocations: 8333)
+
+
+Started GET "/finance/savings_goals" for 172.18.0.1 at 2026-08-20 13:09:26 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::SavingsGoalsController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/savings_goals/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.9ms | Allocations: 1217)
+  Rendered finance_module/app/views/personal_finance/savings_goals/index.html.erb within layouts/application (Duration: 3.9ms | Allocations: 1728)
+  Rendered layout layouts/application.html.erb (Duration: 13.8ms | Allocations: 4315)
+Completed 200 OK in 20ms (Views: 14.7ms | ActiveRecord: 0.7ms | Allocations: 5739)
+
+
+Started GET "/finance/purchase_plans" for 172.18.0.1 at 2026-08-20 13:09:28 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::PurchasePlansController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/purchase_plans/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::PurchasePlan Exists? (1.2ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_purchase_plans" WHERE "finance_purchase_plans"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/purchase_plans/index.html.erb within layouts/application (Duration: 5.3ms | Allocations: 2155)
+  Rendered layout layouts/application.html.erb (Duration: 10.0ms | Allocations: 4759)
+Completed 200 OK in 19ms (Views: 9.7ms | ActiveRecord: 1.6ms | Allocations: 7533)
+
+
+Started GET "/finance/purchase_plans/new" for 172.18.0.1 at 2026-08-20 13:09:31 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::PurchasePlansController#new as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/purchase_plans/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.0ms | Allocations: 14)
+  Rendered finance_module/app/views/personal_finance/purchase_plans/_form.html.erb (Duration: 2.3ms | Allocations: 1121)
+  Rendered finance_module/app/views/personal_finance/purchase_plans/new.html.erb within layouts/application (Duration: 4.6ms | Allocations: 1374)
+  Rendered layout layouts/application.html.erb (Duration: 10.3ms | Allocations: 3936)
+Completed 200 OK in 22ms (Views: 11.4ms | ActiveRecord: 1.8ms | Allocations: 8881)
+
+
+Started POST "/finance/purchase_plans" for 172.18.0.1 at 2026-08-20 13:09:47 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::PurchasePlansController#create as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "purchase_plan"=>{"name"=>"Tablet", "price"=>"18000", "down_payment"=>"0.0", "monthly_cost"=>"0.0", "planned_on"=>"2026-08-20"}, "commit"=>"Planı Değerlendir ve Kaydet"}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::PurchasePlan Create (1.0ms)[0m  [1m[32mINSERT INTO "finance_purchase_plans" ("user_id", "savings_goal_id", "name", "price", "planned_on", "down_payment", "monthly_cost", "notes", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING "id"[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["savings_goal_id", nil], ["name", "Tablet"], ["price", "18000.0"], ["planned_on", "2026-08-20"], ["down_payment", "0.0"], ["monthly_cost", "0.0"], ["notes", nil], ["created_at", "2026-08-20 13:09:48.008905"], ["updated_at", "2026-08-20 13:09:48.008905"]]
+  [1m[36mTRANSACTION (0.7ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/purchase_plans
+Completed 302 Found in 15ms (ActiveRecord: 3.8ms | Allocations: 6745)
+
+
+Started GET "/finance/purchase_plans" for 172.18.0.1 at 2026-08-20 13:09:48 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::PurchasePlansController#index as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/purchase_plans/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::PurchasePlan Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_purchase_plans" WHERE "finance_purchase_plans"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::PurchasePlan Load (0.3ms)[0m  [1m[34mSELECT "finance_purchase_plans".* FROM "finance_purchase_plans" WHERE "finance_purchase_plans"."user_id" = $1 ORDER BY "finance_purchase_plans"."planned_on" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2[0m  [["id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-20"], ["occurred_on", "2026-08-20"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-20"], ["occurred_on", "2026-08-20"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::SavingsGoal Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_savings_goals"."monthly_contribution") FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"]]
+  [1m[36mPersonalFinance::Account Load (0.1ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 AND "financial_accounts"."is_active" = $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["is_active", true]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "87b553ce-5832-42d4-8a56-58c238ad45e7"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-20"], ["occurred_on", "2026-08-20"], ["kind", "expense"]]
+  Rendered finance_module/app/views/personal_finance/purchase_plans/index.html.erb within layouts/application (Duration: 18.4ms | Allocations: 16416)
+  Rendered layout layouts/application.html.erb (Duration: 23.1ms | Allocations: 18992)
+Completed 200 OK in 26ms (Views: 22.2ms | ActiveRecord: 1.8ms | Allocations: 20136)
+
+
+Started GET "/finance/savings_goals" for 172.18.0.1 at 2026-08-20 13:09:51 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::SavingsGoalsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/savings_goals/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 2.1ms | Allocations: 1215)
+  Rendered finance_module/app/views/personal_finance/savings_goals/index.html.erb within layouts/application (Duration: 3.0ms | Allocations: 1472)
+  Rendered layout layouts/application.html.erb (Duration: 10.2ms | Allocations: 4053)
+Completed 200 OK in 17ms (Views: 11.2ms | ActiveRecord: 0.8ms | Allocations: 5197)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:09:52 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.3ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 12.5ms | Allocations: 10114)
+  Rendered layout layouts/application.html.erb (Duration: 18.0ms | Allocations: 12700)
+Completed 200 OK in 26ms (Views: 17.9ms | ActiveRecord: 1.9ms | Allocations: 15042)
+
+
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:10:07 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#index as HTML
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" IN ($1, $2)[0m  [["parent_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 8.3ms | Allocations: 4586)
+  Rendered layout layouts/application.html.erb (Duration: 14.6ms | Allocations: 7159)
+Completed 200 OK in 21ms (Views: 14.8ms | ActiveRecord: 1.5ms | Allocations: 8318)
+
+
+Started GET "/finance" for 172.18.0.1 at 2026-08-20 13:12:46 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 2.0ms | Allocations: 1857)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.4ms | Allocations: 1825)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 22.7ms | Allocations: 26188)
+  Rendered layout layouts/application.html.erb (Duration: 26.2ms | Allocations: 29681)
+Completed 200 OK in 62ms (Views: 25.9ms | ActiveRecord: 7.6ms | Allocations: 62961)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:15:06 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 12.4ms | Allocations: 16861)
+  Rendered layout layouts/application.html.erb (Duration: 16.0ms | Allocations: 20330)
+Completed 200 OK in 36ms (Views: 16.1ms | ActiveRecord: 5.8ms | Allocations: 36644)
+
+
+Started PATCH "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:15:17 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#update as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "budget_period"=>{"planned_income"=>"20000.0"}, "allocations"=>[{"category_id"=>"8d6de3a0-5ce7-4dcb-bf80-9609ac723339", "planned_amount"=>"0"}, {"category_id"=>"db3fcf80-822a-4f26-a959-3552c8cf1283", "planned_amount"=>"0"}], "commit"=>"Save Budget", "month"=>"2026-08"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.2ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPersonalFinance::BudgetPeriod Update (0.4ms)[0m  [1m[33mUPDATE "finance_budget_periods" SET "planned_income" = $1, "updated_at" = $2 WHERE "finance_budget_periods"."id" = $3[0m  [["planned_income", "20000.0"], ["updated_at", "2026-08-20 13:15:17.138954"], ["id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mPersonalFinance::Category Load (0.1ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 AND "finance_categories"."id" = $3 LIMIT $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1 AND "finance_budget_allocations"."category_id" = $2 LIMIT $3[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."id" = $1 LIMIT $2[0m  [["id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."category_id" = $1 AND "finance_budget_allocations"."budget_period_id" = $2 LIMIT $3[0m  [["category_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Create (0.7ms)[0m  [1m[32mINSERT INTO "finance_budget_allocations" ("budget_period_id", "category_id", "planned_amount", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["planned_amount", "0.0"], ["created_at", "2026-08-20 13:15:17.158363"], ["updated_at", "2026-08-20 13:15:17.158363"]]
+  [1m[36mPersonalFinance::Category Load (0.1ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 AND "finance_categories"."id" = $3 LIMIT $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1 AND "finance_budget_allocations"."category_id" = $2 LIMIT $3[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."id" = $1 LIMIT $2[0m  [["id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."category_id" = $1 AND "finance_budget_allocations"."budget_period_id" = $2 LIMIT $3[0m  [["category_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Create (0.2ms)[0m  [1m[32mINSERT INTO "finance_budget_allocations" ("budget_period_id", "category_id", "planned_amount", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["planned_amount", "0.0"], ["created_at", "2026-08-20 13:15:17.164818"], ["updated_at", "2026-08-20 13:15:17.164818"]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/budgets/2026-08
+Completed 302 Found in 44ms (ActiveRecord: 10.5ms | Allocations: 39651)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:15:17 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.1ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 11.0ms | Allocations: 13541)
+  Rendered layout layouts/application.html.erb (Duration: 14.1ms | Allocations: 17019)
+Completed 200 OK in 20ms (Views: 15.3ms | ActiveRecord: 1.3ms | Allocations: 20238)
+
+
+Started GET "/finance" for 172.18.0.1 at 2026-08-20 13:15:20 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.8ms | Allocations: 1879)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.5ms | Allocations: 1853)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 22.6ms | Allocations: 26239)
+  Rendered layout layouts/application.html.erb (Duration: 26.1ms | Allocations: 29718)
+Completed 200 OK in 58ms (Views: 26.3ms | ActiveRecord: 6.6ms | Allocations: 60009)
+
+
+Started GET "/finance/transactions" for 172.18.0.1 at 2026-08-20 13:17:03 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::TransactionsController#index as HTML
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.6ms | Allocations: 1901)
+  Rendered finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application (Duration: 2.9ms | Allocations: 2511)
+  Rendered layout layouts/application.html.erb (Duration: 6.8ms | Allocations: 6003)
+Completed 200 OK in 19ms (Views: 8.0ms | ActiveRecord: 2.6ms | Allocations: 14516)
+
+
+Started GET "/finance/transactions/new" for 172.18.0.1 at 2026-08-20 13:17:05 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::TransactionsController#new as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/transactions/new.html.erb within layouts/application
+  Rendered finance_module/app/views/personal_finance/shared/_errors.html.erb (Duration: 0.7ms | Allocations: 199)
+  [1m[36mPersonalFinance::Account Load (0.2ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 AND "financial_accounts"."is_active" = $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["is_active", true]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  Rendered finance_module/app/views/personal_finance/transactions/_form.html.erb (Duration: 26.4ms | Allocations: 15721)
+  Rendered finance_module/app/views/personal_finance/transactions/new.html.erb within layouts/application (Duration: 28.7ms | Allocations: 16083)
+  Rendered layout layouts/application.html.erb (Duration: 32.3ms | Allocations: 18696)
+Completed 200 OK in 43ms (Views: 29.4ms | ActiveRecord: 5.4ms | Allocations: 23599)
+
+
+Started GET "/finance/transactions" for 172.18.0.1 at 2026-08-20 13:17:18 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::TransactionsController#index as HTML
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 2.2ms | Allocations: 1239)
+  Rendered finance_module/app/views/personal_finance/transactions/index.html.erb within layouts/application (Duration: 3.1ms | Allocations: 1496)
+  Rendered layout layouts/application.html.erb (Duration: 10.0ms | Allocations: 4104)
+Completed 200 OK in 15ms (Views: 10.4ms | ActiveRecord: 1.0ms | Allocations: 5257)
+
+
+Started GET "/finance/accounts" for 172.18.0.1 at 2026-08-20 13:19:04 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::AccountsController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Account Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Account Load (0.2ms)[0m  [1m[34mSELECT "financial_accounts".* FROM "financial_accounts" WHERE "financial_accounts"."user_id" = $1 ORDER BY "financial_accounts"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "7b38f77b-60a9-4c21-ae70-e37dee63f866"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "87b553ce-5832-42d4-8a56-58c238ad45e7"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM(CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END) FROM "finance_transactions" WHERE "finance_transactions"."financial_account_id" = $1[0m  [["financial_account_id", "87b553ce-5832-42d4-8a56-58c238ad45e7"]]
+  Rendered finance_module/app/views/personal_finance/accounts/index.html.erb within layouts/application (Duration: 12.8ms | Allocations: 10170)
+  Rendered layout layouts/application.html.erb (Duration: 18.4ms | Allocations: 12776)
+Completed 200 OK in 23ms (Views: 18.2ms | ActiveRecord: 1.3ms | Allocations: 14214)
+
+
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:19:06 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::CategoriesController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" IN ($1, $2)[0m  [["parent_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 11.6ms | Allocations: 6429)
+  Rendered layout layouts/application.html.erb (Duration: 17.0ms | Allocations: 9056)
+Completed 200 OK in 22ms (Views: 17.2ms | ActiveRecord: 1.1ms | Allocations: 10507)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:19:08 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 12.7ms | Allocations: 13370)
+  Rendered layout layouts/application.html.erb (Duration: 16.7ms | Allocations: 15976)
+Completed 200 OK in 37ms (Views: 17.0ms | ActiveRecord: 4.9ms | Allocations: 24925)
+
+
+Started GET "/finance" for 172.18.0.1 at 2026-08-20 13:19:19 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.3ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.0ms | Allocations: 1237)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.6ms | Allocations: 1873)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 47.9ms | Allocations: 23041)
+  Rendered layout layouts/application.html.erb (Duration: 50.9ms | Allocations: 25678)
+Completed 200 OK in 86ms (Views: 51.0ms | ActiveRecord: 4.4ms | Allocations: 44689)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:19:26 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.5ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.3ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 14.6ms | Allocations: 10167)
+  Rendered layout layouts/application.html.erb (Duration: 19.7ms | Allocations: 12770)
+Completed 200 OK in 26ms (Views: 19.6ms | ActiveRecord: 1.7ms | Allocations: 15131)
+
+
+Started PATCH "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:19:33 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#update as HTML
+  Parameters: {"authenticity_token"=>"[FILTERED]", "budget_period"=>{"planned_income"=>"20000.0"}, "allocations"=>[{"category_id"=>"8d6de3a0-5ce7-4dcb-bf80-9609ac723339", "planned_amount"=>"10000"}, {"category_id"=>"db3fcf80-822a-4f26-a959-3552c8cf1283", "planned_amount"=>"0.0"}], "commit"=>"Save Budget", "month"=>"2026-08"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.5ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mBEGIN[0m
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 AND "finance_categories"."id" = $3 LIMIT $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1 AND "finance_budget_allocations"."category_id" = $2 LIMIT $3[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."id" = $1 LIMIT $2[0m  [["id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."id" = $1 LIMIT $2[0m  [["id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Update (0.3ms)[0m  [1m[33mUPDATE "finance_budget_allocations" SET "planned_amount" = $1, "updated_at" = $2 WHERE "finance_budget_allocations"."id" = $3[0m  [["planned_amount", "10000.0"], ["updated_at", "2026-08-20 13:19:33.692798"], ["id", "f4376332-1218-4de5-8243-d967db0b9d09"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 AND "finance_categories"."id" = $3 LIMIT $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1 AND "finance_budget_allocations"."category_id" = $2 LIMIT $3[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["category_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."id" = $1 LIMIT $2[0m  [["id", "393d7b85-7a7c-45f2-a325-ae7df3225404"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."id" = $1 LIMIT $2[0m  [["id", "db3fcf80-822a-4f26-a959-3552c8cf1283"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.6ms)[0m  [1m[35mCOMMIT[0m
+Redirected to http://localhost:3000/finance/budgets/2026-08
+Completed 302 Found in 34ms (ActiveRecord: 8.0ms | Allocations: 17898)
+
+
+Started GET "/finance/budgets/2026-08" for 172.18.0.1 at 2026-08-20 13:19:33 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::BudgetsController#show as HTML
+  Parameters: {"month"=>"2026-08"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Category Load (0.1ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 AND "finance_categories"."kind" = $2 ORDER BY "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::BudgetAllocation Load (0.1ms)[0m  [1m[34mSELECT "finance_budget_allocations".* FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  Rendered finance_module/app/views/personal_finance/budgets/show.html.erb within layouts/application (Duration: 8.5ms | Allocations: 10172)
+  Rendered layout layouts/application.html.erb (Duration: 11.5ms | Allocations: 12799)
+Completed 200 OK in 15ms (Views: 11.4ms | ActiveRecord: 0.9ms | Allocations: 15155)
+
+
+Started GET "/finance" for 172.18.0.1 at 2026-08-20 13:19:35 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.2ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.2ms | Allocations: 1236)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.0ms | Allocations: 1245)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 20.6ms | Allocations: 23127)
+  Rendered layout layouts/application.html.erb (Duration: 24.6ms | Allocations: 25751)
+Completed 200 OK in 52ms (Views: 24.6ms | ActiveRecord: 3.3ms | Allocations: 42218)
+
+
+Started GET "/" for 172.18.0.1 at 2026-08-20 13:22:47 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Redirected to http://localhost:3000/finance
+Completed 301 Moved Permanently in 1ms
+
+
+Started GET "/finance" for 172.18.0.1 at 2026-08-20 13:22:47 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+Processing by PersonalFinance::DashboardController#show as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "income"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.3ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::BudgetPeriod Load (0.4ms)[0m  [1m[34mSELECT "finance_budget_periods".* FROM "finance_budget_periods" WHERE "finance_budget_periods"."user_id" = $1 AND "finance_budget_periods"."starts_on" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["starts_on", "2026-08-01"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-03-01"], ["occurred_on", "2026-03-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-04-01"], ["occurred_on", "2026-04-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-05-01"], ["occurred_on", "2026-05-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-06-01"], ["occurred_on", "2026-06-30"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-07-01"], ["occurred_on", "2026-07-31"], ["kind", "expense"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "income"]]
+  [1m[36mPersonalFinance::Transaction Sum (0.1ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."occurred_on" BETWEEN $2 AND $3 AND "finance_transactions"."kind" = $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"], ["kind", "expense"]]
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application
+  [1m[36mPersonalFinance::BudgetAllocation Sum (0.2ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mCACHE PersonalFinance::BudgetAllocation Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_budget_allocations"."planned_amount") FROM "finance_budget_allocations" WHERE "finance_budget_allocations"."budget_period_id" = $1[0m  [["budget_period_id", "393d7b85-7a7c-45f2-a325-ae7df3225404"]]
+  [1m[36mCACHE PersonalFinance::Transaction Sum (0.0ms)[0m  [1m[34mSELECT SUM("finance_transactions"."amount") FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 AND "finance_transactions"."kind" = $2 AND "finance_transactions"."occurred_on" BETWEEN $3 AND $4[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["kind", "expense"], ["occurred_on", "2026-08-01"], ["occurred_on", "2026-08-31"]]
+  [1m[36mPersonalFinance::Transaction Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_transactions" WHERE "finance_transactions"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/transactions/_list.html.erb (Duration: 1.5ms | Allocations: 1236)
+  [1m[36mPersonalFinance::SavingsGoal Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_savings_goals" WHERE "finance_savings_goals"."user_id" = $1 AND "finance_savings_goals"."status" = $2 LIMIT $3[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["status", "active"], ["LIMIT", 1]]
+  Rendered finance_module/app/views/personal_finance/savings_goals/_list.html.erb (Duration: 1.1ms | Allocations: 1242)
+  Rendered finance_module/app/views/personal_finance/dashboard/show.html.erb within layouts/application (Duration: 20.6ms | Allocations: 23122)
+  Rendered layout layouts/application.html.erb (Duration: 24.8ms | Allocations: 25746)
+Completed 200 OK in 51ms (Views: 24.5ms | ActiveRecord: 3.8ms | Allocations: 42192)
+
+
+  [1m[36mActiveRecord::SchemaMigration Load (0.6ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Started GET "/finance/categories" for 172.18.0.1 at 2026-08-20 13:26:51 +0000
+Cannot render console from 172.18.0.1! Allowed networks: 127.0.0.0/127.255.255.255, ::1
+  [1m[36mActiveRecord::SchemaMigration Load (0.4ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+Processing by PersonalFinance::CategoriesController#index as */*
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" ORDER BY "users"."id" ASC LIMIT $1[0m  [["LIMIT", 1]]
+  ↳ app/models/user.rb:7:in `dashboard_owner'
+  Rendering layout layouts/application.html.erb
+  Rendering finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application
+  [1m[36mPersonalFinance::Category Exists? (0.5ms)[0m  [1m[34mSELECT 1 AS one FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 LIMIT $2[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"], ["LIMIT", 1]]
+  [1m[36mPersonalFinance::Category Load (0.2ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."user_id" = $1 ORDER BY "finance_categories"."kind" ASC, "finance_categories"."sort_order" ASC, "finance_categories"."name" ASC[0m  [["user_id", "a53e7a9b-cebb-448f-b7c9-c60e527d3b75"]]
+  [1m[36mPersonalFinance::Category Load (0.3ms)[0m  [1m[34mSELECT "finance_categories".* FROM "finance_categories" WHERE "finance_categories"."parent_id" IN ($1, $2)[0m  [["parent_id", "8d6de3a0-5ce7-4dcb-bf80-9609ac723339"], ["parent_id", "db3fcf80-822a-4f26-a959-3552c8cf1283"]]
+  Rendered finance_module/app/views/personal_finance/categories/index.html.erb within layouts/application (Duration: 41.6ms | Allocations: 18930)
+  Rendered layout layouts/application.html.erb (Duration: 158.8ms | Allocations: 68496)
+Completed 200 OK in 207ms (Views: 160.8ms | ActiveRecord: 7.9ms | Allocations: 93174)
+
+

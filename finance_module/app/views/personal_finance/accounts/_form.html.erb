@@ -2,23 +2,22 @@
   <%= render "personal_finance/shared/errors", record: @account %>
 
   <div class="form-group">
-    <%= form.label :name, "Hesap Adı" %>
-    <%= form.text_field :name, maxlength: 80, placeholder: "Örn: Garanti Vadesiz, Nakit Cüzdan, Bonus Kart", required: true %>
+    <%= form.label :name, t("accounts.name", default: "Hesap Adı") %>
+    <%= form.text_field :name, maxlength: 80, placeholder: t("accounts.name_placeholder", default: "Örn: Garanti Vadesiz, Nakit Cüzdan, Bonus Kart"), required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :kind, "Hesap Türü" %>
-    <%= form.select :kind, [["Banka Hesabı", "bank"], ["Kredi Kartı", "card"], ["Nakit Cüzdan", "cash"], ["Birikim Hesabı", "savings"]] %>
+    <%= form.label :kind, t("accounts.kind", default: "Hesap Türü") %>
+    <%= form.select :kind, [[t("accounts.kinds.bank", default: "Banka Hesabı"), "bank"], [t("accounts.kinds.card", default: "Kredi Kartı"), "card"], [t("accounts.kinds.cash", default: "Nakit Cüzdan"), "cash"], [t("accounts.kinds.savings", default: "Birikim Hesabı"), "savings"]] %>
   </div>
 
   <div class="form-group">
-    <%= form.label :opening_balance, "Açılış Bakiyesi" %>
+    <%= form.label :opening_balance, t("accounts.opening_balance", default: "Açılış Bakiyesi") %>
     <%= form.number_field :opening_balance, step: 0.01, placeholder: "0.00", required: true %>
   </div>
 
   <div class="form-actions">
-    <%= form.submit @account.persisted? ? "Hesabı Güncelle" : "Hesabı Kaydet", class: "button button-primary" %>
-    <%= link_to "İptal", finance_accounts_path, class: "button button-secondary" %>
+    <%= form.submit @account.persisted? ? t("accounts.update", default: "Hesabı Güncelle") : t("accounts.save", default: "Hesabı Kaydet"), class: "button button-primary" %>
+    <%= link_to t("app.common.cancel", default: "İptal"), finance_accounts_path, class: "button button-secondary" %>
   </div>
 <% end %>
-

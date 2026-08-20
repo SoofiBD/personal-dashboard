@@ -1,12 +1,11 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">FİNANSAL PLANLAMA</p>
-    <h1>Hedefi Düzenle</h1>
-    <p class="page-subtitle">Tasarruf hedefinize ait tutar ve süre detaylarını güncelleyin.</p>
+    <p class="eyebrow"><%= t("savings_goals.eyebrow", default: "FİNANSAL PLANLAMA") %></p>
+    <h1><%= t("savings_goals.edit_title", default: "Hedefi Düzenle") %></h1>
+    <p class="page-subtitle"><%= t("savings_goals.edit_subtitle", default: "Tasarruf hedefinize ait tutar ve süre detaylarını güncelleyin.") %></p>
   </div>
 </header>
 
 <section class="panel form-panel">
   <%= render "form" %>
 </section>
-

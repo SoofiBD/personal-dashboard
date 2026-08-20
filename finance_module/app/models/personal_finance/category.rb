@@ -13,6 +13,14 @@ module PersonalFinance
     validates :color, format: { with: /\A#[0-9A-Fa-f]{6}\z/ }
     validate :parent_belongs_to_same_user_and_kind
 
+    def full_name
+      parent ? "#{parent.name} › #{name}" : name
+    end
+
+    def self_and_descendant_ids
+      [id] + children.pluck(:id)
+    end
+
     private
 
     def parent_belongs_to_same_user_and_kind

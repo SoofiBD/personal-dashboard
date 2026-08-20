@@ -2,38 +2,37 @@
   <%= render "personal_finance/shared/errors", record: @transaction %>
 
   <div class="form-group">
-    <%= form.label :kind, "İşlem Türü" %>
-    <%= form.select :kind, [["Gider (Expense)", "expense"], ["Gelir (Income)", "income"], ["Transfer", "transfer"]] %>
+    <%= form.label :kind, t("transactions.kind", default: "İşlem Türü") %>
+    <%= form.select :kind, [[t("transactions.kinds.expense", default: "Gider"), "expense"], [t("transactions.kinds.income", default: "Gelir"), "income"], [t("transactions.kinds.transfer", default: "Transfer"), "transfer"]] %>
   </div>
 
   <div class="form-group">
-    <%= form.label :amount, "Tutar" %>
+    <%= form.label :amount, t("transactions.amount", default: "Tutar") %>
     <%= form.number_field :amount, step: 0.01, min: 0.01, placeholder: "0.00", required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :occurred_on, "Tarih" %>
+    <%= form.label :occurred_on, t("transactions.occurred_on", default: "Tarih") %>
     <%= form.date_field :occurred_on, required: true %>
   </div>
 
   <div class="form-group">
-    <%= form.label :financial_account_id, "Hesap" %>
+    <%= form.label :financial_account_id, t("transactions.account", default: "Hesap") %>
     <%= form.collection_select :financial_account_id, PersonalFinance::Account.where(user_id: current_panel_user.id, is_active: true), :id, :name %>
   </div>
 
   <div class="form-group">
-    <%= form.label :category_id, "Kategori" %>
-    <%= form.collection_select :category_id, PersonalFinance::Category.where(user_id: current_panel_user.id), :id, :name, include_blank: "Kategorisiz" %>
+    <%= form.label :category_id, t("transactions.category", default: "Kategori") %>
+    <%= form.collection_select :category_id, PersonalFinance::Category.where(user_id: current_panel_user.id), :id, :name, include_blank: t("app.common.uncategorized", default: "Kategorisiz") %>
   </div>
 
   <div class="form-group">
-    <%= form.label :note, "Açıklama / Not (İsteğe bağlı)" %>
-    <%= form.text_field :note, maxlength: 500, placeholder: "Market alışverişi, fatura vb." %>
+    <%= form.label :note, t("transactions.note", default: "Açıklama / Not (İsteğe bağlı)") %>
+    <%= form.text_field :note, maxlength: 500, placeholder: t("transactions.note_placeholder", default: "Market alışverişi, fatura vb.") %>
   </div>
 
   <div class="form-actions">
-    <%= form.submit @transaction.persisted? ? "İşlemi Güncelle" : "İşlemi Kaydet", class: "button button-primary" %>
-    <%= link_to "İptal", finance_transactions_path, class: "button button-secondary" %>
+    <%= form.submit @transaction.persisted? ? t("transactions.update", default: "İşlemi Güncelle") : t("transactions.save", default: "İşlemi Kaydet"), class: "button button-primary" %>
+    <%= link_to t("app.common.cancel", default: "İptal"), finance_transactions_path, class: "button button-secondary" %>
   </div>
 <% end %>
-

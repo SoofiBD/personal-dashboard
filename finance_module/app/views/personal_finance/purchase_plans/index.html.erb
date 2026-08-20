@@ -41,16 +41,16 @@
 
         <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
           <div style="display: flex; justify-content: space-between;">
-            <span><%= t("purchase_plans.down_payment", default: "Peşinat:") %></span>
+            <span><%= t("purchase_plans.down_payment_label", default: "Peşinat:") %></span>
             <strong style="color: var(--text-main); font-variant-numeric: tabular-nums;"><%= dashboard_currency plan.down_payment %></strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span><%= t("purchase_plans.monthly_cost", default: "Aylık Taksit:") %></span>
+            <span><%= t("purchase_plans.monthly_cost_label", default: "Aylık Taksit:") %></span>
             <strong style="color: var(--text-main); font-variant-numeric: tabular-nums;"><%= dashboard_currency plan.monthly_cost %></strong>
           </div>
           <% if plan.planned_on %>
             <div style="display: flex; justify-content: space-between;">
-              <span><%= t("purchase_plans.planned_on", default: "Hedef Tarihi:") %></span>
+              <span><%= t("purchase_plans.planned_on_label", default: "Hedef Tarihi:") %></span>
               <strong style="color: var(--text-main);"><%= l(plan.planned_on, format: "%d %b %Y") rescue plan.planned_on %></strong>
             </div>
           <% end %>
@@ -61,7 +61,7 @@
 <% else %>
   <section class="panel">
     <div class="empty-state">
-      <p><%= t("app.common.empty_state", default: "Kayıtlı bir satın alma planı bulunmuyor.") %></p>
+      <p><%= t("purchase_plans.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir satın alma planı bulunmuyor.")) %></p>
       <%= link_to t("purchase_plans.new_title", default: "İlk Planı Ekle"), new_finance_purchase_plan_path, class: "button button-secondary button-sm" %>
     </div>
   </section>
