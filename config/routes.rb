@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     resources :transactions, except: :show
     resources :accounts, except: :show
     resources :categories, except: :show
-    resources :budgets, only: %i[show update], param: :month
+    resources :budgets, only: %i[show update], param: :month do
+      patch :currency, on: :member
+    end
     resources :savings_goals, except: :show do
       resources :goal_contributions, only: :create
     end

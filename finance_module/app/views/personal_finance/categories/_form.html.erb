@@ -1,1 +1,24 @@
-<%= form_with model: @category, url: @category.persisted? ? finance_category_path(@category) : finance_categories_path do |form| %><%= render "personal_finance/shared/errors", record: @category %><%= form.label :name, "Category name" %><%= form.text_field :name, maxlength: 80 %><%= form.label :kind, "Type" %><%= form.select :kind, PersonalFinance::Category.kinds.keys.map { |kind| [kind.humanize, kind] } %><%= form.label :color, "Color" %><%= form.color_field :color %><%= form.submit "Save category", class: "button button-primary" %><% end %>
+<%= form_with model: @category, scope: :category, url: @category.persisted? ? finance_category_path(@category) : finance_categories_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @category %>
+
+  <div class="form-group">
+    <%= form.label :name, "Kategori Adı" %>
+    <%= form.text_field :name, maxlength: 80, placeholder: "Örn: Market, Kira, Maaş, Ulaşım", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :kind, "Kategori Türü" %>
+    <%= form.select :kind, [["Gider (Expense)", "expense"], ["Gelir (Income)", "income"], ["Transfer", "transfer"]] %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :color, "Renk Rozeti" %>
+    <%= form.color_field :color, value: @category.color.presence || "#3B82F6" %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit @category.persisted? ? "Kategoriyi Güncelle" : "Kategoriyi Kaydet", class: "button button-primary" %>
+    <%= link_to "İptal", finance_categories_path, class: "button button-secondary" %>
+  </div>
+<% end %>
+

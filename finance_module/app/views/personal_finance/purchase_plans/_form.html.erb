@@ -1,1 +1,34 @@
-<%= form_with model: @purchase_plan, url: @purchase_plan.persisted? ? finance_purchase_plan_path(@purchase_plan) : finance_purchase_plans_path do |form| %><%= render "personal_finance/shared/errors", record: @purchase_plan %><%= form.label :name, "Purchase" %><%= form.text_field :name, maxlength: 100 %><%= form.label :price, "Total price" %><%= form.number_field :price, step: 0.01, min: 0.01 %><%= form.label :down_payment, "Down payment" %><%= form.number_field :down_payment, step: 0.01, min: 0 %><%= form.label :monthly_cost, "Monthly installment" %><%= form.number_field :monthly_cost, step: 0.01, min: 0 %><%= form.label :planned_on, "Planned date" %><%= form.date_field :planned_on %><%= form.submit "Assess plan", class: "button button-primary" %><% end %>
+<%= form_with model: @purchase_plan, scope: :purchase_plan, url: @purchase_plan.persisted? ? finance_purchase_plan_path(@purchase_plan) : finance_purchase_plans_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @purchase_plan %>
+
+  <div class="form-group">
+    <%= form.label :name, "Satın Alma Adı" %>
+    <%= form.text_field :name, maxlength: 100, placeholder: "Örn: Yeni Bilgisayar, Ev Eşyası, Tatil Paketi", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :price, "Toplam Fiyat" %>
+    <%= form.number_field :price, step: 0.01, min: 0.01, placeholder: "0.00", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :down_payment, "Peşinat Tutarı" %>
+    <%= form.number_field :down_payment, step: 0.01, min: 0, placeholder: "0.00" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :monthly_cost, "Aylık Taksit / Ödeme Tutarı" %>
+    <%= form.number_field :monthly_cost, step: 0.01, min: 0, placeholder: "0.00" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :planned_on, "Hedeflenen Satın Alma Tarihi" %>
+    <%= form.date_field :planned_on %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit @purchase_plan.persisted? ? "Planı Güncelle" : "Planı Değerlendir ve Kaydet", class: "button button-primary" %>
+    <%= link_to "İptal", finance_purchase_plans_path, class: "button button-secondary" %>
+  </div>
+<% end %>
+

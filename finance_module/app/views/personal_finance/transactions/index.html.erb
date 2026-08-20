@@ -1,1 +1,16 @@
-<header class="page-header"><div><p class="eyebrow">ACTIVITY</p><h1>Transactions</h1><p class="page-subtitle">Review every movement in your accounts.</p></div><%= link_to "Add transaction", new_finance_transaction_path, class: "button button-primary" %></header><section class="panel"><%= render "list", transactions: @transactions %></section>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">HESAP HAREKETLERİ</p>
+    <h1>İşlemler</h1>
+    <p class="page-subtitle">Tüm hesaplarınızdaki gelir, gider ve transfer hareketlerini inceleyin.</p>
+  </div>
+  <%= link_to new_finance_transaction_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %>
+    <span>Yeni İşlem Ekle</span>
+  <% end %>
+</header>
+
+<section class="panel">
+  <%= render "list", transactions: @transactions %>
+</section>
+

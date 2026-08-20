@@ -1,10 +1,39 @@
-<%= form_with model: @transaction, url: @transaction.persisted? ? finance_transaction_path(@transaction) : finance_transactions_path do |form| %>
+<%= form_with model: @transaction, scope: :transaction, url: @transaction.persisted? ? finance_transaction_path(@transaction) : finance_transactions_path do |form| %>
   <%= render "personal_finance/shared/errors", record: @transaction %>
-  <%= form.label :kind, "Type" %><%= form.select :kind, PersonalFinance::Transaction.kinds.keys.map { |kind| [kind.humanize, kind] } %>
-  <%= form.label :amount, "Amount" %><%= form.number_field :amount, step: 0.01, min: 0.01 %>
-  <%= form.label :occurred_on, "Date" %><%= form.date_field :occurred_on %>
-  <%= form.label :financial_account_id, "Account" %><%= form.collection_select :financial_account_id, PersonalFinance::Account.where(user_id: current_panel_user.id, is_active: true), :id, :name %>
-  <%= form.label :category_id, "Category" %><%= form.collection_select :category_id, PersonalFinance::Category.where(user_id: current_panel_user.id), :id, :name, include_blank: "Uncategorized" %>
-  <%= form.label :note, "Note" %><%= form.text_field :note, maxlength: 500 %>
-  <%= form.submit "Save transaction", class: "button button-primary" %>
+
+  <div class="form-group">
+    <%= form.label :kind, "İşlem Türü" %>
+    <%= form.select :kind, [["Gider (Expense)", "expense"], ["Gelir (Income)", "income"], ["Transfer", "transfer"]] %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :amount, "Tutar" %>
+    <%= form.number_field :amount, step: 0.01, min: 0.01, placeholder: "0.00", required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :occurred_on, "Tarih" %>
+    <%= form.date_field :occurred_on, required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :financial_account_id, "Hesap" %>
+    <%= form.collection_select :financial_account_id, PersonalFinance::Account.where(user_id: current_panel_user.id, is_active: true), :id, :name %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :category_id, "Kategori" %>
+    <%= form.collection_select :category_id, PersonalFinance::Category.where(user_id: current_panel_user.id), :id, :name, include_blank: "Kategorisiz" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :note, "Açıklama / Not (İsteğe bağlı)" %>
+    <%= form.text_field :note, maxlength: 500, placeholder: "Market alışverişi, fatura vb." %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit @transaction.persisted? ? "İşlemi Güncelle" : "İşlemi Kaydet", class: "button button-primary" %>
+    <%= link_to "İptal", finance_transactions_path, class: "button button-secondary" %>
+  </div>
 <% end %>
+

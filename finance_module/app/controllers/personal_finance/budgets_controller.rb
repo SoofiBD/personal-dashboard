@@ -2,6 +2,8 @@ module PersonalFinance
   class BudgetsController < ApplicationController
     before_action :set_budget
 
+    SUPPORTED_CURRENCIES = %w[TRY USD EUR GBP].freeze
+
     def show
       @allocations = @budget.allocations.includes(:category).order("finance_categories.name")
       @expense_categories = owned(Category).expense.order(:name)
@@ -21,6 +23,17 @@ module PersonalFinance
       @allocations = @budget.allocations.includes(:category)
       @expense_categories = owned(Category).expense.order(:name)
       render :show, status: :unprocessable_entity
+    end
+
+    def currency
+      currency = params[:currency].to_s.upcase
+      unless SUPPORTED_CURRENCIES.include?(currency)
+        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Choose a supported currency."
+        return
+      end
+
+      current_panel_user.update!(currency: currency)
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: "Display currency changed to #{currency}. Amounts were not converted."
     end
 
     private

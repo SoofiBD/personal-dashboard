@@ -1,5 +1,49 @@
 <div class="finance-list">
-  <% transactions.each do |transaction| %>
-    <article><span><%= transaction.occurred_on %> · <%= transaction.category&.name || "Uncategorized" %></span><strong class="<%= transaction.kind == "expense" ? "value-negative" : "value-positive" %>"><%= transaction.kind == "expense" ? "−" : "+" %><%= number_to_currency transaction.amount %></strong></article>
+  <% if transactions.any? %>
+    <% transactions.each do |transaction| %>
+      <article class="finance-item-row">
+        <div class="transaction-left">
+          <div class="transaction-type-icon <%= transaction.kind %>">
+            <%= finance_svg_icon(transaction.kind == "expense" ? "expense" : "income") %>
+          </div>
+          <div class="transaction-meta">
+            <div class="transaction-category">
+              <%= transaction.category&.name || "Kategorisiz" %>
+              <% if transaction.note.present? %>
+                <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem; margin-left: 0.35rem;">— <%= transaction.note %></span>
+              <% end %>
+            </div>
+            <div class="transaction-submeta">
+              <span><%= l(transaction.occurred_on, format: "%d %b %Y") rescue transaction.occurred_on %></span>
+              <span>•</span>
+              <span class="badge-pill badge-pill-subtle"><%= transaction.account&.name || "Hesap" %></span>
+              <% if transaction.category&.color.present? %>
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: <%= transaction.category.color %>;" title="<%= transaction.category.name %>"></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="transaction-right">
+          <strong class="transaction-amount <%= transaction.kind == "expense" ? "value-negative" : "value-positive" %>">
+            <%= transaction.kind == "expense" ? "−" : "+" %><%= dashboard_currency transaction.amount %>
+          </strong>
+          <div class="transaction-actions">
+            <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: "Düzenle" do %>
+              <%= finance_svg_icon("edit") %>
+            <% end %>
+            <%= button_to finance_transaction_path(transaction), method: :delete, data: { turbo_confirm: "Bu işlemi silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+              <%= finance_svg_icon("trash") %>
+            <% end %>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  <% else %>
+    <div class="empty-state">
+      <p>Kayıtlı bir finansal işlem bulunmuyor.</p>
+      <%= link_to "Yeni İşlem Ekle", new_finance_transaction_path, class: "button button-secondary button-sm" %>
+    </div>
   <% end %>
 </div>
+
