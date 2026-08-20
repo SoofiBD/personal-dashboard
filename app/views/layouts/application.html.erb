@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Personal Dashboard</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application" %>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <%= link_to "Personal Dashboard", finance_root_path, class: "brand" %>
+        <p class="sidebar-label">PERSONAL FINANCE</p>
+        <nav class="sidebar-nav">
+          <%= finance_navigation_item "Overview", finance_root_path %>
+          <%= finance_navigation_item "Transactions", finance_transactions_path %>
+          <%= finance_navigation_item "Accounts", finance_accounts_path %>
+          <%= finance_navigation_item "Categories", finance_categories_path %>
+          <%= finance_navigation_item "Budget", finance_budget_path(Date.current.strftime("%Y-%m")) %>
+          <%= finance_navigation_item "Savings goals", finance_savings_goals_path %>
+          <%= finance_navigation_item "Purchase plans", finance_purchase_plans_path %>
+        </nav>
+        <div class="sidebar-footer"><span>Private workspace</span><strong><%= User.dashboard_owner.currency %></strong></div>
+      </aside>
+      <div class="page-frame">
+        <% if notice.present? || alert.present? %>
+          <div class="flash-stack" aria-live="polite">
+            <% if notice.present? %><p class="flash flash-notice"><%= notice %></p><% end %>
+            <% if alert.present? %><p class="flash flash-alert"><%= alert %></p><% end %>
+          </div>
+        <% end %>
+        <main id="main-content" class="page-content" tabindex="-1"><%= yield %></main>
+      </div>
+    </div>
+  </body>
+</html>
