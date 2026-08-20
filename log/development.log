@@ -3856,3 +3856,4 @@ Processing by PersonalFinance::SavingsGoalsController#index as HTML
 Completed 200 OK in 17ms (Views: 9.9ms | ActiveRecord: 0.5ms | Allocations: 4420)
 
 
+  [1m[36mActiveRecord::SchemaMigration Load (0.8ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
