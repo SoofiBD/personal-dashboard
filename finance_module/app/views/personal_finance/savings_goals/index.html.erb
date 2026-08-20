@@ -1,16 +1,17 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">FİNANSAL PLANLAMA</p>
-    <h1>Tasarruf Hedefleri</h1>
-    <p class="page-subtitle">Geleceğiniz için belirlediğiniz birikim ve tasarruf hedefleri.</p>
+    <p class="eyebrow"><%= t("savings_goals.eyebrow", default: "FİNANSAL PLANLAMA") %></p>
+    <h1><%= t("savings_goals.title", default: "Tasarruf Hedefleri") %></h1>
+    <p class="page-subtitle"><%= t("savings_goals.subtitle", default: "Geleceğiniz için belirlediğiniz birikim ve tasarruf hedefleri.") %></p>
   </div>
   <%= link_to new_finance_savings_goal_path, class: "button button-primary" do %>
     <%= finance_svg_icon("plus", class: "icon-sm") %>
-    <span>Yeni Hedef Ekle</span>
+    <span><%= t("savings_goals.new_title", default: "Yeni Hedef Ekle") %></span>
   <% end %>
 </header>
 
 <section class="panel">
   <%= render "list", savings_goals: @savings_goals %>
 </section>
+
 

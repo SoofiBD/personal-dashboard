@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="<%= I18n.locale %>">
   <head>
     <meta charset="utf-8">
     <title>Personal Dashboard · Financial Hub</title>
@@ -42,7 +42,7 @@
   </head>
 
   <body>
-    <a class="skip-link" href="#main-content">Ana içeriğe atla</a>
+    <a class="skip-link" href="#main-content"><%= t("app.skip_link", default: "Ana içeriğe atla") %></a>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Ana Navigasyon">
         <div class="brand-wrapper">
@@ -51,30 +51,33 @@
               <%= finance_svg_icon("vault", class: "icon-brand") %>
             </div>
             <div class="brand-text">
-              <span class="brand-title">Personal</span>
-              <span class="brand-subtitle">Finance</span>
+              <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+              <span class="brand-subtitle"><%= t("app.module", default: "Finance") %></span>
             </div>
           <% end %>
         </div>
 
         <div class="sidebar-section">
-          <p class="sidebar-label">FINANS MODÜLÜ</p>
+          <p class="sidebar-label"><%= t("app.sidebar.section_label", default: "FİNANS MODÜLÜ") %></p>
           <nav class="sidebar-nav">
-            <%= finance_navigation_item "Genel Bakış", finance_root_path, "dashboard" %>
-            <%= finance_navigation_item "İşlemler", finance_transactions_path, "transactions" %>
-            <%= finance_navigation_item "Hesaplar", finance_accounts_path, "accounts" %>
-            <%= finance_navigation_item "Kategoriler", finance_categories_path, "categories" %>
-            <%= finance_navigation_item "Aylık Bütçe", finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
-            <%= finance_navigation_item "Tasarruf Hedefleri", finance_savings_goals_path, "savings_goals" %>
-            <%= finance_navigation_item "Satın Alma Planları", finance_purchase_plans_path, "purchase_plans" %>
+            <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
+            <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
+            <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
+            <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
+            <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
+            <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
+            <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma Planları"), finance_purchase_plans_path, "purchase_plans" %>
           </nav>
         </div>
 
         <div class="sidebar-footer">
+          <div class="sidebar-footer-controls">
+            <%= language_switcher %>
+          </div>
           <div class="workspace-pill">
             <div class="status-indicator-dot"></div>
             <div class="workspace-details">
-              <span class="workspace-title">Çalışma Alanı</span>
+              <span class="workspace-title"><%= t("app.sidebar.workspace", default: "Çalışma Alanı") %></span>
               <span class="workspace-currency"><%= current_panel_user.currency %></span>
             </div>
           </div>
@@ -110,3 +113,4 @@
     </div>
   </body>
 </html>
+

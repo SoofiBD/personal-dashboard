@@ -17,6 +17,21 @@ module ApplicationHelper
     end
   end
 
+  def language_switcher
+    current_locale = I18n.locale.to_sym
+    content_tag(:div, class: "language-switcher", role: "group", "aria-label": t("app.sidebar.language", default: "Dil / Language")) do
+      link_to(change_locale_path(:tr), class: "lang-btn #{'is-active' if current_locale == :tr}", title: "Türkçe", "aria-pressed": (current_locale == :tr)) do
+        concat content_tag(:span, "🇹🇷", class: "lang-flag")
+        concat content_tag(:span, "TR", class: "lang-code")
+      end +
+      link_to(change_locale_path(:en), class: "lang-btn #{'is-active' if current_locale == :en}", title: "English", "aria-pressed": (current_locale == :en)) do
+        concat content_tag(:span, "🇬🇧", class: "lang-flag")
+        concat content_tag(:span, "EN", class: "lang-code")
+      end
+    end
+  end
+
+
   def finance_svg_icon(name, options = {})
     css_class = options[:class] || "icon"
     case name.to_s

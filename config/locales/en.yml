@@ -1,31 +1,165 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  app:
+    name: "Personal"
+    module: "Finance"
+    skip_link: "Skip to main content"
+    sidebar:
+      section_label: "FINANCE MODULE"
+      overview: "Overview"
+      transactions: "Transactions"
+      accounts: "Accounts"
+      categories: "Categories"
+      budget: "Monthly Budget"
+      savings_goals: "Savings Goals"
+      purchase_plans: "Purchase Plans"
+      workspace: "Workspace"
+      language: "Language"
+    common:
+      save: "Save"
+      cancel: "Cancel"
+      edit: "Edit"
+      delete: "Delete"
+      add: "Add"
+      change: "Change"
+      actions: "Actions"
+      confirm_delete: "Are you sure you want to delete this item?"
+      empty_state: "No records found yet."
+      uncategorized: "Uncategorized"
+      account: "Account"
+  dashboard:
+    eyebrow: "Monthly Finance Summary"
+    title: "Overview"
+    subtitle: "Cash flow and financial goals for %{month}."
+    add_transaction: "Add Transaction"
+    income: "Income This Month"
+    income_note: "Total recorded income"
+    expenses: "Expenses This Month"
+    expenses_note: "Total recorded expenses"
+    net_cashflow: "Net Cash Flow"
+    net_cashflow_note: "Income minus expenses"
+    budget_remaining: "Budget Remaining"
+    no_budget: "No Budget Set"
+    budget_remaining_note: "Based on planned spending"
+    no_budget_note: "No plan set for this month"
+    cashflow_chart_title: "Six-Month Cash Flow"
+    cashflow_chart_subtitle: "Income and expense history"
+    chart_income: "Income"
+    chart_expense: "Expenses"
+    budget_status_title: "Budget Status"
+    budget_status_subtitle: "Target spending limit for this month"
+    manage_budget: "Manage Budget"
+    budget_over: "Over Budget"
+    budget_left: "Remaining"
+    budget_over_note: "over budget"
+    budget_left_note: "available budget"
+    recent_transactions: "Recent Transactions"
+    recent_transactions_subtitle: "Latest activity across your accounts"
+    view_all: "View All"
+    active_goals: "Savings Goals"
+    active_goals_subtitle: "Your savings progress"
+    view_goals: "View Goals"
+  transactions:
+    eyebrow: "ACTIVITY"
+    title: "Transactions"
+    subtitle: "Review every movement in your accounts."
+    new_title: "New Transaction"
+    new_subtitle: "Record an income, expense, or transfer."
+    edit_title: "Edit Transaction"
+    edit_subtitle: "Update the details and amount of this transaction."
+    kind: "Transaction Type"
+    kinds:
+      expense: "Expense"
+      income: "Income"
+      transfer: "Transfer"
+    amount: "Amount"
+    occurred_on: "Date"
+    account: "Account"
+    category: "Category"
+    note: "Note / Description (Optional)"
+    save: "Save Transaction"
+    update: "Update Transaction"
+  accounts:
+    eyebrow: "FOUNDATIONS"
+    title: "Accounts"
+    subtitle: "Keep all your bank, credit card, and cash balances organized."
+    new_title: "New Account"
+    new_subtitle: "Add a bank, credit card, or cash account."
+    edit_title: "Edit Account"
+    edit_subtitle: "Update account name or opening balance."
+    name: "Account Name"
+    kind: "Account Type"
+    kinds:
+      bank: "Bank Account"
+      card: "Credit Card"
+      cash: "Cash Wallet"
+      savings: "Savings Account"
+    opening_balance: "Opening Balance"
+    current_balance: "Current Balance"
+    save: "Save Account"
+    update: "Update Account"
+  categories:
+    eyebrow: "ORGANIZATION"
+    title: "Categories"
+    subtitle: "Give every transaction a clear home."
+    new_title: "New Category"
+    new_subtitle: "Define a category to classify your spending or earnings."
+    edit_title: "Edit Category"
+    edit_subtitle: "Update category name, type, or color badge."
+    name: "Category Name"
+    kind: "Category Type"
+    color: "Color Badge"
+    save: "Save Category"
+    update: "Update Category"
+  budgets:
+    eyebrow: "MONTHLY PLAN"
+    title: "%{month} Budget"
+    actual_spending: "Actual Spending:"
+    remaining: "Remaining Budget:"
+    display_currency: "Display Currency"
+    planned_income: "Planned Total Income"
+    category_limits: "Category Spending Limits"
+    category_limits_desc: "Set the planned spending amount for each expense category this month."
+    save: "Save Budget"
+    back_to_dashboard: "Back to Overview"
+  savings_goals:
+    eyebrow: "FINANCIAL PLANNING"
+    title: "Savings Goals"
+    subtitle: "Track progress toward what matters most."
+    new_title: "New Savings Goal"
+    new_subtitle: "Set a savings target and planned monthly contribution."
+    edit_title: "Edit Goal"
+    edit_subtitle: "Update savings target and timeframe details."
+    name: "Goal Name"
+    target_amount: "Target Amount"
+    starting_amount: "Starting Amount (If any)"
+    monthly_contribution: "Planned Monthly Contribution"
+    target_date: "Target Date (Optional)"
+    status: "Status"
+    statuses:
+      active: "Active"
+      paused: "Paused"
+      completed: "Completed"
+      archived: "Archived"
+    save: "Save Goal"
+    update: "Update Goal"
+    monthly_contrib_label: "Monthly Contribution:"
+    estimated_time: "Estimated time: ~%{months} months"
+    no_target_date: "No target date set"
+  purchase_plans:
+    eyebrow: "FINANCIAL PLANNING"
+    title: "Purchase Plans"
+    subtitle: "Make major purchases with confidence."
+    new_title: "New Purchase Plan"
+    new_subtitle: "Evaluate the affordability of a planned purchase."
+    edit_title: "Edit Plan"
+    edit_subtitle: "Update purchase price, down payment, or installment details."
+    name: "Purchase Name"
+    price: "Total Price"
+    down_payment: "Down Payment"
+    monthly_cost: "Monthly Installment"
+    planned_on: "Planned Date"
+    save: "Assess Plan & Save"
+    update: "Update Plan"
+    status_comfortable: "Comfortable"
+    status_plan: "Plan Ahead"
+    status_defer: "Defer"
