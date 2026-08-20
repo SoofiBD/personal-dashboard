@@ -1,0 +1,5 @@
+<div class="finance-list">
+  <% transactions.each do |transaction| %>
+    <article><span><%= transaction.occurred_on %> · <%= transaction.category&.name || "Uncategorized" %></span><strong class="<%= transaction.kind == "expense" ? "value-negative" : "value-positive" %>"><%= transaction.kind == "expense" ? "−" : "+" %><%= number_to_currency transaction.amount %></strong></article>
+  <% end %>
+</div>

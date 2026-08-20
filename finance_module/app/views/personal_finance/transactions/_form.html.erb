@@ -1,0 +1,10 @@
+<%= form_with model: @transaction, url: @transaction.persisted? ? finance_transaction_path(@transaction) : finance_transactions_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @transaction %>
+  <%= form.label :kind, "Type" %><%= form.select :kind, PersonalFinance::Transaction.kinds.keys.map { |kind| [kind.humanize, kind] } %>
+  <%= form.label :amount, "Amount" %><%= form.number_field :amount, step: 0.01, min: 0.01 %>
+  <%= form.label :occurred_on, "Date" %><%= form.date_field :occurred_on %>
+  <%= form.label :financial_account_id, "Account" %><%= form.collection_select :financial_account_id, PersonalFinance::Account.where(user_id: current_panel_user.id, is_active: true), :id, :name %>
+  <%= form.label :category_id, "Category" %><%= form.collection_select :category_id, PersonalFinance::Category.where(user_id: current_panel_user.id), :id, :name, include_blank: "Uncategorized" %>
+  <%= form.label :note, "Note" %><%= form.text_field :note, maxlength: 500 %>
+  <%= form.submit "Save transaction", class: "button button-primary" %>
+<% end %>

@@ -1,0 +1,22 @@
+<header class="page-header">
+  <div><p class="eyebrow">PERSONAL FINANCE</p><h1>This month's overview</h1><p class="page-subtitle">Your cash flow and plan for <%= l(Date.current, format: "%B %Y") %>.</p></div>
+  <%= link_to "Add transaction", new_finance_transaction_path, class: "button button-primary" %>
+</header>
+<section class="finance-cards" aria-label="Monthly overview">
+  <article class="metric-card"><p>Income</p><strong><%= dashboard_currency @income %></strong><span class="metric-note">Recorded this month</span></article>
+  <article class="metric-card"><p>Expenses</p><strong><%= dashboard_currency @expenses %></strong><span class="metric-note">Recorded this month</span></article>
+  <article class="metric-card"><p>Net cash flow</p><strong class="<%= @income - @expenses >= 0 ? "value-positive" : "value-negative" %>"><%= dashboard_currency @income - @expenses %></strong><span class="metric-note">Income minus expenses</span></article>
+  <article class="metric-card"><p>Budget remaining</p><strong><%= @budget ? dashboard_currency(@budget.remaining) : "Set a budget" %></strong><span class="metric-note"><%= @budget ? "Based on planned spending" : "No plan for this month" %></span></article>
+</section>
+<section class="dashboard-grid">
+  <article class="panel"><div class="panel-header"><div><h2>Six-month cash flow</h2><p>Income and expense comparison</p></div></div>
+    <% maximum = @monthly_cash_flow.flat_map { |month| [month[:income], month[:expenses]] }.max.to_f %>
+    <% if maximum.positive? %><div class="bar-chart" role="img" aria-label="Income and expenses for the last six months"><% @monthly_cash_flow.each do |month| %><div class="bar-group"><div class="bar-pair"><span class="bar income-bar" style="height: <%= [(month[:income] / maximum * 100).round, 3].max %>%" title="Income: <%= dashboard_currency month[:income] %>"></span><span class="bar expense-bar" style="height: <%= [(month[:expenses] / maximum * 100).round, 3].max %>%" title="Expenses: <%= dashboard_currency month[:expenses] %>"></span></div><span><%= month[:label] %></span></div><% end %></div><p class="chart-legend"><span><i class="legend-income"></i>Income</span><span><i class="legend-expense"></i>Expenses</span></p>
+    <% else %><div class="empty-state"><p>Add income or expenses to populate your chart.</p><%= link_to "Add your first transaction", new_finance_transaction_path, class: "text-link" %></div><% end %>
+  </article>
+  <article class="panel budget-panel"><div class="panel-header"><div><h2>Budget status</h2><p>Planned spending for this month</p></div><%= link_to "Open budget", finance_budget_path(Date.current.strftime("%Y-%m")), class: "text-link" %></div>
+    <% if @budget %><% percent = @budget.planned_spending.positive? ? [(@budget.actual_spending / @budget.planned_spending * 100).round, 100].min : 0 %><p class="budget-value"><strong><%= dashboard_currency @budget.actual_spending %></strong><span> / <%= dashboard_currency @budget.planned_spending %></span></p><div class="progress-track" aria-label="Budget used: <%= percent %> percent"><span class="progress-fill <%= "is-over" if @budget.actual_spending > @budget.planned_spending %>" style="width: <%= percent %>%"></span></div><p class="metric-note"><%= dashboard_currency @budget.remaining.abs %> <%= @budget.remaining.negative? ? "over budget" : "remaining" %></p>
+    <% else %><div class="empty-state"><p>You have not set a spending limit for this month.</p><%= link_to "Set a budget", finance_budget_path(Date.current.strftime("%Y-%m")), class: "text-link" %></div><% end %>
+  </article>
+</section>
+<section class="dashboard-grid lower-grid"><article class="panel"><div class="panel-header"><div><h2>Recent transactions</h2><p>Your latest recorded activity</p></div><%= link_to "View all", finance_transactions_path, class: "text-link" %></div><%= render "personal_finance/transactions/list", transactions: @recent_transactions %></article><article class="panel"><div class="panel-header"><div><h2>Active goals</h2><p>Your savings progress</p></div><%= link_to "View goals", finance_savings_goals_path, class: "text-link" %></div><%= render "personal_finance/savings_goals/list", savings_goals: @goals %></article></section>

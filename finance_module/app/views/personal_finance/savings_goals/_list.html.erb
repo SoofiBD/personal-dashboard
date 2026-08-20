@@ -1,0 +1,1 @@
+<div class="finance-list"><% savings_goals.each do |goal| %><article><span><%= goal.name %> · <%= number_to_currency goal.saved_amount %> / <%= number_to_currency goal.target_amount %></span><strong><%= goal.estimated_months ? "~#{goal.estimated_months} months" : "Set a contribution" %></strong></article><% end %></div>
