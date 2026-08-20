@@ -6,11 +6,11 @@ module PersonalFinance
     belongs_to :account, class_name: "PersonalFinance::Account", foreign_key: :financial_account_id
     belongs_to :category, class_name: "PersonalFinance::Category", optional: true
 
-    enum :kind, { income: "income", expense: "expense", transfer: "transfer" }, validate: true
+    enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
 
-    validates :amount, numericality: { greater_than: 0, less_than_or_equal_to: 99_999_999 }
+    validates :amount, numericality: {greater_than: 0, less_than_or_equal_to: 99_999_999}
     validates :occurred_on, presence: true
-    validates :note, length: { maximum: 500 }
+    validates :note, length: {maximum: 500}
     validate :owned_account
     validate :matching_category_kind
 

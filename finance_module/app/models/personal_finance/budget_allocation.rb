@@ -5,8 +5,8 @@ module PersonalFinance
     belongs_to :budget_period, class_name: "PersonalFinance::BudgetPeriod"
     belongs_to :category, class_name: "PersonalFinance::Category"
 
-    validates :category_id, uniqueness: { scope: :budget_period_id }
-    validates :planned_amount, numericality: { greater_than_or_equal_to: 0 }
+    validates :category_id, uniqueness: {scope: :budget_period_id}
+    validates :planned_amount, numericality: {greater_than_or_equal_to: 0}
     validate :expense_category_owned_by_budget_user
 
     def target_category_ids

@@ -23,6 +23,7 @@ module PersonalFinance
     def recent_transactions
       @plan.user.then { |user| PersonalFinance::Transaction.where(user_id: user.id, occurred_on: 3.months.ago.to_date..Date.current) }
     end
+
     def monthly_income
       recent_transactions.income.sum(:amount) / 3.0
     end

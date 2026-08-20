@@ -10,8 +10,8 @@ class CreatePersonalFinancePlanning < ActiveRecord::Migration[7.1]
     add_index :finance_budget_periods, %i[user_id starts_on], unique: true
 
     create_table :finance_budget_allocations, id: :uuid do |t|
-      t.references :budget_period, null: false, type: :uuid, foreign_key: { to_table: :finance_budget_periods }
-      t.references :category, null: false, type: :uuid, foreign_key: { to_table: :finance_categories }
+      t.references :budget_period, null: false, type: :uuid, foreign_key: {to_table: :finance_budget_periods}
+      t.references :category, null: false, type: :uuid, foreign_key: {to_table: :finance_categories}
       t.decimal :planned_amount, null: false, precision: 14, scale: 2, default: 0
       t.timestamps
     end
@@ -29,8 +29,8 @@ class CreatePersonalFinancePlanning < ActiveRecord::Migration[7.1]
     end
 
     create_table :finance_goal_contributions, id: :uuid do |t|
-      t.references :savings_goal, null: false, type: :uuid, foreign_key: { to_table: :finance_savings_goals }
-      t.references :transaction, type: :uuid, foreign_key: { to_table: :finance_transactions }
+      t.references :savings_goal, null: false, type: :uuid, foreign_key: {to_table: :finance_savings_goals}
+      t.references :transaction, type: :uuid, foreign_key: {to_table: :finance_transactions}
       t.decimal :amount, null: false, precision: 14, scale: 2
       t.date :contributed_on, null: false
       t.string :note, limit: 500
@@ -39,7 +39,7 @@ class CreatePersonalFinancePlanning < ActiveRecord::Migration[7.1]
 
     create_table :finance_purchase_plans, id: :uuid do |t|
       t.references :user, null: false, type: :uuid, index: true, foreign_key: true
-      t.references :savings_goal, type: :uuid, foreign_key: { to_table: :finance_savings_goals }
+      t.references :savings_goal, type: :uuid, foreign_key: {to_table: :finance_savings_goals}
       t.string :name, null: false
       t.decimal :price, null: false, precision: 14, scale: 2
       t.date :planned_on
