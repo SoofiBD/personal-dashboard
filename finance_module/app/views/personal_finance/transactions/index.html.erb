@@ -1,16 +1,17 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">HESAP HAREKETLERİ</p>
-    <h1>İşlemler</h1>
-    <p class="page-subtitle">Tüm hesaplarınızdaki gelir, gider ve transfer hareketlerini inceleyin.</p>
+    <p class="eyebrow"><%= t("transactions.eyebrow", default: "HESAP HAREKETLERİ") %></p>
+    <h1><%= t("transactions.title", default: "İşlemler") %></h1>
+    <p class="page-subtitle"><%= t("transactions.subtitle", default: "Tüm hesaplarınızdaki gelir, gider ve transfer hareketlerini inceleyin.") %></p>
   </div>
   <%= link_to new_finance_transaction_path, class: "button button-primary" do %>
     <%= finance_svg_icon("plus", class: "icon-sm") %>
-    <span>Yeni İşlem Ekle</span>
+    <span><%= t("dashboard.add_transaction", default: "Yeni İşlem Ekle") %></span>
   <% end %>
 </header>
 
 <section class="panel">
   <%= render "list", transactions: @transactions %>
 </section>
+
 

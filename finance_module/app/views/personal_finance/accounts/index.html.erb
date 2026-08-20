@@ -1,12 +1,12 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">FİNANSAL TEMELLER</p>
-    <h1>Hesaplar</h1>
-    <p class="page-subtitle">Tüm banka, kredi kartı ve nakit bakiyelerinizi tek bir yerden yönetin.</p>
+    <p class="eyebrow"><%= t("accounts.eyebrow", default: "FİNANSAL TEMELLER") %></p>
+    <h1><%= t("accounts.title", default: "Hesaplar") %></h1>
+    <p class="page-subtitle"><%= t("accounts.subtitle", default: "Tüm banka, kredi kartı ve nakit bakiyelerinizi tek bir yerden yönetin.") %></p>
   </div>
   <%= link_to new_finance_account_path, class: "button button-primary" do %>
     <%= finance_svg_icon("plus", class: "icon-sm") %>
-    <span>Yeni Hesap Ekle</span>
+    <span><%= t("accounts.new_title", default: "Yeni Hesap Ekle") %></span>
   <% end %>
 </header>
 
@@ -18,25 +18,25 @@
           <div>
             <div class="card-item-title"><%= account.name %></div>
             <span class="badge-pill badge-pill-subtle" style="margin-top: 0.35rem;">
-              <%= { "cash" => "Nakit", "bank" => "Banka Hesabı", "card" => "Kredi Kartı", "savings" => "Birikim Hesabı" }[account.kind] || account.kind.humanize %>
+              <%= t("accounts.kinds.#{account.kind}", default: account.kind.humanize) %>
             </span>
           </div>
           <div class="transaction-actions">
-            <%= link_to edit_finance_account_path(account), class: "action-btn", title: "Düzenle" do %>
+            <%= link_to edit_finance_account_path(account), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
-            <%= button_to finance_account_path(account), method: :delete, data: { turbo_confirm: "Bu hesabı silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+            <%= button_to finance_account_path(account), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu hesabı silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>
         </div>
 
         <div>
-          <span class="metric-label">Mevcut Bakiye</span>
+          <span class="metric-label"><%= t("accounts.current_balance", default: "Mevcut Bakiye") %></span>
           <div class="card-item-balance <%= account.current_balance >= 0 ? "value-positive" : "value-negative" %>">
             <%= dashboard_currency account.current_balance %>
           </div>
-          <p class="metric-note">Açılış bakiyesi: <%= dashboard_currency account.opening_balance %></p>
+          <p class="metric-note"><%= t("accounts.opening_balance", default: "Açılış bakiyesi") %>: <%= dashboard_currency account.opening_balance %></p>
         </div>
       </div>
     <% end %>
@@ -44,9 +44,10 @@
 <% else %>
   <section class="panel">
     <div class="empty-state">
-      <p>Kayıtlı bir hesap bulunmuyor.</p>
-      <%= link_to "İlk Hesabı Ekle", new_finance_account_path, class: "button button-secondary button-sm" %>
+      <p><%= t("app.common.empty_state", default: "Kayıtlı bir hesap bulunmuyor.") %></p>
+      <%= link_to t("accounts.new_title", default: "İlk Hesabı Ekle"), new_finance_account_path, class: "button button-secondary button-sm" %>
     </div>
   </section>
 <% end %>
+
 

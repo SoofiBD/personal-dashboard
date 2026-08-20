@@ -338,9 +338,65 @@ textarea:focus-visible {
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sidebar-footer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  width: 100%;
+  gap: 2px;
+}
+
+.lang-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.lang-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lang-btn.is-active {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+}
+
+.lang-flag {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.lang-code {
+  letter-spacing: 0.05em;
 }
 
 .workspace-pill {
+
   display: flex;
   align-items: center;
   gap: 0.75rem;

@@ -2,14 +2,14 @@
   <div>
     <p class="eyebrow">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Aylık Finans Özeti
+      <%= t("dashboard.eyebrow", default: "Aylık Finans Özeti") %>
     </p>
-    <h1>Genel Bakış</h1>
-    <p class="page-subtitle"><%= l(Date.current, format: "%B %Y") %> dönemi için nakit akışı ve finansal hedefleriniz.</p>
+    <h1><%= t("dashboard.title", default: "Genel Bakış") %></h1>
+    <p class="page-subtitle"><%= t("dashboard.subtitle", month: l(Date.current, format: "%B %Y"), default: "#{l(Date.current, format: '%B %Y')} dönemi için nakit akışı ve finansal hedefleriniz.") %></p>
   </div>
   <%= link_to new_finance_transaction_path, class: "button button-primary" do %>
     <%= finance_svg_icon("plus", class: "icon-sm") %>
-    <span>İşlem Ekle</span>
+    <span><%= t("dashboard.add_transaction", default: "İşlem Ekle") %></span>
   <% end %>
 </header>
 
@@ -17,7 +17,7 @@
   <!-- Gelir -->
   <article class="metric-card">
     <div class="metric-card-top">
-      <span class="metric-label">Bu Ayki Gelir</span>
+      <span class="metric-label"><%= t("dashboard.income", default: "Bu Ayki Gelir") %></span>
       <div class="metric-badge-icon icon-income-badge">
         <%= finance_svg_icon("income") %>
       </div>
@@ -25,14 +25,14 @@
     <strong class="value-positive"><%= dashboard_currency @income %></strong>
     <span class="metric-note">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      Kayıtlı toplam gelir
+      <%= t("dashboard.income_note", default: "Kayıtlı toplam gelir") %>
     </span>
   </article>
 
   <!-- Gider -->
   <article class="metric-card">
     <div class="metric-card-top">
-      <span class="metric-label">Bu Ayki Gider</span>
+      <span class="metric-label"><%= t("dashboard.expenses", default: "Bu Ayki Gider") %></span>
       <div class="metric-badge-icon icon-expense-badge">
         <%= finance_svg_icon("expense") %>
       </div>
@@ -40,7 +40,7 @@
     <strong class="value-negative"><%= dashboard_currency @expenses %></strong>
     <span class="metric-note">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      Kayıtlı toplam harcama
+      <%= t("dashboard.expenses_note", default: "Kayıtlı toplam harcama") %>
     </span>
   </article>
 
@@ -48,7 +48,7 @@
   <% net_cashflow = @income - @expenses %>
   <article class="metric-card">
     <div class="metric-card-top">
-      <span class="metric-label">Net Nakit Akışı</span>
+      <span class="metric-label"><%= t("dashboard.net_cashflow", default: "Net Nakit Akışı") %></span>
       <div class="metric-badge-icon icon-cashflow-badge">
         <%= finance_svg_icon(net_cashflow >= 0 ? "income" : "expense") %>
       </div>
@@ -57,21 +57,21 @@
       <%= net_cashflow >= 0 ? "+" : "" %><%= dashboard_currency net_cashflow %>
     </strong>
     <span class="metric-note">
-      Gelir ile gider farkı
+      <%= t("dashboard.net_cashflow_note", default: "Gelir ile gider farkı") %>
     </span>
   </article>
 
   <!-- Kalan Bütçe -->
   <article class="metric-card">
     <div class="metric-card-top">
-      <span class="metric-label">Kalan Bütçe</span>
+      <span class="metric-label"><%= t("dashboard.budget_remaining", default: "Kalan Bütçe") %></span>
       <div class="metric-badge-icon icon-budget-badge">
         <%= finance_svg_icon("budget") %>
       </div>
     </div>
-    <strong><%= @budget ? dashboard_currency(@budget.remaining) : "Bütçe Belirlenmedi" %></strong>
+    <strong><%= @budget ? dashboard_currency(@budget.remaining) : t("dashboard.no_budget", default: "Bütçe Belirlenmedi") %></strong>
     <span class="metric-note">
-      <%= @budget ? "Planlanan harcama limiti" : "Bu ay için plan yok" %>
+      <%= @budget ? t("dashboard.budget_remaining_note", default: "Planlanan harcama limiti") : t("dashboard.no_budget_note", default: "Bu ay için plan yok") %>
     </span>
   </article>
 </section>
@@ -81,8 +81,8 @@
   <article class="panel">
     <div class="panel-header">
       <div>
-        <h2>6 Aylık Nakit Akışı</h2>
-        <p>Gelir ve gider karşılaştırma geçmişi</p>
+        <h2><%= t("dashboard.cashflow_chart_title", default: "6 Aylık Nakit Akışı") %></h2>
+        <p><%= t("dashboard.cashflow_chart_subtitle", default: "Gelir ve gider karşılaştırma geçmişi") %></p>
       </div>
     </div>
     <% maximum = @monthly_cash_flow.flat_map { |month| [month[:income], month[:expenses]] }.max.to_f %>
@@ -91,21 +91,21 @@
         <% @monthly_cash_flow.each do |month| %>
           <div class="bar-group">
             <div class="bar-pair">
-              <span class="bar income-bar" style="height: <%= [(month[:income] / maximum * 100).round, 4].max %>%" title="Gelir: <%= dashboard_currency month[:income] %>"></span>
-              <span class="bar expense-bar" style="height: <%= [(month[:expenses] / maximum * 100).round, 4].max %>%" title="Gider: <%= dashboard_currency month[:expenses] %>"></span>
+              <span class="bar income-bar" style="height: <%= [(month[:income] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_income', default: 'Gelir') %>: <%= dashboard_currency month[:income] %>"></span>
+              <span class="bar expense-bar" style="height: <%= [(month[:expenses] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_expense', default: 'Gider') %>: <%= dashboard_currency month[:expenses] %>"></span>
             </div>
             <span><%= month[:label] %></span>
           </div>
         <% end %>
       </div>
       <div class="chart-legend">
-        <span><i class="legend-income"></i> Gelir</span>
-        <span><i class="legend-expense"></i> Gider</span>
+        <span><i class="legend-income"></i> <%= t("dashboard.chart_income", default: "Gelir") %></span>
+        <span><i class="legend-expense"></i> <%= t("dashboard.chart_expense", default: "Gider") %></span>
       </div>
     <% else %>
       <div class="empty-state">
-        <p>Grafiği görüntülemek için henüz işlem kaydı bulunmuyor.</p>
-        <%= link_to "İlk işlemi ekle", new_finance_transaction_path, class: "button button-secondary button-sm" %>
+        <p><%= t("app.common.empty_state", default: "Grafiği görüntülemek için henüz işlem kaydı bulunmuyor.") %></p>
+        <%= link_to t("dashboard.add_transaction", default: "İlk işlemi ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
       </div>
     <% end %>
   </article>
@@ -114,10 +114,10 @@
   <article class="panel budget-panel">
     <div class="panel-header">
       <div>
-        <h2>Bütçe Durumu</h2>
-        <p>Bu ay için hedeflenen harcama limiti</p>
+        <h2><%= t("dashboard.budget_status_title", default: "Bütçe Durumu") %></h2>
+        <p><%= t("dashboard.budget_status_subtitle", default: "Bu ay için hedeflenen harcama limiti") %></p>
       </div>
-      <%= link_to "Bütçeyi Yönet", finance_budget_path(Date.current.strftime("%Y-%m")), class: "text-link" %>
+      <%= link_to t("dashboard.manage_budget", default: "Bütçeyi Yönet"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "text-link" %>
     </div>
     <% if @budget %>
       <% percent = @budget.planned_spending.positive? ? [(@budget.actual_spending / @budget.planned_spending * 100).round, 100].min : 0 %>
@@ -130,14 +130,14 @@
       </div>
       <p class="metric-note" style="margin-top: 0.85rem;">
         <span class="badge-pill <%= @budget.remaining.negative? ? "badge-status-defer" : "badge-status-comfortable" %>">
-          <%= @budget.remaining.negative? ? "Aşıldı" : "Kalan" %>
+          <%= @budget.remaining.negative? ? t("dashboard.budget_over", default: "Aşıldı") : t("dashboard.budget_left", default: "Kalan") %>
         </span>
-        <%= dashboard_currency @budget.remaining.abs %> <%= @budget.remaining.negative? ? "bütçe aşıldı" : "kullanılabilir bütçe" %>
+        <%= dashboard_currency @budget.remaining.abs %> <%= @budget.remaining.negative? ? t("dashboard.budget_over_note", default: "bütçe aşıldı") : t("dashboard.budget_left_note", default: "kullanılabilir bütçe") %>
       </p>
     <% else %>
       <div class="empty-state">
-        <p>Bu ay için henüz bir harcama limiti belirlemediniz.</p>
-        <%= link_to "Bütçe Oluştur", finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary button-sm" %>
+        <p><%= t("dashboard.no_budget_note", default: "Bu ay için henüz bir harcama limiti belirlemediniz.") %></p>
+        <%= link_to t("dashboard.manage_budget", default: "Bütçe Oluştur"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary button-sm" %>
       </div>
     <% end %>
   </article>
@@ -148,10 +148,10 @@
   <article class="panel">
     <div class="panel-header">
       <div>
-        <h2>Son İşlemler</h2>
-        <p>Hesaplarınızdaki en son hareketler</p>
+        <h2><%= t("dashboard.recent_transactions", default: "Son İşlemler") %></h2>
+        <p><%= t("dashboard.recent_transactions_subtitle", default: "Hesaplarınızdaki en son hareketler") %></p>
       </div>
-      <%= link_to "Tümünü Gör", finance_transactions_path, class: "text-link" %>
+      <%= link_to t("dashboard.view_all", default: "Tümünü Gör"), finance_transactions_path, class: "text-link" %>
     </div>
     <%= render "personal_finance/transactions/list", transactions: @recent_transactions %>
   </article>
@@ -160,11 +160,12 @@
   <article class="panel">
     <div class="panel-header">
       <div>
-        <h2>Tasarruf Hedefleri</h2>
-        <p>Hedeflerinize olan ilerleme durumunuz</p>
+        <h2><%= t("dashboard.active_goals", default: "Tasarruf Hedefleri") %></h2>
+        <p><%= t("dashboard.active_goals_subtitle", default: "Hedeflerinize olan ilerleme durumunuz") %></p>
       </div>
-      <%= link_to "Hedefleri Gör", finance_savings_goals_path, class: "text-link" %>
+      <%= link_to t("dashboard.view_goals", default: "Hedefleri Gör"), finance_savings_goals_path, class: "text-link" %>
     </div>
     <%= render "personal_finance/savings_goals/list", savings_goals: @goals %>
   </article>
 </section>
+

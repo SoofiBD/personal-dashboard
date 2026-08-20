@@ -16,5 +16,8 @@ Rails.application.routes.draw do
     resources :purchase_plans, except: :show
   end
 
+  match "locale/:locale", to: "locales#update", via: %i[get post], as: :change_locale
+
   root to: redirect("/finance")
 end
+

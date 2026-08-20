@@ -7,15 +7,15 @@
           <div style="display: flex; align-items: center; gap: 0.6rem;">
             <span class="transaction-category"><%= goal.name %></span>
             <span class="badge-pill <%= goal.status == 'completed' ? 'badge-status-comfortable' : (goal.status == 'active' ? 'badge-pill-subtle' : 'badge-status-plan') %>">
-              <%= { 'active' => 'Aktif', 'paused' => 'Durduruldu', 'completed' => 'Tamamlandı', 'archived' => 'Arşivlendi' }[goal.status] || goal.status.humanize %>
+              <%= t("savings_goals.statuses.#{goal.status}", default: goal.status.humanize) %>
             </span>
           </div>
 
           <div class="transaction-actions">
-            <%= link_to edit_finance_savings_goal_path(goal), class: "action-btn", title: "Düzenle" do %>
+            <%= link_to edit_finance_savings_goal_path(goal), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
-            <%= button_to finance_savings_goal_path(goal), method: :delete, data: { turbo_confirm: "Bu hedefi silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+            <%= button_to finance_savings_goal_path(goal), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu hedefi silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>
@@ -34,16 +34,17 @@
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted);">
-          <span>Aylık Katkı: <strong><%= dashboard_currency goal.monthly_contribution %></strong></span>
-          <span><%= goal.estimated_months ? "Tahmini süre: ~#{goal.estimated_months} ay" : "Hedef tarihi belirlenmedi" %></span>
+          <span><%= t("savings_goals.monthly_contrib_label", default: "Aylık Katkı:") %> <strong><%= dashboard_currency goal.monthly_contribution %></strong></span>
+          <span><%= goal.estimated_months ? t("savings_goals.estimated_time", months: goal.estimated_months, default: "Tahmini süre: ~#{goal.estimated_months} ay") : t("savings_goals.no_target_date", default: "Hedef tarihi belirlenmedi") %></span>
         </div>
       </article>
     <% end %>
   <% else %>
     <div class="empty-state">
-      <p>Kayıtlı bir tasarruf hedefi bulunmuyor.</p>
-      <%= link_to "Yeni Hedef Ekle", new_finance_savings_goal_path, class: "button button-secondary button-sm" %>
+      <p><%= t("app.common.empty_state", default: "Kayıtlı bir tasarruf hedefi bulunmuyor.") %></p>
+      <%= link_to t("savings_goals.new_title", default: "Yeni Hedef Ekle"), new_finance_savings_goal_path, class: "button button-secondary button-sm" %>
     </div>
   <% end %>
 </div>
+
 

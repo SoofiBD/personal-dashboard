@@ -27,6 +27,10 @@ module Workspace
     config.paths["app/views"] << Rails.root.join("finance_module/app/views")
     config.time_zone = ENV.fetch("DASHBOARD_TIME_ZONE", "Europe/Istanbul")
 
+    config.i18n.available_locales = %i[tr en]
+    config.i18n.default_locale = :tr
+    config.i18n.fallbacks = true
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

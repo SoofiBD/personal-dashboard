@@ -8,7 +8,7 @@
           </div>
           <div class="transaction-meta">
             <div class="transaction-category">
-              <%= transaction.category&.name || "Kategorisiz" %>
+              <%= transaction.category&.name || t("app.common.uncategorized", default: "Kategorisiz") %>
               <% if transaction.note.present? %>
                 <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem; margin-left: 0.35rem;">— <%= transaction.note %></span>
               <% end %>
@@ -16,7 +16,7 @@
             <div class="transaction-submeta">
               <span><%= l(transaction.occurred_on, format: "%d %b %Y") rescue transaction.occurred_on %></span>
               <span>•</span>
-              <span class="badge-pill badge-pill-subtle"><%= transaction.account&.name || "Hesap" %></span>
+              <span class="badge-pill badge-pill-subtle"><%= transaction.account&.name || t("app.common.account", default: "Hesap") %></span>
               <% if transaction.category&.color.present? %>
                 <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: <%= transaction.category.color %>;" title="<%= transaction.category.name %>"></span>
               <% end %>
@@ -29,10 +29,10 @@
             <%= transaction.kind == "expense" ? "−" : "+" %><%= dashboard_currency transaction.amount %>
           </strong>
           <div class="transaction-actions">
-            <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: "Düzenle" do %>
+            <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
-            <%= button_to finance_transaction_path(transaction), method: :delete, data: { turbo_confirm: "Bu işlemi silmek istediğinizden emin misiniz?" }, class: "action-btn delete", title: "Sil", form: { style: "display: inline;" } do %>
+            <%= button_to finance_transaction_path(transaction), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu işlemi silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>
@@ -41,9 +41,10 @@
     <% end %>
   <% else %>
     <div class="empty-state">
-      <p>Kayıtlı bir finansal işlem bulunmuyor.</p>
-      <%= link_to "Yeni İşlem Ekle", new_finance_transaction_path, class: "button button-secondary button-sm" %>
+      <p><%= t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.") %></p>
+      <%= link_to t("dashboard.add_transaction", default: "Yeni İşlem Ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
     </div>
   <% end %>
 </div>
+
 
