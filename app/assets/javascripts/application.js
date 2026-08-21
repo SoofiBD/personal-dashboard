@@ -214,11 +214,208 @@
     });
   };
 
+  const initQuickAdd = () => {
+    const quickAdd = document.querySelector("[data-quick-add]");
+    if (!quickAdd || quickAdd.dataset.initialized === "true") return;
+    quickAdd.dataset.initialized = "true";
+
+    const sheet = quickAdd.querySelector("[data-quick-add-sheet]") || document.getElementById("quick-add-sheet");
+    const backdrop = quickAdd.querySelector(".quick-add-backdrop");
+    const trigger = quickAdd.querySelector("[data-quick-add-open]");
+    const closeButtons = quickAdd.querySelectorAll("[data-quick-add-close]");
+    const amount = quickAdd.querySelector("[data-quick-add-amount]");
+    const kindInput = quickAdd.querySelector("[data-quick-add-kind]");
+    const categoryInput = quickAdd.querySelector("[data-quick-add-category]");
+    const typeButtons = quickAdd.querySelectorAll("[data-quick-add-type]");
+    const categoryButtons = quickAdd.querySelectorAll("[data-quick-add-category]");
+    const swipeViewport = quickAdd.querySelector("[data-quick-add-swipe]");
+    let lastFocused;
+
+    if (!sheet || !backdrop || !trigger) return;
+
+    const visibleCategories = () => Array.from(categoryButtons).filter((button) => !button.hidden);
+
+    const selectCategory = (button) => {
+      if (!button || button.hidden) return;
+      categoryButtons.forEach((item) => {
+        const selected = item === button;
+        item.classList.toggle("is-selected", selected);
+        item.setAttribute("aria-checked", selected ? "true" : "false");
+      });
+      categoryInput.value = button.dataset.quickAddCategory;
+      button.scrollIntoView({ behavior: motionQuery.matches ? "auto" : "smooth", inline: "center", block: "nearest" });
+    };
+
+    const selectType = (kind) => {
+      kindInput.value = kind;
+      typeButtons.forEach((button) => {
+        const selected = button.dataset.quickAddType === kind;
+        button.classList.toggle("is-selected", selected);
+        button.setAttribute("aria-pressed", selected ? "true" : "false");
+      });
+      categoryButtons.forEach((button) => {
+        button.hidden = button.dataset.quickAddCategoryKind !== kind;
+      });
+      selectCategory(visibleCategories()[0]);
+    };
+
+    const open = () => {
+      lastFocused = document.activeElement;
+      backdrop.hidden = false;
+      sheet.hidden = false;
+      requestAnimationFrame(() => quickAdd.classList.add("is-open"));
+      document.body.classList.add("quick-add-open");
+      window.setTimeout(() => amount?.focus(), motionQuery.matches ? 0 : 180);
+    };
+
+    const close = () => {
+      quickAdd.classList.remove("is-open");
+      document.body.classList.remove("quick-add-open");
+      window.setTimeout(() => {
+        backdrop.hidden = true;
+        sheet.hidden = true;
+        lastFocused?.focus();
+      }, motionQuery.matches ? 0 : 180);
+    };
+
+    trigger.addEventListener("click", open);
+    closeButtons.forEach((button) => button.addEventListener("click", close));
+    typeButtons.forEach((button) => button.addEventListener("click", () => selectType(button.dataset.quickAddType)));
+    categoryButtons.forEach((button) => button.addEventListener("click", () => selectCategory(button)));
+
+    sheet.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") close();
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(sheet.querySelectorAll("button:not([disabled]), input, select, summary")).filter((element) => !element.hidden && element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+
+    if (swipeViewport) {
+      let startX = 0;
+      swipeViewport.addEventListener("touchstart", (event) => { startX = event.touches[0].clientX; }, { passive: true });
+      swipeViewport.addEventListener("touchend", (event) => {
+        const distance = event.changedTouches[0].clientX - startX;
+        if (Math.abs(distance) < 36) return;
+        const options = visibleCategories();
+        const currentIndex = options.findIndex((button) => button.classList.contains("is-selected"));
+        selectCategory(options[Math.max(0, Math.min(options.length - 1, currentIndex + (distance < 0 ? 1 : -1)))]);
+      }, { passive: true });
+    }
+
+    selectType("expense");
+  };
+
+  const registerServiceWorker = () => {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  };
+
+  const initPurchaseScenario = () => {
+    const root = document.getElementById("purchase-assessment");
+    if (!root) return;
+
+    const monthlyFreeCash = parseFloat(root.dataset.monthlyFreeCash) || 0;
+    const availableCash = parseFloat(root.dataset.availableCash) || 0;
+    const monthlyExpenses = parseFloat(root.dataset.monthlyExpenses) || 0;
+    const savingsGoalApplied = parseFloat(root.dataset.savingsGoalApplied) || 0;
+
+    const fmt = (val) => {
+      const num = Number(val) || 0;
+      const userCurrency = document.querySelector(".workspace-currency")?.textContent?.trim() || "TRY";
+      return `${num.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${userCurrency}`;
+    };
+
+    const statusFor = (down, monthly, affectsGoal) => {
+      const mfc = monthlyFreeCash - monthly;
+      const buffer = availableCash - down - monthlyExpenses;
+      if (mfc < 0 || buffer < 0) return "defer";
+      if (monthly > 0 || affectsGoal) return "plan";
+      return "comfortable";
+    };
+
+    const statusLabel = (s) => {
+      const map = {
+        comfortable: root.dataset.labelComfortable || "Comfortable",
+        plan: root.dataset.labelPlan || "Plan",
+        defer: root.dataset.labelDefer || "Defer"
+      };
+      return map[s];
+    };
+
+    const computeScenario = (card) => {
+      const key = card.dataset.scenario;
+      const months = parseInt(card.dataset.months, 10) || 0;
+      const price = parseFloat(root.querySelector('[data-scenario-input="price"]').value) || 0;
+      const baseDown = parseFloat(root.querySelector('[data-scenario-input="down_payment"]').value) || 0;
+
+      let down, monthly, affectsGoal = false;
+      if (key === "cash") {
+        down = price;
+        monthly = 0;
+      } else if (key === "savings_goal") {
+        const remainingAfterGoal = Math.max(price - savingsGoalApplied, 0);
+        down = Math.min(baseDown, remainingAfterGoal);
+        monthly = (remainingAfterGoal - down) / 12.0;
+        affectsGoal = true;
+      } else if (months > 0) {
+        down = baseDown;
+        monthly = (price - baseDown) / months;
+      } else {
+        down = baseDown;
+        monthly = 0;
+      }
+
+      const status = statusFor(down, monthly, affectsGoal);
+      const mfcAfter = monthlyFreeCash - monthly;
+      const buffer = availableCash - down - monthlyExpenses;
+
+      card.classList.remove("status-comfortable", "status-plan", "status-defer");
+      card.classList.add(`status-${status}`);
+
+      const setField = (name, value, isNegative) => {
+        const el = card.querySelector(`[data-field="${name}"]`);
+        if (!el) return;
+        el.textContent = fmt(value);
+        if (isNegative !== undefined) {
+          el.classList.toggle("value-negative", isNegative);
+          el.classList.toggle("value-positive", !isNegative);
+        }
+      };
+
+      setField("monthly_cost", monthly);
+      setField("down_payment", down);
+      setField("safety_buffer", buffer, buffer < 0);
+      setField("monthly_free_cash_after", mfcAfter, mfcAfter < 0);
+
+      const badge = card.querySelector(".scenario-status");
+      if (badge) {
+        badge.textContent = statusLabel(status);
+        badge.className = `badge-pill ${status === "comfortable" ? "badge-status-comfortable" : status === "plan" ? "badge-status-plan" : "badge-status-defer"} scenario-status`;
+      }
+    };
+
+    const recalc = () => {
+      root.querySelectorAll(".scenario-card").forEach(computeScenario);
+    };
+
+    root.querySelectorAll(".scenario-input").forEach((input) => {
+      input.addEventListener("input", recalc);
+    });
+
+    recalc();
+  };
+
   const init = () => {
     animateDashboard();
     initBudgetSelector();
     initBudgetCalculator();
     initTransactionFilters();
+    initPurchaseScenario();
+    initQuickAdd();
+    registerServiceWorker();
   };
 
   document.addEventListener("DOMContentLoaded", init);
@@ -228,4 +425,3 @@
     }
   });
 })();
-
