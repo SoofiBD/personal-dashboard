@@ -749,7 +749,6 @@
     initPurchaseScenario();
     initQuickAdd();
     initCashFlowChart();
-    initCategoryBars();
     initOnboardingWizard();
     registerServiceWorker();
   };
@@ -761,4 +760,3 @@
     }
   });
 })();
-
