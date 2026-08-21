@@ -14,21 +14,13 @@
   <div class="card-grid">
     <% @purchase_plans.each do |plan| %>
       <% status = plan.assessment.status %>
-      <div class="card-item">
+      <%= link_to finance_purchase_plan_path(plan), class: "card-item card-item-link", style: "text-decoration: none; color: inherit; display: block;" do %>
         <div class="card-item-header">
           <div>
             <div class="card-item-title"><%= plan.name %></div>
             <span class="badge-pill <%= status == :comfortable ? 'badge-status-comfortable' : (status == :plan ? 'badge-status-plan' : 'badge-status-defer') %>" style="margin-top: 0.35rem;">
               <%= t("purchase_plans.status_#{status}", default: status.to_s.humanize) %>
             </span>
-          </div>
-          <div class="transaction-actions">
-            <%= link_to edit_finance_purchase_plan_path(plan), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
-              <%= finance_svg_icon("edit") %>
-            <% end %>
-            <%= button_to finance_purchase_plan_path(plan), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu planı silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
-              <%= finance_svg_icon("trash") %>
-            <% end %>
           </div>
         </div>
 
@@ -55,6 +47,15 @@
             </div>
           <% end %>
         </div>
+      <% end %>
+
+      <div class="card-item-actions">
+        <%= link_to edit_finance_purchase_plan_path(plan), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
+          <%= finance_svg_icon("edit") %>
+        <% end %>
+        <%= button_to finance_purchase_plan_path(plan), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu planı silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
+          <%= finance_svg_icon("trash") %>
+        <% end %>
       </div>
     <% end %>
   </div>
@@ -66,5 +67,3 @@
     </div>
   </section>
 <% end %>
-
-
