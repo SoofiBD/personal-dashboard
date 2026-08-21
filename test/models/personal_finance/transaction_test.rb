@@ -22,4 +22,16 @@ class PersonalFinance::TransactionTest < ActiveSupport::TestCase
     assert_not transaction.valid?
     assert_includes transaction.errors[:category], "is invalid"
   end
+
+  test "search_notes scope returns matches case-insensitively" do
+    owner = User.create!(name: "Owner", currency: "TRY", time_zone: "Europe/Istanbul")
+    account = PersonalFinance::Account.create!(user: owner, name: "Cash", kind: :cash, opening_balance: 0)
+    category = PersonalFinance::Category.create!(user: owner, name: "Food", kind: :expense, color: "#2563EB")
+    t1 = PersonalFinance::Transaction.create!(user: owner, account: account, category: category, kind: :expense, amount: 100, occurred_on: Date.current, note: "Grocery store buy")
+    t2 = PersonalFinance::Transaction.create!(user: owner, account: account, category: category, kind: :expense, amount: 200, occurred_on: Date.current, note: "Dinner out")
+
+    results = PersonalFinance::Transaction.search_notes("grocery")
+    assert_includes results, t1
+    assert_not_includes results, t2
+  end
 end

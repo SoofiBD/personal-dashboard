@@ -15,6 +15,7 @@ module PersonalFinance
     validate :matching_category_kind
 
     scope :during, ->(range) { where(occurred_on: range) }
+    scope :search_notes, ->(query) { where("finance_transactions.note ILIKE ?", "%#{query}%") }
 
     private
 
