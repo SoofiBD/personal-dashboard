@@ -86,22 +86,46 @@
       </div>
     </div>
     <% maximum = @monthly_cash_flow.flat_map { |month| [month[:income], month[:expenses]] }.max.to_f %>
+    <% cashflow_chart_data = @monthly_cash_flow.map { |m| { label: m[:label], income: m[:income].to_f, expenses: m[:expenses].to_f } } %>
     <% if maximum.positive? %>
-      <div class="bar-chart" role="img" aria-label="<%= t('dashboard.chart_aria_label', default: 'Son altı ayın gelir ve gider tablosu') %>">
-        <% @monthly_cash_flow.each do |month| %>
-          <div class="bar-group">
-            <div class="bar-pair">
-              <span class="bar income-bar" style="height: <%= [(month[:income] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_income', default: 'Gelir') %>: <%= dashboard_currency month[:income] %>"></span>
-              <span class="bar expense-bar" style="height: <%= [(month[:expenses] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_expense', default: 'Gider') %>: <%= dashboard_currency month[:expenses] %>"></span>
-            </div>
-            <span><%= month[:label] %></span>
-          </div>
-        <% end %>
-      </div>
-      <div class="chart-legend">
-        <span><i class="legend-income"></i> <%= t("dashboard.chart_income", default: "Gelir") %></span>
-        <span><i class="legend-expense"></i> <%= t("dashboard.chart_expense", default: "Gider") %></span>
-      </div>
+      <figure class="chart-figure">
+        <div class="chart-container">
+          <canvas id="cashflow-chart"
+                  role="img"
+                  tabindex="0"
+                  aria-label="<%= t('dashboard.chart_aria_label', default: 'Son altı ayın gelir, gider ve net nakit akışı grafiği') %>"
+                  aria-describedby="cashflow-data-table"
+                  data-label-income="<%= t('dashboard.chart_income', default: 'Gelir') %>"
+                  data-label-expense="<%= t('dashboard.chart_expense', default: 'Gider') %>"
+                  data-label-net="<%= t('dashboard.net_cashflow', default: 'Net Nakit Akışı') %>"></canvas>
+        </div>
+        <figcaption class="chart-caption"><%= t("dashboard.chart_caption", default: "Grafik üzerinde detayları görmek için üzerine gelin veya odaklanın.") %></figcaption>
+      </figure>
+
+      <table class="visually-hidden" id="cashflow-data-table">
+        <caption><%= t("dashboard.chart_table_caption", default: "Son altı ayın gelir, gider ve net nakit akışı") %></caption>
+        <thead>
+          <tr>
+            <th scope="col"><%= t("dashboard.month", default: "Ay") %></th>
+            <th scope="col"><%= t("dashboard.chart_income", default: "Gelir") %></th>
+            <th scope="col"><%= t("dashboard.chart_expense", default: "Gider") %></th>
+            <th scope="col"><%= t("dashboard.net_cashflow", default: "Net Nakit Akışı") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @monthly_cash_flow.each do |month| %>
+            <% net = month[:income].to_f - month[:expenses].to_f %>
+            <tr>
+              <th scope="row"><%= month[:label] %></th>
+              <td><%= dashboard_currency month[:income] %></td>
+              <td><%= dashboard_currency month[:expenses] %></td>
+              <td><%= dashboard_currency net %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <script type="application/json" id="cashflow-chart-data"><%= raw cashflow_chart_data.to_json %></script>
     <% else %>
       <div class="empty-state">
         <p><%= t("app.common.empty_state", default: "Grafiği görüntülemek için henüz işlem kaydı bulunmuyor.") %></p>
@@ -220,6 +244,30 @@
               </button>
             <% end %>
           </div>
+        </div>
+
+        <div class="category-bars" aria-label="<%= t('dashboard.category_progress_aria', default: 'Kategori bazlı harcama ilerlemesi') %>">
+          <% @budget_allocations_data.each do |item| %>
+            <div class="cat-bar-row">
+              <div class="cat-bar-head">
+                <span class="cat-bar-name">
+                  <span class="tag-dot" style="background-color: <%= item[:color] %>;"></span>
+                  <%= item[:name] %>
+                </span>
+                <span class="cat-bar-values">
+                  <strong class="<%= item[:is_over] ? 'value-negative' : '' %>"><%= dashboard_currency item[:spent] %></strong>
+                  <span class="cat-bar-planned">/ <%= dashboard_currency item[:planned] %></span>
+                </span>
+              </div>
+              <div class="progress-track" role="progressbar"
+                   aria-valuenow="<%= item[:percent] %>" aria-valuemin="0" aria-valuemax="100"
+                   aria-label="<%= item[:name] %>: <%= dashboard_currency item[:spent] %> / <%= dashboard_currency item[:planned] %>">
+                <span class="progress-fill <%= 'is-over' if item[:is_over] %>"
+                      data-target-width="<%= item[:percent] %>"
+                      style="width: 0%;"></span>
+              </div>
+            </div>
+          <% end %>
         </div>
       <% end %>
 

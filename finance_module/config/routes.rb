@@ -7,6 +7,10 @@ scope :finance, module: :personal_finance, as: :finance do
   get "budget/year/:year", to: "budgets#year", as: :year_budget
   resources :budgets, only: %i[show update], param: :month do
     patch :currency, on: :member
+    patch :copy_previous, on: :member
+  end
+  resource :onboarding, only: %i[show create], controller: :onboarding do
+    post :skip, on: :collection
   end
   resources :savings_goals, except: :show do
     resources :goal_contributions, only: :create
