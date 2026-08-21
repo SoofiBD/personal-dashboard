@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     resources :transactions, except: :show
     resources :accounts, except: :show
     resources :categories, except: :show
+    get "budgets/year/:year", to: "budgets#year", as: :year_budget
     resources :budgets, only: %i[show update], param: :month do
       patch :currency, on: :member
     end

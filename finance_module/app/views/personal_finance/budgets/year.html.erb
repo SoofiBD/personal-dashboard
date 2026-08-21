@@ -1,0 +1,170 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("budgets.year.eyebrow", default: "YILLIK BÜTÇE PLANI") %></p>
+    <h1><%= @year %></h1>
+    <p class="page-subtitle">
+      <%= t("budgets.year.total_income", default: "Toplam Gelir:") %> <strong class="value-positive"><%= dashboard_currency @yearly[:actual_income] %></strong> ·
+      <%= t("budgets.year.total_expense", default: "Toplam Gider:") %> <strong class="value-negative"><%= dashboard_currency @yearly[:actual_expense] %></strong> ·
+      <%= t("budgets.year.net", default: "Net:") %> <strong class="<%= @yearly[:net] >= 0 ? 'value-positive' : 'value-negative' %>"><%= dashboard_currency @yearly[:net] %></strong>
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 0.5rem;">
+    <%= link_to finance_year_budget_path(@year - 1), class: "button button-secondary button-sm" do %>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      <%= @year - 1 %>
+    <% end %>
+    <%= link_to finance_year_budget_path(@year + 1), class: "button button-secondary button-sm" do %>
+      <%= @year + 1 %>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    <% end %>
+  </div>
+</header>
+
+<!-- 12-Month Summary Table -->
+<section class="panel yearly-table-panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("budgets.year.monthly_summary", default: "Aylık Özet") %></h2>
+      <p><%= t("budgets.year.monthly_summary_desc", default: "Her ay için planlanan ve gerçekleşen gelir/gider karşılaştırması") %></p>
+    </div>
+  </div>
+
+  <div class="yearly-table-wrapper">
+    <table class="yearly-table" role="table" aria-label="<%= t('budgets.year.table_aria_label', default: 'Yıllık bütçe özeti tablosu') %>">
+      <thead>
+        <tr>
+          <th scope="col"><%= t("budgets.year.month", default: "Ay") %></th>
+          <th scope="col" class="num-col"><%= t("budgets.year.planned_income", default: "Planlanan Gelir") %></th>
+          <th scope="col" class="num-col"><%= t("budgets.year.actual_income", default: "Gerçekleşen Gelir") %></th>
+          <th scope="col" class="num-col"><%= t("budgets.year.planned_expense", default: "Planlanan Harcama") %></th>
+          <th scope="col" class="num-col"><%= t("budgets.year.actual_expense", default: "Gerçekleşen Harcama") %></th>
+          <th scope="col" class="num-col"><%= t("budgets.year.net", default: "Net") %></th>
+          <th scope="col"><%= t("budgets.year.status", default: "Durum") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @months.each do |m| %>
+          <tr class="<%= 'no-budget' unless m[:has_budget] %>">
+            <td>
+              <div class="month-cell">
+                <span class="month-name"><%= m[:label] %></span>
+              </div>
+            </td>
+            <td class="num-col"><%= m[:has_budget] ? dashboard_currency(m[:planned_income]) : "—" %></td>
+            <td class="num-col"><%= m[:actual_income].positive? ? dashboard_currency(m[:actual_income]) : "—" %></td>
+            <td class="num-col"><%= m[:has_budget] ? dashboard_currency(m[:planned_spending]) : "—" %></td>
+            <td class="num-col"><%= m[:actual_expense].positive? ? dashboard_currency(m[:actual_expense]) : "—" %></td>
+            <td class="num-col">
+              <% if m[:actual_income].positive? || m[:actual_expense].positive? %>
+                <strong class="<%= m[:net] >= 0 ? 'value-positive' : 'value-negative' %>">
+                  <%= m[:net] >= 0 ? "+" : "" %><%= dashboard_currency m[:net] %>
+                </strong>
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td>
+              <% if m[:has_budget] %>
+                <% over = m[:actual_expense] > m[:planned_spending] && m[:planned_spending].positive? %>
+                <span class="badge-pill <%= over ? 'badge-status-defer' : 'badge-status-comfortable' %>">
+                  <%= over ? t("budgets.year.over", default: "Aşıldı") : t("budgets.year.on_track", default: "Yolda") %>
+                </span>
+              <% else %>
+                <%= link_to t("budgets.year.add_plan", default: "Plan Ekle"), finance_budget_path(m[:date].strftime("%Y-%m")), class: "button button-primary button-sm" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr class="yearly-total-row">
+          <td><strong><%= t("budgets.year.total", default: "Toplam") %></strong></td>
+          <td class="num-col"><strong><%= dashboard_currency @yearly[:planned_income] %></strong></td>
+          <td class="num-col"><strong><%= dashboard_currency @yearly[:actual_income] %></strong></td>
+          <td class="num-col"><strong><%= dashboard_currency @yearly[:planned_spending] %></strong></td>
+          <td class="num-col"><strong><%= dashboard_currency @yearly[:actual_expense] %></strong></td>
+          <td class="num-col">
+            <strong class="<%= @yearly[:net] >= 0 ? 'value-positive' : 'value-negative' %>">
+              <%= @yearly[:net] >= 0 ? "+" : "" %><%= dashboard_currency @yearly[:net] %>
+            </strong>
+          </td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+<!-- 12-Month Cash Flow Chart -->
+<section class="panel yearly-chart-panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("budgets.year.cashflow_chart", default: "12 Aylık Nakit Akışı") %></h2>
+      <p><%= t("budgets.year.cashflow_chart_desc", default: "Gelir ve gider karşılaştırma grafiği") %></p>
+    </div>
+  </div>
+
+  <% maximum = @months.flat_map { |m| [m[:actual_income], m[:actual_expense]] }.max.to_f %>
+  <% if maximum.positive? %>
+    <div class="bar-chart bar-chart-yearly" role="img" aria-label="<%= t('budgets.year.chart_aria_label', default: '12 ayın gelir ve gider tablosu') %>">
+      <% @months.each do |m| %>
+        <div class="bar-group">
+          <div class="bar-pair">
+            <span class="bar income-bar" style="height: <%= [(m[:actual_income] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_income', default: 'Gelir') %>: <%= dashboard_currency m[:actual_income] %>"></span>
+            <span class="bar expense-bar" style="height: <%= [(m[:actual_expense] / maximum * 100).round, 4].max %>%" title="<%= t('dashboard.chart_expense', default: 'Gider') %>: <%= dashboard_currency m[:actual_expense] %>"></span>
+          </div>
+          <span><%= m[:label] %></span>
+        </div>
+      <% end %>
+    </div>
+    <div class="chart-legend">
+      <span><i class="legend-income"></i> <%= t("dashboard.chart_income", default: "Gelir") %></span>
+      <span><i class="legend-expense"></i> <%= t("dashboard.chart_expense", default: "Gider") %></span>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p><%= t("budgets.year.no_data", default: "Bu yıl için henüz veri bulunmuyor.") %></p>
+    </div>
+  <% end %>
+</section>
+
+<!-- Category-Level Yearly Comparison -->
+<% if @category_yearly.present? %>
+  <section class="panel yearly-category-panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("budgets.year.category_comparison", default: "Kategori Bazlı Yıllık Karşılaştırma") %></h2>
+        <p><%= t("budgets.year.category_comparison_desc", default: "Yıllık planlanan harcama limitleri ve gerçekleşen harcamalar") %></p>
+      </div>
+    </div>
+
+    <div class="yearly-category-list">
+      <% @category_yearly.each do |cat| %>
+        <% percent = cat[:percent] %>
+        <% capped = [percent, 100].min %>
+        <div class="yearly-category-row">
+          <div class="yearly-cat-info">
+            <span class="tag-dot" style="background-color: <%= cat[:color] %>;"></span>
+            <span class="yearly-cat-name"><%= cat[:name] %></span>
+          </div>
+          <div class="yearly-cat-values">
+            <span class="yearly-cat-spent"><%= dashboard_currency cat[:spent] %></span>
+            <span class="yearly-cat-separator">/</span>
+            <span class="yearly-cat-planned"><%= cat[:planned].positive? ? dashboard_currency(cat[:planned]) : t("budgets.year.unlimited", default: "Limitsiz") %></span>
+          </div>
+          <div class="yearly-cat-bar-wrapper">
+            <div class="yearly-cat-bar-track">
+              <span class="yearly-cat-bar-fill <%= 'is-over' if cat[:is_over] %>" style="width: <%= capped %>%; background-color: <%= cat[:color] %>;"></span>
+            </div>
+            <span class="yearly-cat-percent <%= 'is-over' if cat[:is_over] %>"><%= percent %>%</span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<div style="margin-top: 1.5rem;">
+  <%= link_to t("budgets.back_to_dashboard", default: "Genel Bakışa Dön"), finance_root_path, class: "button button-secondary" %>
+</div>

@@ -1594,7 +1594,223 @@ textarea:focus-visible {
 }
 
 /* ==========================================================================
-   14. RESPONSIVE BREAKPOINTS
+   14. YEARLY BUDGET OVERVIEW
+   ========================================================================== */
+.yearly-table-panel,
+.yearly-chart-panel,
+.yearly-category-panel {
+  max-width: 100%;
+}
+
+.yearly-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.yearly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.yearly-table th,
+.yearly-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.yearly-table th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.02);
+  position: sticky;
+  top: 0;
+}
+
+.yearly-table td.num-col,
+.yearly-table th.num-col {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.yearly-table tbody tr:hover {
+  background: var(--surface-elevated);
+}
+
+.yearly-table tbody tr.no-budget {
+  opacity: 0.65;
+}
+
+.yearly-table tbody tr.no-budget:hover {
+  opacity: 1;
+}
+
+.month-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.month-name {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.yearly-total-row {
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 2px solid var(--border-card);
+}
+
+.yearly-total-row td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: none;
+}
+
+.bar-chart-yearly {
+  grid-template-columns: repeat(12, minmax(28px, 1fr));
+}
+
+@media (max-width: 860px) {
+  .bar-chart-yearly {
+    grid-template-columns: repeat(6, minmax(36px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .bar-chart-yearly {
+    grid-template-columns: repeat(4, minmax(36px, 1fr));
+    gap: 0.4rem;
+  }
+
+  .yearly-table {
+    font-size: 0.8rem;
+  }
+
+  .yearly-table th,
+  .yearly-table td {
+    padding: 0.55rem 0.65rem;
+  }
+}
+
+.yearly-category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.yearly-category-row {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease;
+}
+
+.yearly-category-row:hover {
+  background: var(--surface-elevated);
+  border-color: var(--border-hover);
+}
+
+.yearly-cat-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.yearly-cat-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yearly-cat-values {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+}
+
+.yearly-cat-spent {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.yearly-cat-separator {
+  color: var(--text-muted);
+}
+
+.yearly-cat-planned {
+  color: var(--text-muted);
+}
+
+.yearly-cat-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 120px;
+}
+
+.yearly-cat-bar-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.yearly-cat-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  opacity: 0.8;
+}
+
+.yearly-cat-bar-fill.is-over {
+  opacity: 1;
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+}
+
+.yearly-cat-percent {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 36px;
+  text-align: right;
+}
+
+.yearly-cat-percent.is-over {
+  color: var(--negative);
+}
+
+@media (max-width: 700px) {
+  .yearly-category-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .yearly-cat-bar-wrapper {
+    min-width: 0;
+  }
+}
+
+/* ==========================================================================
+   15. RESPONSIVE BREAKPOINTS
    ========================================================================== */
 @media (max-width: 1024px) {
   .finance-cards {
