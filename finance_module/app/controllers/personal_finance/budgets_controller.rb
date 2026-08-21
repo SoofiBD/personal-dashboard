@@ -1,12 +1,13 @@
 module PersonalFinance
   class BudgetsController < ApplicationController
-    before_action :set_budget, only: %i[show update currency]
+    before_action :set_budget, only: %i[show update currency copy_previous]
 
     SUPPORTED_CURRENCIES = %w[TRY USD EUR GBP].freeze
 
     def show
       @allocations = @budget.allocations.includes(:category).order("finance_categories.name")
       @expense_categories = owned(Category).expense.includes(:parent, :children).order(:sort_order, :name)
+      @can_copy_previous = @budget.allocations.none? && previous_budget_period.present?
       month = @budget.starts_on..@budget.ends_on
       category_spending = owned(Transaction).expense.during(month).group(:category_id).sum(:amount)
       @category_current_spent = {}
@@ -33,6 +34,15 @@ module PersonalFinance
       @allocations = @budget.allocations.includes(:category)
       @expense_categories = owned(Category).expense.order(:name)
       render :show, status: :unprocessable_entity
+    end
+
+    def copy_previous
+      copied = CopyPreviousBudget.new(@budget).call
+      if copied
+        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: t("budgets.flash.copied", default: "Previous month's budget was copied. Review and save your changes.")
+      else
+        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: t("budgets.flash.no_previous", default: "No previous month's budget found to copy.")
+      end
     end
 
     def currency
@@ -123,6 +133,10 @@ module PersonalFinance
     end
 
     private
+
+    def previous_budget_period
+      owned(BudgetPeriod).where("starts_on < ?", @budget.starts_on).order(starts_on: :desc).first
+    end
 
     def set_budget
       month = Date.strptime(params[:month], "%Y-%m").beginning_of_month
