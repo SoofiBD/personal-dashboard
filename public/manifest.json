@@ -1,0 +1,12 @@
+{
+  "name": "Personal Finance",
+  "short_name": "Finance",
+  "description": "Kişisel finans ve bütçe yönetimi",
+  "start_url": "/finance",
+  "display": "standalone",
+  "background_color": "#080C14",
+  "theme_color": "#0F172A",
+  "icons": [
+    { "src": "/pwa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

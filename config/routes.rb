@@ -7,14 +7,16 @@ Rails.application.routes.draw do
     resources :transactions, except: :show
     resources :accounts, except: :show
     resources :categories, except: :show
-    get "budgets/year/:year", to: "budgets#year", as: :year_budget
+    get "budget/year/:year", to: "budgets#year", as: :year_budget
     resources :budgets, only: %i[show update], param: :month do
       patch :currency, on: :member
     end
     resources :savings_goals, except: :show do
       resources :goal_contributions, only: :create
     end
-    resources :purchase_plans, except: :show
+    resources :purchase_plans do
+      post :convert, on: :member
+    end
   end
 
   match "locale/:locale", to: "locales#update", via: %i[get post], as: :change_locale
