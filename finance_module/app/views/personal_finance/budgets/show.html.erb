@@ -17,6 +17,24 @@
   <% end %>
 </header>
 
+<% if @can_copy_previous %>
+  <section class="panel" style="margin-bottom: 1.5rem; border-color: rgba(59, 130, 246, 0.35);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+      <div>
+        <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">
+          <%= t("budgets.copy_previous_prompt", default: "Bu ay için henüz bütçe planı yok.") %>
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          <%= t("budgets.copy_previous_hint", default: "Bir önceki ayın kategori limitlerini ve planlanan gelirini kopyalayabilirsiniz.") %>
+        </p>
+      </div>
+      <%= button_to t("budgets.copy_previous", default: "Önceki Aydan Kopyala"),
+            copy_previous_finance_budget_path(@budget.starts_on.strftime("%Y-%m")),
+            method: :patch, class: "button button-primary" %>
+    </div>
+  </section>
+<% end %>
+
 <section class="panel form-panel">
   <%= form_with url: finance_budget_path(@budget.starts_on.strftime("%Y-%m")), method: :patch, id: "budget-edit-form" do |form| %>
     <div class="form-group">

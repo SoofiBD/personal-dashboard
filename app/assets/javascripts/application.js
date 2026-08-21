@@ -408,6 +408,339 @@
     recalc();
   };
 
+  const formatChartCurrency = (val) => {
+    const num = Number(val) || 0;
+    const userCurrency = document.querySelector(".workspace-currency")?.textContent?.trim() || "TRY";
+    return `${num.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${userCurrency}`;
+  };
+
+  const initCashFlowChart = () => {
+    const canvas = document.getElementById("cashflow-chart");
+    if (!canvas || typeof window.Chart === "undefined") return;
+
+    const dataEl = document.getElementById("cashflow-chart-data");
+    if (!dataEl) return;
+
+    let rows;
+    try {
+      rows = JSON.parse(dataEl.textContent);
+    } catch (e) {
+      return;
+    }
+    if (!Array.isArray(rows) || !rows.length) return;
+
+    const labels = rows.map((r) => r.label);
+    const income = rows.map((r) => Number(r.income) || 0);
+    const expenses = rows.map((r) => Number(r.expenses) || 0);
+    const net = income.map((v, i) => v - expenses[i]);
+
+    const labelIncome = canvas.dataset.labelIncome || "Gelir";
+    const labelExpense = canvas.dataset.labelExpense || "Gider";
+    const labelNet = canvas.dataset.labelNet || "Net";
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    new window.Chart(canvas, {
+      data: {
+        labels,
+        datasets: [
+          {
+            type: "bar",
+            label: labelIncome,
+            data: income,
+            backgroundColor: "rgba(16, 185, 129, 0.85)",
+            hoverBackgroundColor: "#10B981",
+            borderColor: "#10B981",
+            borderRadius: 6,
+            maxBarThickness: 34,
+          },
+          {
+            type: "bar",
+            label: labelExpense,
+            data: expenses,
+            backgroundColor: "rgba(59, 130, 246, 0.85)",
+            hoverBackgroundColor: "#3B82F6",
+            borderColor: "#3B82F6",
+            borderRadius: 6,
+            maxBarThickness: 34,
+          },
+          {
+            type: "line",
+            label: labelNet,
+            data: net,
+            borderColor: "#F59E0B",
+            backgroundColor: "#F59E0B",
+            borderWidth: 2,
+            tension: 0.35,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: reduceMotion ? false : { duration: 800, easing: "easeOutQuart" },
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: "#94A3B8", usePointStyle: true, boxWidth: 8, padding: 16 },
+          },
+          tooltip: {
+            backgroundColor: "rgba(15, 23, 42, 0.92)",
+            titleColor: "#E2E8F0",
+            bodyColor: "#CBD5E1",
+            padding: 12,
+            cornerRadius: 8,
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${formatChartCurrency(ctx.parsed.y)}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { color: "rgba(148, 163, 184, 0.12)" },
+            ticks: { color: "#94A3B8" },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: "rgba(148, 163, 184, 0.12)" },
+            ticks: {
+              color: "#94A3B8",
+              callback: (value) => formatChartCurrency(value),
+            },
+          },
+        },
+      },
+    });
+  };
+
+  const initOnboardingWizard = () => {
+    const wizardForm = document.getElementById("onboarding-form");
+    if (!wizardForm) return;
+
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    const stepTabs = document.querySelectorAll(".stepper-step");
+    const stepSections = document.querySelectorAll(".wizard-step");
+    const progressBar = document.getElementById("stepper-progress-bar");
+
+    const currencyRadios = document.querySelectorAll(".currency-radio");
+    const currencyAdornments = document.querySelectorAll("#income-currency-adornment, .budget-currency-adornment, .goal-currency-adornment");
+    const incomeInput = document.getElementById("onboarding-income");
+
+    const budgetSummaryIncome = document.getElementById("budget-summary-income");
+    const budgetSummaryExpense = document.getElementById("budget-summary-expense");
+    const budgetSummaryRemaining = document.getElementById("budget-summary-remaining");
+    const allocationInputs = document.querySelectorAll(".allocation-input");
+
+    const goalTarget = document.getElementById("goal-target");
+    const goalStarting = document.getElementById("goal-starting");
+    const goalMonthly = document.getElementById("goal-monthly");
+    const goalEstimatedMonths = document.getElementById("goal-estimated-months");
+    const goalEstimateBox = document.getElementById("goal-estimate-box");
+
+    let currentCurrency = document.querySelector(".currency-radio:checked")?.value || "TRY";
+
+    const formatCurrency = (val) => {
+      const num = Number(val) || 0;
+      return `${num.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currentCurrency}`;
+    };
+
+    const updateStep = (step) => {
+      currentStep = Math.max(1, Math.min(totalSteps, step));
+
+      if (progressBar) {
+        progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
+      }
+
+      stepTabs.forEach((tab) => {
+        const tabStep = parseInt(tab.dataset.step, 10);
+        tab.classList.toggle("is-active", tabStep === currentStep);
+        tab.classList.toggle("is-completed", tabStep < currentStep);
+      });
+
+      stepSections.forEach((section) => {
+        const sectionStep = parseInt(section.dataset.stepIndex, 10);
+        section.classList.toggle("is-active", sectionStep === currentStep);
+      });
+
+      if (currentStep === 4) {
+        updateBudgetCalculations();
+      } else if (currentStep === 5) {
+        updateGoalEstimate();
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    currencyRadios.forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        currentCurrency = e.target.value;
+        document.querySelectorAll(".currency-card").forEach((card) => {
+          card.classList.toggle("is-selected", card.querySelector(".currency-radio")?.checked);
+        });
+        currencyAdornments.forEach((adorn) => {
+          adorn.textContent = currentCurrency;
+        });
+        updateBudgetCalculations();
+      });
+    });
+
+    wizardForm.querySelectorAll(".next-step-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const next = parseInt(btn.dataset.nextStep, 10);
+        updateStep(next);
+      });
+    });
+
+    wizardForm.querySelectorAll(".prev-step-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const prev = parseInt(btn.dataset.prevStep, 10);
+        updateStep(prev);
+      });
+    });
+
+    wizardForm.querySelectorAll(".skip-step-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const skipTo = parseInt(btn.dataset.skipStep, 10);
+        updateStep(skipTo);
+      });
+    });
+
+    stepTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const step = parseInt(tab.dataset.step, 10);
+        updateStep(step);
+      });
+    });
+
+    const addAccountBtn = document.getElementById("add-account-row-btn");
+    const accountsList = document.getElementById("accounts-builder-list");
+
+    const bindRemoveAccountButtons = () => {
+      document.querySelectorAll(".remove-account-btn").forEach((btn) => {
+        btn.onclick = () => {
+          const row = btn.closest(".account-builder-row");
+          if (row && accountsList && accountsList.querySelectorAll(".account-builder-row").length > 1) {
+            row.remove();
+          }
+        };
+      });
+    };
+
+    if (addAccountBtn && accountsList) {
+      addAccountBtn.addEventListener("click", () => {
+        const row = document.createElement("div");
+        row.className = "account-builder-row";
+        row.innerHTML = `
+          <div class="account-row-field">
+            <label class="field-mini-label">Hesap Adı</label>
+            <input type="text" name="accounts[][name]" class="form-control" placeholder="Hesap Adı">
+          </div>
+          <div class="account-row-field">
+            <label class="field-mini-label">Hesap Türü</label>
+            <select name="accounts[][kind]" class="form-control">
+              <option value="cash">Nakit / Cüzdan</option>
+              <option value="bank" selected>Banka Hesabı</option>
+              <option value="card">Kredi Kartı</option>
+              <option value="savings">Birikim Hesabı</option>
+            </select>
+          </div>
+          <div class="account-row-field">
+            <label class="field-mini-label">Açılış Bakiyesi</label>
+            <input type="number" name="accounts[][opening_balance]" class="form-control" value="0" step="0.01" placeholder="0.00">
+          </div>
+          <button type="button" class="action-btn remove-account-btn" title="Kaldır">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+          </button>
+        `;
+        accountsList.appendChild(row);
+        bindRemoveAccountButtons();
+      });
+    }
+    bindRemoveAccountButtons();
+
+    document.querySelectorAll(".category-toggle-card").forEach((card) => {
+      const checkbox = card.querySelector(".category-toggle-checkbox");
+      card.addEventListener("click", (e) => {
+        if (e.target !== checkbox) {
+          checkbox.checked = !checkbox.checked;
+        }
+        card.classList.toggle("is-enabled", checkbox.checked);
+
+        const catName = card.dataset.categoryName;
+        const budgetCard = document.querySelector(`.budget-allocation-card[data-category="${catName}"]`);
+        if (budgetCard) {
+          budgetCard.style.display = checkbox.checked ? "" : "none";
+        }
+        updateBudgetCalculations();
+      });
+    });
+
+    const updateBudgetCalculations = () => {
+      const income = parseFloat(incomeInput?.value) || 0;
+      let totalExpense = 0;
+
+      allocationInputs.forEach((input) => {
+        const card = input.closest(".budget-allocation-card");
+        if (!card || card.style.display !== "none") {
+          totalExpense += parseFloat(input.value) || 0;
+        }
+      });
+
+      const remaining = income - totalExpense;
+
+      if (budgetSummaryIncome) budgetSummaryIncome.textContent = formatCurrency(income);
+      if (budgetSummaryExpense) budgetSummaryExpense.textContent = formatCurrency(totalExpense);
+      if (budgetSummaryRemaining) {
+        budgetSummaryRemaining.textContent = formatCurrency(remaining);
+        budgetSummaryRemaining.className = `summary-metric-val ${remaining >= 0 ? "value-positive" : "value-negative"}`;
+      }
+    };
+
+    if (incomeInput) {
+      incomeInput.addEventListener("input", updateBudgetCalculations);
+    }
+    allocationInputs.forEach((input) => {
+      input.addEventListener("input", updateBudgetCalculations);
+    });
+
+    const updateGoalEstimate = () => {
+      const target = parseFloat(goalTarget?.value) || 0;
+      const starting = parseFloat(goalStarting?.value) || 0;
+      const monthly = parseFloat(goalMonthly?.value) || 0;
+      const needed = Math.max(0, target - starting);
+
+      if (monthly > 0 && needed > 0) {
+        const months = Math.ceil(needed / monthly);
+        if (goalEstimatedMonths) goalEstimatedMonths.textContent = `~${months} ay`;
+        if (goalEstimateBox) goalEstimateBox.style.display = "";
+      } else {
+        if (goalEstimateBox) goalEstimateBox.style.display = "none";
+      }
+    };
+
+    [goalTarget, goalStarting, goalMonthly].forEach((el) => {
+      el?.addEventListener("input", updateGoalEstimate);
+    });
+
+    const skipGoalBtn = document.getElementById("skip-goal-and-submit-btn");
+    if (skipGoalBtn) {
+      skipGoalBtn.addEventListener("click", () => {
+        if (goalTarget) goalTarget.value = "0";
+        const goalNameInput = document.getElementById("goal-name");
+        if (goalNameInput) goalNameInput.value = "";
+        wizardForm.submit();
+      });
+    }
+
+    updateStep(1);
+  };
+
   const init = () => {
     animateDashboard();
     initBudgetSelector();
@@ -415,6 +748,9 @@
     initTransactionFilters();
     initPurchaseScenario();
     initQuickAdd();
+    initCashFlowChart();
+    initCategoryBars();
+    initOnboardingWizard();
     registerServiceWorker();
   };
 
@@ -425,3 +761,4 @@
     }
   });
 })();
+
