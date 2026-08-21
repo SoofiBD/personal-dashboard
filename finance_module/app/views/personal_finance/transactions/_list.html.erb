@@ -41,8 +41,13 @@
     <% end %>
   <% else %>
     <div class="empty-state">
-      <p><%= t("transactions.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.")) %></p>
-      <%= link_to t("dashboard.add_transaction", default: "Yeni İşlem Ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
+      <% if local_assigns[:filters_active] && filters_active %>
+        <p><%= t("transactions.empty_filtered", default: "Seçilen filtrelere uygun işlem bulunamadı.") %></p>
+        <%= link_to t("transactions.filters.clear", default: "Filtreleri Temizle"), finance_transactions_path, class: "button button-secondary button-sm" %>
+      <% else %>
+        <p><%= t("transactions.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.")) %></p>
+        <%= link_to t("dashboard.add_transaction", default: "Yeni İşlem Ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
+      <% end %>
     </div>
   <% end %>
 </div>
