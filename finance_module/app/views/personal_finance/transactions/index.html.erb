@@ -10,8 +10,70 @@
   <% end %>
 </header>
 
-<section class="panel">
-  <%= render "list", transactions: @transactions %>
-</section>
+<turbo-frame id="transactions_frame">
+  <%= form_with url: finance_transactions_path, method: :get, class: "transaction-filters", data: { turbo_action: "advance" } do %>
+    <div class="filter-field filter-search">
+      <%= label_tag :q, t("transactions.filters.search", default: "Arama") %>
+      <%= text_field_tag :q, @filters[:q], placeholder: t("transactions.filters.search_placeholder", default: "Notta ara..."), class: "filter-input", autocomplete: "off" %>
+    </div>
 
+    <div class="filter-field">
+      <%= label_tag :kind, t("transactions.filters.type", default: "Tür") %>
+      <%= select_tag :kind,
+            options_for_select([
+              [t("transactions.filters.all_types", default: "Tümü"), ""],
+              [t("transactions.filters.income", default: "Gelir"), "income"],
+              [t("transactions.filters.expense", default: "Gider"), "expense"],
+              [t("transactions.filters.transfer", default: "Transfer"), "transfer"]
+            ], @filters[:kind]),
+            class: "filter-input" %>
+    </div>
 
+    <div class="filter-field">
+      <%= label_tag :account_id, t("transactions.filters.account", default: "Hesap") %>
+      <%= select_tag :account_id,
+            options_from_collection_for_select(@accounts, :id, :name, @filters[:account_id]),
+            include_blank: t("transactions.filters.all_accounts", default: "Tüm Hesaplar"),
+            class: "filter-input" %>
+    </div>
+
+    <div class="filter-field">
+      <%= label_tag :from, t("transactions.filters.from", default: "Başlangıç") %>
+      <%= date_field_tag :from, @filters[:from], class: "filter-input", max: @filters[:to].presence %>
+    </div>
+
+    <div class="filter-field">
+      <%= label_tag :to, t("transactions.filters.to", default: "Bitiş") %>
+      <%= date_field_tag :to, @filters[:to], class: "filter-input", min: @filters[:from].presence %>
+    </div>
+
+    <details class="filter-field filter-multiselect">
+      <summary class="filter-multiselect-summary">
+        <%= t("transactions.filters.categories", default: "Kategoriler") %>
+        <% if @filters[:category_id].any? %>
+          <span class="filter-count"><%= @filters[:category_id].size %></span>
+        <% end %>
+      </summary>
+      <div class="filter-multiselect-panel">
+        <% @categories.each do |cat| %>
+          <label class="filter-checkbox">
+            <%= check_box_tag "category_id[]", cat.id, @filters[:category_id].include?(cat.id.to_s), id: "cat_#{cat.id}" %>
+            <span class="filter-cat-dot" style="background-color: <%= cat.color.presence || "#3B82F6" %>;"></span>
+            <span><%= cat.name %></span>
+          </label>
+        <% end %>
+      </div>
+    </details>
+
+    <div class="filter-actions">
+      <%= submit_tag t("transactions.filters.apply", default: "Uygula"), class: "button button-primary button-sm" %>
+      <% if @filters_active %>
+        <%= link_to t("transactions.filters.clear", default: "Temizle"), finance_transactions_path, class: "button button-secondary button-sm" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <section class="panel">
+    <%= render "list", transactions: @transactions, filters_active: @filters_active %>
+  </section>
+</turbo-frame>

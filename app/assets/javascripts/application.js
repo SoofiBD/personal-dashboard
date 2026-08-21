@@ -156,10 +156,69 @@
     calculateTotal();
   };
 
+  const initTransactionFilters = () => {
+    const frame = document.getElementById("transactions_frame");
+    if (!frame) return;
+    const form = frame.querySelector("form.transaction-filters");
+    if (!form) return;
+
+    const hasTurbo = typeof window.Turbo !== "undefined";
+    let debounceTimer;
+
+    const fetchUpdate = () => {
+      const url = new URL(form.action, window.location.origin);
+      const data = new FormData(form);
+      url.search = new URLSearchParams(data).toString();
+
+      fetch(url.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+        .then((resp) => resp.text())
+        .then((html) => {
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const newFrame = doc.getElementById("transactions_frame");
+          if (newFrame) {
+            frame.innerHTML = newFrame.innerHTML;
+            initTransactionFilters();
+          }
+          history.replaceState(null, "", url.toString());
+        })
+        .catch(() => {
+          window.location.href = url.toString();
+        });
+    };
+
+    const trigger = () => {
+      if (hasTurbo) {
+        form.requestSubmit();
+      } else {
+        fetchUpdate();
+      }
+    };
+
+    form.addEventListener("submit", (event) => {
+      if (!hasTurbo) {
+        event.preventDefault();
+        fetchUpdate();
+      }
+    });
+
+    const textInput = form.querySelector('input[name="q"]');
+    if (textInput) {
+      textInput.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(trigger, 350);
+      });
+    }
+
+    form.querySelectorAll("select, input[type='date'], input[type='checkbox']").forEach((el) => {
+      el.addEventListener("change", trigger);
+    });
+  };
+
   const init = () => {
     animateDashboard();
     initBudgetSelector();
     initBudgetCalculator();
+    initTransactionFilters();
   };
 
   document.addEventListener("DOMContentLoaded", init);
