@@ -1,0 +1,417 @@
+<div class="onboarding-wrapper">
+  <header class="onboarding-header">
+    <div class="onboarding-header-main">
+      <p class="eyebrow"><%= t("onboarding.eyebrow", default: "İLK KURULUM SİHİRBAZI") %></p>
+      <h1 class="onboarding-title"><%= t("onboarding.title", default: "Finans Modülüne Hoş Geldiniz") %></h1>
+      <p class="onboarding-subtitle"><%= t("onboarding.subtitle", default: "Finansal yolculuğunuzu birkaç kısa adımda kişiselleştirin.") %></p>
+    </div>
+    <div class="onboarding-header-actions">
+      <%= button_to skip_finance_onboarding_path, method: :post, class: "button button-secondary button-sm", data: { turbo: false } do %>
+        <span><%= t("onboarding.skip_wizard", default: "Sihirbazı Atla (Doğrudan Başla)") %></span>
+        <%= finance_svg_icon("arrow-up-right", class: "icon-xs") %>
+      <% end %>
+    </div>
+  </header>
+
+  <!-- Step Progress Indicator -->
+  <nav class="onboarding-stepper" aria-label="Onboarding Progress">
+    <div class="stepper-track">
+      <div class="stepper-progress-bar" id="stepper-progress-bar" style="width: 20%;"></div>
+    </div>
+    <div class="stepper-steps">
+      <button type="button" class="stepper-step is-active" data-step="1" id="step-tab-1">
+        <span class="step-badge">1</span>
+        <span class="step-name"><%= t("onboarding.steps.step1_title", default: "Temel Bilgiler") %></span>
+      </button>
+      <button type="button" class="stepper-step" data-step="2" id="step-tab-2">
+        <span class="step-badge">2</span>
+        <span class="step-name"><%= t("onboarding.steps.step2_title", default: "Hesaplar") %></span>
+      </button>
+      <button type="button" class="stepper-step" data-step="3" id="step-tab-3">
+        <span class="step-badge">3</span>
+        <span class="step-name"><%= t("onboarding.steps.step3_title", default: "Kategoriler") %></span>
+      </button>
+      <button type="button" class="stepper-step" data-step="4" id="step-tab-4">
+        <span class="step-badge">4</span>
+        <span class="step-name"><%= t("onboarding.steps.step4_title", month: @current_month_label, default: "Bütçe Planı") %></span>
+      </button>
+      <button type="button" class="stepper-step" data-step="5" id="step-tab-5">
+        <span class="step-badge">5</span>
+        <span class="step-name"><%= t("onboarding.steps.step5_title", default: "Birikim Hedefi") %></span>
+      </button>
+    </div>
+  </nav>
+
+  <%= form_with url: finance_onboarding_path, method: :post, id: "onboarding-form", class: "onboarding-card", local: true do |form| %>
+    
+    <!-- STEP 1: BASICS -->
+    <section class="wizard-step is-active" id="wizard-step-1" data-step-index="1">
+      <div class="step-heading">
+        <div class="step-icon-bubble">
+          <%= finance_svg_icon("dashboard", class: "icon-lg") %>
+        </div>
+        <div>
+          <h2><%= t("onboarding.steps.step1_title", default: "1. Temel Bilgiler") %></h2>
+          <p><%= t("onboarding.steps.step1_desc", default: "Kullanmak istediğiniz para birimini ve aylık net gelir beklentinizi belirleyin.") %></p>
+        </div>
+      </div>
+
+      <div class="wizard-step-body">
+        <div class="form-group">
+          <label class="form-label" for="onboarding-currency"><%= t("onboarding.steps.currency_label", default: "Para Birimi") %></label>
+          <div class="currency-card-grid">
+            <% @currencies.each do |c| %>
+              <label class="currency-card <%= 'is-selected' if c == @currency %>">
+                <%= form.radio_button :currency, c, checked: (c == @currency), class: "currency-radio", id: "currency-opt-#{c.downcase}" %>
+                <span class="currency-code"><%= c %></span>
+                <span class="currency-symbol">
+                  <%= case c when 'TRY' then '₺' when 'USD' then '$' when 'EUR' then '€' when 'GBP' then '£' when 'CHF' then 'CHF' when 'CAD' then 'CA$' when 'AUD' then 'A$' when 'JPY' then '¥' else c end %>
+                </span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label" for="onboarding-income"><%= t("onboarding.steps.income_label", default: "Aylık Beklenen Net Gelir") %></label>
+          <div class="input-with-adornment">
+            <input type="number" 
+                   name="planned_income" 
+                   id="onboarding-income" 
+                   class="form-control form-control-lg" 
+                   placeholder="0.00" 
+                   step="0.01" 
+                   min="0" 
+                   value="50000">
+            <span class="input-adornment" id="income-currency-adornment"><%= @currency %></span>
+          </div>
+          <small class="form-hint"><%= t("onboarding.steps.income_hint", default: "Düzensiz geliriniz varsa tahmini ortalama bir tutar girebilirsiniz.") %></small>
+        </div>
+      </div>
+
+      <footer class="wizard-footer">
+        <div></div>
+        <button type="button" class="button button-primary button-lg next-step-btn" data-next-step="2">
+          <span><%= t("onboarding.next_step", default: "Sonraki Adım →") %></span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- STEP 2: ACCOUNTS (SKIPPABLE) -->
+    <section class="wizard-step" id="wizard-step-2" data-step-index="2">
+      <div class="step-heading">
+        <div class="step-icon-bubble">
+          <%= finance_svg_icon("accounts", class: "icon-lg") %>
+        </div>
+        <div>
+          <h2><%= t("onboarding.steps.step2_title", default: "2. Hesaplar (İsteğe Bağlı)") %></h2>
+          <p><%= t("onboarding.steps.step2_desc", default: "Nakit, banka ve birikim hesaplarınızı başlangıç bakiyeleriyle ekleyin.") %></p>
+        </div>
+      </div>
+
+      <div class="wizard-step-body">
+        <div class="accounts-builder-container" id="accounts-builder-list">
+          <!-- Initial Account Rows -->
+          <div class="account-builder-row">
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_name", default: "Hesap Adı") %></label>
+              <input type="text" name="accounts[][name]" class="form-control" value="Nakit Cüzdan" placeholder="Hesap Adı">
+            </div>
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_kind", default: "Hesap Türü") %></label>
+              <select name="accounts[][kind]" class="form-control">
+                <option value="cash" selected><%= t("onboarding.steps.kinds.cash", default: "Nakit / Cüzdan") %></option>
+                <option value="bank"><%= t("onboarding.steps.kinds.bank", default: "Banka Hesabı") %></option>
+                <option value="card"><%= t("onboarding.steps.kinds.card", default: "Kredi Kartı") %></option>
+                <option value="savings"><%= t("onboarding.steps.kinds.savings", default: "Birikim Hesabı") %></option>
+              </select>
+            </div>
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_balance", default: "Açılış Bakiyesi") %></label>
+              <input type="number" name="accounts[][opening_balance]" class="form-control" value="1000" step="0.01" placeholder="0.00">
+            </div>
+            <button type="button" class="action-btn remove-account-btn" title="<%= t('onboarding.steps.remove_account', default: 'Kaldır') %>">
+              <%= finance_svg_icon("trash") %>
+            </button>
+          </div>
+
+          <div class="account-builder-row">
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_name", default: "Hesap Adı") %></label>
+              <input type="text" name="accounts[][name]" class="form-control" value="Ana Banka Hesabı" placeholder="Hesap Adı">
+            </div>
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_kind", default: "Hesap Türü") %></label>
+              <select name="accounts[][kind]" class="form-control">
+                <option value="cash"><%= t("onboarding.steps.kinds.cash", default: "Nakit / Cüzdan") %></option>
+                <option value="bank" selected><%= t("onboarding.steps.kinds.bank", default: "Banka Hesabı") %></option>
+                <option value="card"><%= t("onboarding.steps.kinds.card", default: "Kredi Kartı") %></option>
+                <option value="savings"><%= t("onboarding.steps.kinds.savings", default: "Birikim Hesabı") %></option>
+              </select>
+            </div>
+            <div class="account-row-field">
+              <label class="field-mini-label"><%= t("onboarding.steps.account_balance", default: "Açılış Bakiyesi") %></label>
+              <input type="number" name="accounts[][opening_balance]" class="form-control" value="25000" step="0.01" placeholder="0.00">
+            </div>
+            <button type="button" class="action-btn remove-account-btn" title="<%= t('onboarding.steps.remove_account', default: 'Kaldır') %>">
+              <%= finance_svg_icon("trash") %>
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <button type="button" id="add-account-row-btn" class="button button-secondary button-sm">
+            <%= finance_svg_icon("plus", class: "icon-xs") %>
+            <span><%= t("onboarding.steps.add_account_btn", default: "+ Yeni Hesap Ekle") %></span>
+          </button>
+        </div>
+      </div>
+
+      <footer class="wizard-footer">
+        <button type="button" class="button button-secondary prev-step-btn" data-prev-step="1">
+          <span><%= t("onboarding.prev_step", default: "← Önceki Adım") %></span>
+        </button>
+        <div class="wizard-footer-actions">
+          <button type="button" class="button button-ghost skip-step-btn" data-skip-step="3">
+            <span><%= t("onboarding.skip_step", default: "Bu Adımı Atla") %></span>
+          </button>
+          <button type="button" class="button button-primary next-step-btn" data-next-step="3">
+            <span><%= t("onboarding.next_step", default: "Sonraki Adım →") %></span>
+          </button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- STEP 3: CATEGORIES -->
+    <section class="wizard-step" id="wizard-step-3" data-step-index="3">
+      <div class="step-heading">
+        <div class="step-icon-bubble">
+          <%= finance_svg_icon("categories", class: "icon-lg") %>
+        </div>
+        <div>
+          <h2><%= t("onboarding.steps.step3_title", default: "3. Harcama ve Gelir Kategorileri") %></h2>
+          <p><%= t("onboarding.steps.step3_desc", default: "Hazır kategorilerinizi inceleyin, istemediklerinizi çıkarın veya yenilerini ekleyin.") %></p>
+        </div>
+      </div>
+
+      <div class="wizard-step-body">
+        <h3 class="step-section-title"><%= t("onboarding.steps.expense_cats", default: "Gider Kategorileri") %></h3>
+        <div class="categories-grid" id="onboarding-expense-categories-grid">
+          <% @default_expense_categories.each_with_index do |cat, index| %>
+            <div class="category-toggle-card is-enabled" data-category-name="<%= cat[:name] %>">
+              <label class="category-toggle-label">
+                <input type="checkbox" name="categories[][enabled]" value="1" checked class="category-toggle-checkbox" data-cat-index="<%= index %>">
+                <span class="category-color-dot" style="background-color: <%= cat[:color] %>;"></span>
+                <span class="category-title"><%= cat[:name] %></span>
+              </label>
+              <input type="hidden" name="categories[][name]" value="<%= cat[:name] %>">
+              <input type="hidden" name="categories[][kind]" value="expense">
+              <input type="hidden" name="categories[][color]" value="<%= cat[:color] %>">
+              <input type="hidden" name="categories[][icon]" value="<%= cat[:icon] %>">
+              <input type="hidden" name="categories[][sort_order]" value="<%= cat[:sort_order] %>">
+            </div>
+          <% end %>
+        </div>
+
+        <h3 class="step-section-title" style="margin-top: 1.5rem;"><%= t("onboarding.steps.income_cats", default: "Gelir Kategorileri") %></h3>
+        <div class="categories-grid">
+          <% @default_income_categories.each_with_index do |cat, index| %>
+            <div class="category-toggle-card is-enabled" data-category-name="<%= cat[:name] %>">
+              <label class="category-toggle-label">
+                <input type="checkbox" name="categories[][enabled]" value="1" checked class="category-toggle-checkbox">
+                <span class="category-color-dot" style="background-color: <%= cat[:color] %>;"></span>
+                <span class="category-title"><%= cat[:name] %></span>
+              </label>
+              <input type="hidden" name="categories[][name]" value="<%= cat[:name] %>">
+              <input type="hidden" name="categories[][kind]" value="income">
+              <input type="hidden" name="categories[][color]" value="<%= cat[:color] %>">
+              <input type="hidden" name="categories[][icon]" value="<%= cat[:icon] %>">
+              <input type="hidden" name="categories[][sort_order]" value="<%= cat[:sort_order] %>">
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <footer class="wizard-footer">
+        <button type="button" class="button button-secondary prev-step-btn" data-prev-step="2">
+          <span><%= t("onboarding.prev_step", default: "← Önceki Adım") %></span>
+        </button>
+        <button type="button" class="button button-primary next-step-btn" data-next-step="4">
+          <span><%= t("onboarding.next_step", default: "Sonraki Adım →") %></span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- STEP 4: BUDGET -->
+    <section class="wizard-step" id="wizard-step-4" data-step-index="4">
+      <div class="step-heading">
+        <div class="step-icon-bubble">
+          <%= finance_svg_icon("budget", class: "icon-lg") %>
+        </div>
+        <div>
+          <h2><%= t("onboarding.steps.step4_title", month: @current_month_label, default: "4. Aylık Bütçe Limitleri (#{@current_month_label})") %></h2>
+          <p><%= t("onboarding.steps.step4_desc", default: "Bu ay için kategorilere ayırmak istediğiniz harcama limitlerini belirleyin.") %></p>
+        </div>
+      </div>
+
+      <div class="wizard-step-body">
+        <!-- Live Calculation Summary Card -->
+        <div class="budget-live-summary">
+          <div class="summary-metric">
+            <span class="summary-metric-label"><%= t("onboarding.steps.budget_income_summary", default: "Planlanan Gelir:") %></span>
+            <span class="summary-metric-val value-positive" id="budget-summary-income">50.000,00 <%= @currency %></span>
+          </div>
+          <div class="summary-metric">
+            <span class="summary-metric-label"><%= t("onboarding.steps.budget_expense_summary", default: "Toplam Planlanan Gider:") %></span>
+            <span class="summary-metric-val value-negative" id="budget-summary-expense">0,00 <%= @currency %></span>
+          </div>
+          <div class="summary-metric">
+            <span class="summary-metric-label"><%= t("onboarding.steps.budget_remaining_summary", default: "Kalan Serbest Nakit:") %></span>
+            <span class="summary-metric-val value-positive" id="budget-summary-remaining">50.000,00 <%= @currency %></span>
+          </div>
+        </div>
+
+        <div class="budget-limit-inputs-grid" id="onboarding-budget-allocation-inputs">
+          <% default_limits = {
+            "Ev & Faturalar" => 15000,
+            "Market & Yemek" => 12000,
+            "Ulaşım" => 4000,
+            "Sağlık" => 2000,
+            "Eğitim" => 2000,
+            "Eğlence" => 3000,
+            "Alışveriş" => 5000,
+            "Abonelikler" => 1000,
+            "Diğer Gider" => 2000
+          } %>
+          <% @default_expense_categories.each do |cat| %>
+            <div class="budget-allocation-card" data-category="<%= cat[:name] %>">
+              <div class="allocation-card-header">
+                <span class="category-color-dot" style="background-color: <%= cat[:color] %>;"></span>
+                <span class="allocation-category-title"><%= cat[:name] %></span>
+              </div>
+              <div class="input-with-adornment">
+                <input type="number" 
+                       name="allocations[<%= cat[:name] %>]" 
+                       class="form-control allocation-input" 
+                       value="<%= default_limits[cat[:name]] || 0 %>" 
+                       step="1" 
+                       min="0" 
+                       data-cat-name="<%= cat[:name] %>">
+                <span class="input-adornment budget-currency-adornment"><%= @currency %></span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <footer class="wizard-footer">
+        <button type="button" class="button button-secondary prev-step-btn" data-prev-step="3">
+          <span><%= t("onboarding.prev_step", default: "← Önceki Adım") %></span>
+        </button>
+        <button type="button" class="button button-primary next-step-btn" data-next-step="5">
+          <span><%= t("onboarding.next_step", default: "Sonraki Adım →") %></span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- STEP 5: SAVINGS GOAL (SKIPPABLE) -->
+    <section class="wizard-step" id="wizard-step-5" data-step-index="5">
+      <div class="step-heading">
+        <div class="step-icon-bubble">
+          <%= finance_svg_icon("savings_goals", class: "icon-lg") %>
+        </div>
+        <div>
+          <h2><%= t("onboarding.steps.step5_title", default: "5. Birikim Hedefi (İsteğe Bağlı)") %></h2>
+          <p><%= t("onboarding.steps.step5_desc", default: "Kendinize ilk tasarruf hedefinizi koyun ve ilerlemenizi takip edin.") %></p>
+        </div>
+      </div>
+
+      <div class="wizard-step-body">
+        <div class="form-grid">
+          <div class="form-group span-full">
+            <label class="form-label" for="goal-name"><%= t("onboarding.steps.goal_name_label", default: "Hedef Adı") %></label>
+            <input type="text" 
+                   name="savings_goal[name]" 
+                   id="goal-name" 
+                   class="form-control" 
+                   placeholder="<%= t('onboarding.steps.goal_name_placeholder', default: 'Örn: Acil Durum Fonu, Yeni Bilgisayar, Tatil') %>"
+                   value="Acil Durum Fonu">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="goal-target"><%= t("onboarding.steps.goal_target_label", default: "Hedeflenen Tutar") %></label>
+            <div class="input-with-adornment">
+              <input type="number" 
+                     name="savings_goal[target_amount]" 
+                     id="goal-target" 
+                     class="form-control" 
+                     placeholder="0.00" 
+                     step="1" 
+                     value="100000">
+              <span class="input-adornment goal-currency-adornment"><%= @currency %></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="goal-starting"><%= t("onboarding.steps.goal_starting_label", default: "Başlangıç Tutarı (Varsa)") %></label>
+            <div class="input-with-adornment">
+              <input type="number" 
+                     name="savings_goal[starting_amount]" 
+                     id="goal-starting" 
+                     class="form-control" 
+                     placeholder="0.00" 
+                     step="1" 
+                     value="10000">
+              <span class="input-adornment goal-currency-adornment"><%= @currency %></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="goal-monthly"><%= t("onboarding.steps.goal_monthly_label", default: "Aylık Katkı Tutarı") %></label>
+            <div class="input-with-adornment">
+              <input type="number" 
+                     name="savings_goal[monthly_contribution]" 
+                     id="goal-monthly" 
+                     class="form-control" 
+                     placeholder="0.00" 
+                     step="1" 
+                     value="7500">
+              <span class="input-adornment goal-currency-adornment"><%= @currency %></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="goal-date"><%= t("onboarding.steps.goal_date_label", default: "Hedef Tarihi (İsteğe bağlı)") %></label>
+            <input type="date" 
+                   name="savings_goal[target_date]" 
+                   id="goal-date" 
+                   class="form-control" 
+                   value="<%= (Date.current + 1.year).strftime('%Y-%m-%d') %>">
+          </div>
+        </div>
+
+        <div class="goal-estimated-badge" id="goal-estimate-box" style="margin-top: 1.25rem;">
+          <span class="goal-estimate-text">
+            🎯 <%= t("onboarding.steps.estimated_months_preview", default: "Tahmini Tamamlanma:") %> 
+            <strong id="goal-estimated-months">~12 ay</strong>
+          </span>
+        </div>
+      </div>
+
+      <footer class="wizard-footer">
+        <button type="button" class="button button-secondary prev-step-btn" data-prev-step="4">
+          <span><%= t("onboarding.prev_step", default: "← Önceki Adım") %></span>
+        </button>
+        <div class="wizard-footer-actions">
+          <button type="button" id="skip-goal-and-submit-btn" class="button button-ghost">
+            <span><%= t("onboarding.skip_step", default: "Bu Adımı Atla") %></span>
+          </button>
+          <button type="submit" class="button button-primary button-lg" id="submit-onboarding-btn">
+            <span><%= t("onboarding.finish", default: "Kurulumu Tamamla ve Başla ✓") %></span>
+          </button>
+        </div>
+      </footer>
+    </section>
+
+  <% end %>
+</div>
