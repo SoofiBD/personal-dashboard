@@ -1,0 +1,160 @@
+<% assessment = @purchase_plan.assessment %>
+<% assum = assessment.assumptions %>
+<%
+  status_class = ->(s) { s == :comfortable ? "badge-status-comfortable" : (s == :plan ? "badge-status-plan" : "badge-status-defer") }
+%>
+
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("purchase_plans.eyebrow", default: "FİNANSAL PLANLAMA") %></p>
+    <h1><%= @purchase_plan.name %></h1>
+    <p class="page-subtitle">
+      <%= t("purchase_plans.show_subtitle", default: "Farklı ödeme senaryolarını karşılaştırın ve satın alma kararınızı verin.") %>
+      <% if @purchase_plan.savings_goal.present? %>
+        · <%= t("purchase_plans.linked_goal", default: "Hedef:") %> <strong><%= @purchase_plan.savings_goal.name %></strong>
+      <% end %>
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.5rem;">
+    <%= link_to edit_finance_purchase_plan_path(@purchase_plan), class: "button button-secondary" do %>
+      <%= finance_svg_icon("edit", class: "icon-sm") %>
+      <span><%= t("app.common.edit", default: "Düzenle") %></span>
+    <% end %>
+    <%= link_to finance_purchase_plans_path, class: "button button-secondary" do %>
+      <span><%= t("purchase_plans.back", default: "Planlara Dön") %></span>
+    <% end %>
+  </div>
+</header>
+
+<div id="purchase-assessment"
+     data-monthly-free-cash="<%= assum[:monthly_free_cash] %>"
+     data-available-cash="<%= assum[:available_cash] %>"
+     data-monthly-expenses="<%= assum[:monthly_expenses] %>"
+     data-savings-goal-applied="<%= assessment.savings_goal_applied %>">
+
+  <!-- Editable Inputs -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("purchase_plans.inputs_title", default: "Hesaplama Girdileri") %></h2>
+        <p><%= t("purchase_plans.inputs_desc", default: "Değerleri değiştirin, senaryolar anlık olarak güncellenir.") %></p>
+      </div>
+      <%= link_to t("purchase_plans.save_inputs", default: "Planı Güncelle"), edit_finance_purchase_plan_path(@purchase_plan), class: "text-link" %>
+    </div>
+    <div class="scenario-inputs">
+      <div class="form-group">
+        <label for="input-price"><%= t("purchase_plans.price", default: "Toplam Fiyat") %></label>
+        <%= number_field_tag nil, @purchase_plan.price, step: 0.01, min: 0.01, id: "input-price", class: "scenario-input", data: { scenario_input: "price" } %>
+      </div>
+      <div class="form-group">
+        <label for="input-down"><%= t("purchase_plans.down_payment", default: "Peşinat Tutarı") %></label>
+        <%= number_field_tag nil, @purchase_plan.down_payment, step: 0.01, min: 0, id: "input-down", class: "scenario-input", data: { scenario_input: "down_payment" } %>
+      </div>
+      <div class="form-group">
+        <label for="input-monthly"><%= t("purchase_plans.monthly_cost", default: "Aylık Taksit (Referans)") %></label>
+        <%= number_field_tag nil, @purchase_plan.monthly_cost, step: 0.01, min: 0, id: "input-monthly", class: "scenario-input", data: { scenario_input: "monthly_cost" } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scenario Comparison -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("purchase_plans.scenarios_title", default: "Senaryo Karşılaştırması") %></h2>
+        <p><%= t("purchase_plans.scenarios_desc", default: "Peşin, taksit ve birikim hedefi kullanımı yan yana.") %></p>
+      </div>
+    </div>
+
+    <div class="scenario-grid">
+      <% assessment.scenarios.each do |sc| %>
+        <article class="scenario-card status-<%= sc[:status] %>" data-scenario="<%= sc[:key] %>" data-months="<%= sc[:key].to_s.match(/installment_(\d+)/) ? Regexp.last_match(1) : (sc[:key] == :cash ? 0 : 12) %>">
+          <div class="scenario-card-head">
+            <span class="scenario-label"><%= sc[:label] %></span>
+            <span class="badge-pill <%= status_class.call(sc[:status]) %> scenario-status"><%= t("purchase_plans.status_#{sc[:status]}", default: sc[:status].to_s.humanize) %></span>
+          </div>
+          <div class="scenario-figure">
+            <span class="scenario-figure-label"><%= t("purchase_plans.monthly_payment", default: "Aylık Ödeme") %></span>
+            <strong class="scenario-monthly" data-field="monthly_cost"><%= dashboard_currency sc[:monthly_cost] %></strong>
+          </div>
+          <div class="scenario-rows">
+            <div class="scenario-row">
+              <span><%= t("purchase_plans.down_payment_label", default: "Peşinat") %></span>
+              <strong data-field="down_payment"><%= dashboard_currency sc[:down_payment] %></strong>
+            </div>
+            <div class="scenario-row">
+              <span><%= t("purchase_plans.safety_buffer", default: "Sonraki Güvenlik Marjı") %></span>
+              <strong data-field="safety_buffer" class="<%= sc[:safety_buffer] < 0 ? 'value-negative' : 'value-positive' %>"><%= dashboard_currency sc[:safety_buffer] %></strong>
+            </div>
+            <div class="scenario-row">
+              <span><%= t("purchase_plans.free_cash_after", default: "Sonraki Aylık Boş Nakit") %></span>
+              <strong data-field="monthly_free_cash_after" class="<%= sc[:monthly_free_cash_after] < 0 ? 'value-negative' : 'value-positive' %>"><%= dashboard_currency sc[:monthly_free_cash_after] %></strong>
+            </div>
+          </div>
+          <% if sc[:affects_goal] %>
+            <div class="scenario-goal-note"><%= t("purchase_plans.uses_goal", default: "Birikim hedefi kullanılır") %></div>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Assumptions -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("purchase_plans.assumptions_title", default: "Varsayımlar ve Girdiler") %></h2>
+        <p><%= t("purchase_plans.assumptions_desc", default: "Tüm hesaplamalar şu verilere dayanır (son 3 ay).") %></p>
+      </div>
+    </div>
+    <div class="assumptions-grid">
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_income", default: "Aylık Gelir") %></span>
+        <strong><%= dashboard_currency assum[:monthly_income] %></strong>
+      </div>
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_expenses", default: "Aylık Gider") %></span>
+        <strong><%= dashboard_currency assum[:monthly_expenses] %></strong>
+      </div>
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_goal_contrib", default: "Aktif Hedef Katkıları") %></span>
+        <strong><%= dashboard_currency assum[:active_goal_contributions] %></strong>
+      </div>
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_free_cash", default: "Aylık Boş Nakit") %></span>
+        <strong class="<%= assum[:monthly_free_cash] < 0 ? 'value-negative' : 'value-positive' %>"><%= dashboard_currency assum[:monthly_free_cash] %></strong>
+      </div>
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_available_cash", default: "Kullanılabilir Nakit") %></span>
+        <strong><%= dashboard_currency assum[:available_cash] %></strong>
+      </div>
+      <div class="assumption-item">
+        <span class="assumption-label"><%= t("purchase_plans.assum_goal_remaining", default: "Hedef Kalan Tutar") %></span>
+        <strong><%= dashboard_currency assum[:savings_goal_remaining] %></strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- Convert to Transaction -->
+  <section class="panel convert-panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("purchase_plans.convert_title", default: "Satın Alma İşlemine Dönüştür") %></h2>
+        <p><%= t("purchase_plans.convert_desc", default: "Onaylandığında plan bir gider işlemine dönüşür.") %></p>
+      </div>
+    </div>
+    <%= form_with url: convert_finance_purchase_plan_path(@purchase_plan), method: :post, class: "convert-form" do |form| %>
+      <div class="form-group">
+        <%= form.label :financial_account_id, t("purchase_plans.convert_account", default: "Ödeme Yapılan Hesap") %>
+        <%= form.select :financial_account_id, options_from_collection_for_select(@accounts, :id, :name, @accounts.first&.id), { include_blank: t("purchase_plans.select_account", default: "Hesap Seçin") }, required: true, class: "filter-input" %>
+      </div>
+      <div class="form-group">
+        <%= form.label :category_id, t("purchase_plans.convert_category", default: "Kategori (opsiyonel)") %>
+        <%= form.select :category_id, options_from_collection_for_select(@expense_categories, :id, :name, nil), { include_blank: t("purchase_plans.no_category", default: "Kategorisiz") }, class: "filter-input" %>
+      </div>
+      <div class="form-actions">
+        <%= form.submit t("purchase_plans.convert_button", default: "İşleme Dönüştür"), class: "button button-primary" %>
+      </div>
+    <% end %>
+  </section>
+</div>

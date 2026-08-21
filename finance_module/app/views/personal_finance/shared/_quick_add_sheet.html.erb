@@ -1,0 +1,82 @@
+<% quick_accounts = quick_add_accounts.to_a %>
+<% quick_categories = %w[expense income transfer].flat_map { |kind| quick_add_categories_for(kind).to_a }.uniq %>
+<% if quick_accounts.any? %>
+  <div class="quick-add" data-quick-add>
+    <button type="button" class="quick-add-trigger" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet">
+      <%= finance_svg_icon("plus", class: "quick-add-trigger-icon", "aria-hidden": true) %>
+      <span><%= t("quick_add.open", default: "Hızlı işlem ekle") %></span>
+    </button>
+
+    <div class="quick-add-backdrop" data-quick-add-close hidden></div>
+    <section id="quick-add-sheet" class="quick-add-sheet" role="dialog" aria-modal="true" aria-labelledby="quick-add-title" hidden tabindex="-1">
+      <div class="quick-add-handle" aria-hidden="true"></div>
+      <div class="quick-add-heading">
+        <div>
+          <p class="eyebrow"><%= t("quick_add.eyebrow", default: "HIZLI EKLE") %></p>
+          <h2 id="quick-add-title"><%= t("quick_add.title", default: "Yeni işlem") %></h2>
+        </div>
+        <button type="button" class="quick-add-close" data-quick-add-close aria-label="<%= t('quick_add.close', default: 'Hızlı işlem penceresini kapat') %>">
+          <%= finance_svg_icon("close", class: "quick-add-close-icon", "aria-hidden": true) %>
+        </button>
+      </div>
+
+      <%= form_with model: PersonalFinance::Transaction.new(occurred_on: Date.current, kind: "expense", financial_account_id: quick_accounts.first.id), scope: :transaction, url: finance_transactions_path, class: "quick-add-form", data: { quick_add_form: true } do |form| %>
+        <div class="quick-add-type" role="group" aria-label="<%= t('transactions.kind', default: 'İşlem türü') %>">
+          <% [["expense", t("transactions.kinds.expense", default: "Gider")], ["income", t("transactions.kinds.income", default: "Gelir")], ["transfer", t("transactions.kinds.transfer", default: "Transfer")]].each do |kind, label| %>
+            <button type="button" class="quick-add-type-button <%= "is-selected" if kind == "expense" %>" data-quick-add-type="<%= kind %>" aria-pressed="<%= kind == "expense" %>"><%= label %></button>
+          <% end %>
+          <%= form.hidden_field :kind, data: { quick_add_kind: true } %>
+        </div>
+
+        <div class="quick-add-amount-field">
+          <%= form.label :amount, t("transactions.amount", default: "Tutar") %>
+          <div class="quick-add-amount-input">
+            <%= form.number_field :amount, step: 0.01, min: 0.01, inputmode: "decimal", autocomplete: "off", placeholder: "0,00", required: true, data: { quick_add_amount: true } %>
+            <span><%= current_panel_user.currency %></span>
+          </div>
+        </div>
+
+        <div class="quick-add-category-section">
+          <div class="quick-add-section-label">
+            <%= form.label :category_id, t("transactions.category", default: "Kategori") %>
+            <span><%= t("quick_add.swipe_hint", default: "Kaydırarak seç") %></span>
+          </div>
+          <div class="quick-add-category-viewport" data-quick-add-swipe>
+            <div class="quick-add-categories" data-quick-add-categories role="radiogroup" aria-label="<%= t('transactions.category', default: 'Kategori') %>">
+              <% quick_categories.each do |category| %>
+                <button type="button" class="quick-add-category" data-quick-add-category="<%= category.id %>" data-quick-add-category-kind="<%= category.kind %>" role="radio" aria-checked="false">
+                  <span class="quick-add-category-dot" style="background-color: <%= category.color %>" aria-hidden="true"></span>
+                  <span><%= category.name %></span>
+                </button>
+              <% end %>
+            </div>
+          </div>
+          <%= form.hidden_field :category_id, data: { quick_add_category: true } %>
+        </div>
+
+        <details class="quick-add-details">
+          <summary><%= t("quick_add.more", default: "Not, tarih veya hesap ekle") %></summary>
+          <div class="quick-add-optional-fields">
+            <div class="form-group">
+              <%= form.label :note, t("transactions.note", default: "Not") %>
+              <%= form.text_field :note, maxlength: 500, placeholder: t("transactions.note_placeholder", default: "Kısa bir not") %>
+            </div>
+            <div class="form-group">
+              <%= form.label :occurred_on, t("transactions.occurred_on", default: "Tarih") %>
+              <%= form.date_field :occurred_on, required: true %>
+            </div>
+            <div class="form-group">
+              <%= form.label :financial_account_id, t("transactions.account", default: "Hesap") %>
+              <%= form.collection_select :financial_account_id, quick_accounts, :id, :name %>
+            </div>
+          </div>
+        </details>
+
+        <div class="quick-add-actions">
+          <button type="button" class="button button-secondary" data-quick-add-close><%= t("app.common.cancel", default: "İptal") %></button>
+          <%= form.submit t("quick_add.save", default: "İşlemi kaydet"), class: "button button-primary" %>
+        </div>
+      <% end %>
+    </section>
+  </div>
+<% end %>

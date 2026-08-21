@@ -96,6 +96,11 @@ module ApplicationHelper
         tag.line(x1: "12", y1: "5", x2: "12", y2: "19") +
           tag.line(x1: "5", y1: "12", x2: "19", y2: "12")
       end
+    when "close"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.line(x1: "18", x2: "6", y1: "6", y2: "18") +
+          tag.line(x1: "6", x2: "18", y1: "6", y2: "18")
+      end
     when "edit"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
         tag.path(d: "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z") +
@@ -119,5 +124,23 @@ module ApplicationHelper
     else
       content_tag(:span, "•", class: css_class)
     end
+  end
+
+  def quick_add_categories
+    categories = PersonalFinance::Category.where(user_id: current_panel_user.id, kind: "expense").order(:name).to_a
+    recent_ids = PersonalFinance::Transaction.where(user_id: current_panel_user.id).where.not(category_id: nil)
+      .order(occurred_on: :desc, created_at: :desc).limit(24).pluck(:category_id).uniq
+
+    (categories.sort_by { |category| recent_ids.index(category.id) || recent_ids.length } + categories).uniq.first(8)
+  end
+
+  def quick_add_categories_for(kind)
+    return quick_add_categories if kind == "expense"
+
+    PersonalFinance::Category.where(user_id: current_panel_user.id, kind: kind).order(:name).limit(8)
+  end
+
+  def quick_add_accounts
+    PersonalFinance::Account.where(user_id: current_panel_user.id, is_active: true).order(:name)
   end
 end
