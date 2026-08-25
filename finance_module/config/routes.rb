@@ -8,6 +8,9 @@ scope :finance, module: :personal_finance, as: :finance do
   end
   resource :notification_settings, only: :update
   resources :subscriptions, except: :show
+  resources :debts, except: :show do
+    post :pay, on: :member
+  end
   resources :tags, except: :show do
     collection do
       get :report
