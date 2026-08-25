@@ -1,11 +1,11 @@
 require "test_helper"
 
-class PersonalFinance::DashboardControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::DashboardControllerTest < PersonalFinance::IntegrationTest
   setup do
     User.dashboard_owner.update!(onboarded_at: Time.current)
   end
 
-  test "dashboard is available without an authentication flow" do
+  test "dashboard is available after authentication" do
     get finance_root_path
 
     assert_response :success

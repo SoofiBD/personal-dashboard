@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::OnboardingControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::OnboardingControllerTest < PersonalFinance::IntegrationTest
   setup do
     # Clear any existing data so we test clean first-time user experience
     PersonalFinance::BudgetAllocation.delete_all
@@ -11,6 +11,7 @@ class PersonalFinance::OnboardingControllerTest < ActionDispatch::IntegrationTes
     PersonalFinance::SavingsGoal.delete_all
     PersonalFinance::PurchasePlan.delete_all
     User.delete_all
+    sign_in_dashboard_owner
   end
 
   test "new user visiting finance root is redirected to onboarding" do
