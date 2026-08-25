@@ -7,6 +7,7 @@ scope :finance, module: :personal_finance, as: :finance do
     post :mark_all_read, on: :collection
   end
   resource :notification_settings, only: :update
+  resource :theme_preference, only: :update
   resources :subscriptions, except: :show
   resources :debts, except: :show do
     post :pay, on: :member

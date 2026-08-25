@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" data-theme="<%= current_panel_user.theme_preference %>">
   <head>
     <meta charset="utf-8">
     <title>Personal Dashboard · Financial Hub</title>
@@ -64,6 +64,7 @@
         <div class="sidebar-footer">
           <div class="sidebar-footer-controls">
             <%= language_switcher %>
+            <%= form_with url: finance_theme_preference_path, method: :patch, class: "theme-form" do %><label class="sr-only" for="theme_preference">Tema</label><%= select_tag :theme_preference, options_for_select([["Sistem", "system"], ["Koyu", "dark"], ["Açık", "light"]], current_panel_user.theme_preference), onchange: "this.form.requestSubmit()", class: "theme-select" %><% end %>
           </div>
           <div class="workspace-pill">
             <div class="status-indicator-dot"></div>
