@@ -43,6 +43,7 @@
           <nav class="sidebar-nav">
             <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
             <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
+            <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan İşlemler"), finance_recurring_rules_path, "recurring" %>
             <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
             <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
             <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>

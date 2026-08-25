@@ -3,6 +3,7 @@ module PersonalFinance
     before_action :set_transaction, only: %i[edit update destroy]
 
     def index
+      RecurringTransactionGenerator.generate_due_for(current_panel_user)
       @filters = filter_params
 
       scope = owned(Transaction).includes(:account, :category)
@@ -46,7 +47,7 @@ module PersonalFinance
 
     def create
       @transaction = owned(Transaction).new(transaction_params)
-      save_or_render
+      create_transaction_and_rule
     end
 
     def update
@@ -79,6 +80,44 @@ module PersonalFinance
 
     def transaction_params
       params.require(:transaction).permit(:financial_account_id, :category_id, :kind, :amount, :occurred_on, :note, :is_recurring)
+    end
+
+    def recurrence_params
+      params.require(:transaction).permit(:recurrence_interval, :recurrence_end_date, :recurrence_count)
+    end
+
+    def create_transaction_and_rule
+      if @transaction.is_recurring?
+        @transaction.assign_attributes(recurrence_params)
+        ActiveRecord::Base.transaction do
+          @transaction.save!
+          rule = owned(RecurringRule).create!(rule_attributes_for(@transaction))
+          @transaction.update!(recurring_rule: rule)
+        end
+        redirect_to finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved.")
+      else
+        save_or_render
+      end
+    rescue ActiveRecord::RecordInvalid => error
+      source = error.record
+      source.errors.each { |attribute, message| @transaction.errors.add(attribute, message) } unless source.equal?(@transaction)
+      render :new, status: :unprocessable_entity
+    end
+
+    def rule_attributes_for(transaction)
+      recurrence = recurrence_params
+      {
+        financial_account_id: transaction.financial_account_id,
+        category_id: transaction.category_id,
+        kind: transaction.kind,
+        amount: transaction.amount,
+        note: transaction.note,
+        starts_on: transaction.occurred_on,
+        last_generated_on: transaction.occurred_on,
+        recurrence_interval: recurrence[:recurrence_interval],
+        recurrence_end_date: recurrence[:recurrence_end_date].presence,
+        recurrence_count: recurrence[:recurrence_count].presence
+      }
     end
 
     def save_or_render

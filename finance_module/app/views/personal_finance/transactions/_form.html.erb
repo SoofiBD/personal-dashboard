@@ -31,6 +31,37 @@
     <%= form.text_field :note, maxlength: 500, placeholder: t("transactions.note_placeholder", default: "Market alışverişi, fatura vb.") %>
   </div>
 
+  <% if @transaction.persisted? && @transaction.recurring_rule.present? %>
+    <div class="recurrence-callout">
+      <%= finance_svg_icon("recurring", class: "icon-sm") %>
+      <span><%= t("transactions.recurrence.edit_hint", default: "Bu işlem bir tekrar eden plana bağlıdır. Gelecek işlemleri değiştirmek için planı yönetin.") %></span>
+      <%= link_to t("recurring_rules.manage", default: "Planı Yönet"), edit_finance_recurring_rule_path(@transaction.recurring_rule), class: "text-link" %>
+    </div>
+  <% elsif !@transaction.persisted? %>
+    <fieldset class="recurrence-fields">
+      <legend><%= t("transactions.recurrence.legend", default: "Tekrarlama") %></legend>
+      <label class="recurrence-toggle">
+        <%= form.check_box :is_recurring %>
+        <span><%= t("transactions.recurrence.enable", default: "Bu işlemi tekrarlayan olarak kaydet") %></span>
+      </label>
+      <p class="field-hint"><%= t("transactions.recurrence.hint", default: "İlk işlem seçtiğiniz tarihte kaydedilir; sonraki işlemler planınıza göre otomatik eklenir.") %></p>
+      <div class="recurrence-grid">
+        <div class="form-group">
+          <%= label_tag "transaction_recurrence_interval", t("transactions.recurrence.interval", default: "Tekrarlama sıklığı") %>
+          <%= select_tag "transaction[recurrence_interval]", options_for_select([[t("transactions.recurrence.weekly", default: "Her hafta"), "weekly"], [t("transactions.recurrence.biweekly", default: "İki haftada bir"), "biweekly"], [t("transactions.recurrence.monthly", default: "Her ay"), "monthly"], [t("transactions.recurrence.yearly", default: "Her yıl"), "yearly"]], @transaction.recurrence_interval || "monthly"), id: "transaction_recurrence_interval" %>
+        </div>
+        <div class="form-group">
+          <%= label_tag "transaction_recurrence_end_date", t("transactions.recurrence.end_date", default: "Bitiş tarihi (isteğe bağlı)") %>
+          <%= date_field_tag "transaction[recurrence_end_date]", @transaction.recurrence_end_date, id: "transaction_recurrence_end_date" %>
+        </div>
+        <div class="form-group">
+          <%= label_tag "transaction_recurrence_count", t("transactions.recurrence.count", default: "Toplam işlem sayısı (isteğe bağlı)") %>
+          <%= number_field_tag "transaction[recurrence_count]", @transaction.recurrence_count, min: 1, step: 1, id: "transaction_recurrence_count" %>
+        </div>
+      </div>
+    </fieldset>
+  <% end %>
+
   <div class="form-actions">
     <%= form.submit @transaction.persisted? ? t("transactions.update", default: "İşlemi Güncelle") : t("transactions.save", default: "İşlemi Kaydet"), class: "button button-primary" %>
     <%= link_to t("app.common.cancel", default: "İptal"), finance_transactions_path, class: "button button-secondary" %>

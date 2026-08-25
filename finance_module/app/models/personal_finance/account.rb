@@ -4,6 +4,7 @@ module PersonalFinance
 
     belongs_to :user, class_name: "::User"
     has_many :transactions, class_name: "PersonalFinance::Transaction", foreign_key: :financial_account_id, dependent: :restrict_with_error
+    has_many :recurring_rules, class_name: "PersonalFinance::RecurringRule", foreign_key: :financial_account_id, dependent: :restrict_with_error
 
     enum :kind, {cash: "cash", bank: "bank", card: "card", savings: "savings"}, validate: true
 

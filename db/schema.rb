@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_21_000003) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -78,6 +78,31 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000003) do
     t.index ["user_id"], name: "index_finance_purchase_plans_on_user_id"
   end
 
+  create_table "finance_recurring_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "financial_account_id", null: false
+    t.uuid "category_id"
+    t.string "kind", null: false
+    t.decimal "amount", precision: 14, scale: 2, null: false
+    t.string "note", limit: 500
+    t.date "starts_on", null: false
+    t.string "recurrence_interval", null: false
+    t.date "recurrence_end_date"
+    t.integer "recurrence_count"
+    t.integer "generated_count", default: 1, null: false
+    t.boolean "is_paused", default: false, null: false
+    t.date "last_generated_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "stopped_at"
+    t.index ["category_id"], name: "index_finance_recurring_rules_on_category_id"
+    t.index ["financial_account_id"], name: "index_finance_recurring_rules_on_financial_account_id"
+    t.index ["user_id", "is_paused"], name: "index_finance_recurring_rules_on_user_id_and_is_paused"
+    t.index ["user_id"], name: "index_finance_recurring_rules_on_user_id"
+    t.check_constraint "amount > 0::numeric", name: "finance_recurring_rule_amount_positive"
+    t.check_constraint "recurrence_count IS NULL OR recurrence_count > 0", name: "finance_recurring_rule_count_positive"
+  end
+
   create_table "finance_savings_goals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "name", null: false
@@ -102,8 +127,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000003) do
     t.boolean "is_recurring", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "recurring_rule_id"
     t.index ["category_id"], name: "index_finance_transactions_on_category_id"
     t.index ["financial_account_id"], name: "index_finance_transactions_on_financial_account_id"
+    t.index ["recurring_rule_id", "occurred_on"], name: "index_finance_transactions_on_rule_and_date", unique: true, where: "(recurring_rule_id IS NOT NULL)"
+    t.index ["recurring_rule_id"], name: "index_finance_transactions_on_recurring_rule_id"
     t.index ["user_id", "occurred_on"], name: "index_finance_transactions_on_user_id_and_occurred_on"
     t.index ["user_id"], name: "index_finance_transactions_on_user_id"
     t.check_constraint "amount > 0::numeric", name: "finance_transaction_amount_positive"
@@ -138,8 +166,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_21_000003) do
   add_foreign_key "finance_goal_contributions", "finance_transactions", column: "transaction_id"
   add_foreign_key "finance_purchase_plans", "finance_savings_goals", column: "savings_goal_id"
   add_foreign_key "finance_purchase_plans", "users"
+  add_foreign_key "finance_recurring_rules", "finance_categories", column: "category_id"
+  add_foreign_key "finance_recurring_rules", "financial_accounts"
+  add_foreign_key "finance_recurring_rules", "users"
   add_foreign_key "finance_savings_goals", "users"
   add_foreign_key "finance_transactions", "finance_categories", column: "category_id"
+  add_foreign_key "finance_transactions", "finance_recurring_rules", column: "recurring_rule_id"
   add_foreign_key "finance_transactions", "financial_accounts"
   add_foreign_key "finance_transactions", "users"
   add_foreign_key "financial_accounts", "users"

@@ -52,6 +52,11 @@ module ApplicationHelper
           tag.path(d: "m21 8-4-4-4 4") +
           tag.path(d: "M17 4v16")
       end
+    when "recurring", "repeat"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "m17 2 4 4-4 4") + tag.path(d: "M3 11V9a3 3 0 0 1 3-3h15") +
+          tag.path(d: "m7 22-4-4 4-4") + tag.path(d: "M21 13v2a3 3 0 0 1-3 3H3")
+      end
     when "accounts", "wallet"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
         tag.rect(width: "20", height: "14", x: "2", y: "5", rx: "2") +

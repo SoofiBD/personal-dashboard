@@ -1,0 +1,37 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("recurring_rules.eyebrow", default: "OTOMATİK İŞLEMLER") %></p>
+    <h1><%= t("recurring_rules.title", default: "Tekrarlayan İşlemler") %></h1>
+    <p class="page-subtitle"><%= t("recurring_rules.subtitle", default: "Düzenli gelir ve gider planlarınızı yönetin.") %></p>
+  </div>
+  <%= link_to new_finance_transaction_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %><span><%= t("recurring_rules.add", default: "Yeni Tekrarlayan İşlem") %></span>
+  <% end %>
+</header>
+
+<section class="panel recurring-rules-list">
+  <% if @recurring_rules.any? %>
+    <% @recurring_rules.each do |rule| %>
+      <article class="recurring-rule-row">
+        <div>
+          <div class="recurring-rule-title"><%= rule.category&.name || t("app.common.uncategorized", default: "Kategorisiz") %><span class="status-badge <%= rule.stopped? ? "is-stopped" : (rule.is_paused? ? "is-paused" : "is-active") %>"><%= rule.stopped? ? t("recurring_rules.stopped", default: "Durduruldu") : (rule.is_paused? ? t("recurring_rules.paused", default: "Duraklatıldı") : t("recurring_rules.active", default: "Aktif")) %></span></div>
+          <p><%= [rule.note.presence, rule.account.name, t("recurring_rules.intervals.#{rule.recurrence_interval}", default: rule.recurrence_interval.humanize)].compact.join(" · ") %></p>
+          <small><%= t("recurring_rules.next_on", date: l(rule.next_occurrence_on), default: "Sonraki işlem: #{l(rule.next_occurrence_on)}") unless rule.stopped? || rule.is_paused? || !rule.can_generate_on?(rule.next_occurrence_on) %></small>
+        </div>
+        <div class="recurring-rule-summary"><strong class="<%= rule.kind == "expense" ? "value-negative" : "value-positive" %>"><%= rule.kind == "expense" ? "−" : "+" %><%= dashboard_currency rule.amount %></strong><span><%= t("recurring_rules.generated_count", count: rule.generated_count, default: "%{count} işlem oluşturuldu") %></span></div>
+        <div class="recurring-rule-actions">
+          <%= link_to t("app.common.edit", default: "Düzenle"), edit_finance_recurring_rule_path(rule), class: "button button-secondary button-sm" %>
+          <% if rule.stopped? %>
+          <% elsif rule.is_paused? %>
+            <%= button_to t("recurring_rules.resume", default: "Devam Et"), resume_finance_recurring_rule_path(rule), method: :patch, class: "button button-primary button-sm" %>
+          <% else %>
+            <%= button_to t("recurring_rules.pause", default: "Duraklat"), pause_finance_recurring_rule_path(rule), method: :patch, class: "button button-secondary button-sm" %>
+          <% end %>
+          <%= button_to t("recurring_rules.stop", default: "Durdur"), finance_recurring_rule_path(rule), method: :delete, data: { turbo_confirm: t("recurring_rules.confirm_stop", default: "Bu planı durdurmak istiyor musunuz? Önceki işlemler korunur.") }, class: "button button-danger button-sm" %>
+        </div>
+      </article>
+    <% end %>
+  <% else %>
+    <div class="empty-state"><p><%= t("recurring_rules.empty_state", default: "Henüz tekrarlayan işlem planı yok.") %></p><%= link_to t("recurring_rules.add", default: "Yeni Tekrarlayan İşlem"), new_finance_transaction_path, class: "button button-secondary button-sm" %></div>
+  <% end %>
+</section>
