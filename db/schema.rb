@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_31_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_01_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -60,6 +60,31 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_31_000000) do
     t.index ["parent_id"], name: "index_finance_categories_on_parent_id"
     t.index ["user_id", "name"], name: "index_finance_categories_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_finance_categories_on_user_id"
+  end
+
+  create_table "finance_debt_payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "debt_id", null: false
+    t.decimal "amount", precision: 14, scale: 2, null: false
+    t.date "paid_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["debt_id"], name: "index_finance_debt_payments_on_debt_id"
+  end
+
+  create_table "finance_debts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "name", null: false
+    t.decimal "total_amount", precision: 14, scale: 2, null: false
+    t.decimal "remaining_amount", precision: 14, scale: 2, null: false
+    t.decimal "interest_rate", precision: 6, scale: 3, default: "0.0", null: false
+    t.decimal "monthly_payment", precision: 14, scale: 2, null: false
+    t.integer "remaining_installments", null: false
+    t.date "next_payment_on"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "active"], name: "index_finance_debts_on_user_id_and_active"
+    t.index ["user_id"], name: "index_finance_debts_on_user_id"
   end
 
   create_table "finance_exchange_rates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -252,6 +277,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_31_000000) do
   add_foreign_key "finance_budget_templates", "users"
   add_foreign_key "finance_categories", "finance_categories", column: "parent_id"
   add_foreign_key "finance_categories", "users"
+  add_foreign_key "finance_debt_payments", "finance_debts", column: "debt_id"
+  add_foreign_key "finance_debts", "users"
   add_foreign_key "finance_exchange_rates", "users"
   add_foreign_key "finance_goal_contributions", "finance_savings_goals", column: "savings_goal_id"
   add_foreign_key "finance_goal_contributions", "finance_transactions", column: "transaction_id"

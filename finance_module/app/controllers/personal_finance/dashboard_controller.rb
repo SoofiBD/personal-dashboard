@@ -12,6 +12,7 @@ module PersonalFinance
       @goals = owned(SavingsGoal).active.order(:target_date).limit(3)
       @recent_transactions = owned(Transaction).includes(:category).order(occurred_on: :desc, created_at: :desc).limit(8)
       @unread_notifications = owned(Notification).unread.recent_first.limit(3)
+      @total_debt = owned(Debt).where(active: true).sum(:remaining_amount)
       @monthly_cash_flow = cash_flow_for_last_six_months
       prepare_budget_data(month) if @budget
     end
