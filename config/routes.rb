@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"
     resource :dashboard, only: :show
+    resource :spending_report, only: :show
     resources :transactions, except: :show do
       collection do
         get :import
