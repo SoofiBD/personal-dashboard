@@ -42,6 +42,7 @@
           <p class="sidebar-label"><%= t("app.sidebar.section_label", default: "FİNANS MODÜLÜ") %></p>
           <nav class="sidebar-nav">
             <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
+            <%= finance_navigation_item t("app.sidebar.notifications", default: "Bildirimler"), finance_notifications_path, "chart", badge: current_panel_user.finance_notifications.unread.count %>
             <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
             <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan İşlemler"), finance_recurring_rules_path, "recurring" %>
             <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
