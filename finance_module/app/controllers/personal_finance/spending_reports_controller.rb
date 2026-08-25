@@ -24,7 +24,7 @@ module PersonalFinance
           previous: previous,
           children: category.children.filter_map do |child|
             amount = current_spending[child.id].to_f
-            { name: child.name, amount: amount, color: child.color.presence || category.color.presence || "#3B82F6" } if amount.positive?
+            {name: child.name, amount: amount, color: child.color.presence || category.color.presence || "#3B82F6"} if amount.positive?
           end
         }
       end.sort_by { |item| -item[:current] }
@@ -42,7 +42,7 @@ module PersonalFinance
       default_to = Date.current.end_of_month
       from = parse_date(params[:from]) || default_from
       to = parse_date(params[:to]) || default_to
-      from <= to ? [from, to] : [default_from, default_to]
+      (from <= to) ? [from, to] : [default_from, default_to]
     end
 
     def parse_date(value)
