@@ -78,6 +78,11 @@
       </div>
     </details>
 
+    <div class="filter-field">
+      <%= label_tag :tag_id, t("transactions.filters.tag", default: "Etiket") %>
+      <%= select_tag :tag_id, options_from_collection_for_select(@tags, :id, :name, @filters[:tag_id]), include_blank: t("transactions.filters.all_tags", default: "Tüm Etiketler"), class: "filter-input" %>
+    </div>
+
     <div class="filter-actions">
       <%= submit_tag t("transactions.filters.apply", default: "Uygula"), class: "button button-primary button-sm" %>
       <% if @filters_active %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_26_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_27_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -116,6 +116,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_000000) do
     t.index ["user_id"], name: "index_finance_savings_goals_on_user_id"
   end
 
+  create_table "finance_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "name", limit: 50, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "user_id, lower((name)::text)", name: "index_finance_tags_on_user_and_lower_name", unique: true
+    t.index ["user_id"], name: "index_finance_tags_on_user_id"
+  end
+
   create_table "finance_transaction_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "financial_account_id", null: false
@@ -130,6 +139,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_000000) do
     t.datetime "updated_at", null: false
     t.index ["financial_account_id"], name: "index_finance_transaction_imports_on_financial_account_id"
     t.index ["user_id"], name: "index_finance_transaction_imports_on_user_id"
+  end
+
+  create_table "finance_transaction_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "transaction_id", null: false
+    t.uuid "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id"], name: "index_finance_transaction_tags_on_tag_id"
+    t.index ["transaction_id", "tag_id"], name: "index_finance_transaction_tags_on_transaction_id_and_tag_id", unique: true
+    t.index ["transaction_id"], name: "index_finance_transaction_tags_on_transaction_id"
   end
 
   create_table "finance_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -186,8 +205,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_26_000000) do
   add_foreign_key "finance_recurring_rules", "financial_accounts"
   add_foreign_key "finance_recurring_rules", "users"
   add_foreign_key "finance_savings_goals", "users"
+  add_foreign_key "finance_tags", "users"
   add_foreign_key "finance_transaction_imports", "financial_accounts"
   add_foreign_key "finance_transaction_imports", "users"
+  add_foreign_key "finance_transaction_tags", "finance_tags", column: "tag_id"
+  add_foreign_key "finance_transaction_tags", "finance_transactions", column: "transaction_id"
   add_foreign_key "finance_transactions", "finance_categories", column: "category_id"
   add_foreign_key "finance_transactions", "finance_recurring_rules", column: "recurring_rule_id"
   add_foreign_key "finance_transactions", "financial_accounts"

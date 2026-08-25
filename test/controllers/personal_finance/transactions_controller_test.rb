@@ -27,6 +27,8 @@ class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationT
       occurred_on: Date.current,
       note: "Monthly payout salary"
     )
+    @tag = PersonalFinance::Tag.create!(user: @user, name: "Vacation")
+    @t1.tags << @tag
   end
 
   test "should get index with all transactions" do
@@ -71,6 +73,21 @@ class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationT
     assert_select ".transaction-category", text: /Monthly payout salary/, count: 0
   end
 
+  test "should filter by tag" do
+    get finance_transactions_path(tag_id: @tag.id)
+
+    assert_response :success
+    assert_select ".transaction-tag", text: "Vacation"
+    assert_select ".transaction-category", text: /Monthly payout salary/, count: 0
+  end
+
+  test "creates transaction with comma-separated tags" do
+    post finance_transactions_path, params: {transaction: {financial_account_id: @account.id, category_id: @category_food.id, kind: "expense", amount: 80, occurred_on: Date.current, tag_names: "Vacation, Work"}}
+
+    assert_redirected_to finance_transactions_path
+    assert_equal %w[Vacation Work], PersonalFinance::Transaction.find_by!(amount: 80).tags.order(:name).pluck(:name)
+  end
+
   test "exports filtered transactions as an Excel-compatible CSV" do
     from = (Date.current - 7.days).to_s
     to = Date.current.to_s
@@ -83,8 +100,8 @@ class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationT
     assert_includes response.headers["Content-Disposition"], "transactions_#{Date.current.strftime("%Y-%m")}_#{Date.current.strftime("%Y-%m")}.csv"
 
     rows = CSV.parse(response.body.delete_prefix("\uFEFF"))
-    assert_equal %w[date type amount category account note], rows.first
+    assert_equal %w[date type amount category account tags note], rows.first
     assert_equal 2, rows.size
-    assert_equal [(Date.current - 5.days).iso8601, "expense", "50.0", "Food", "Card", "Weekly groceries buy"], rows.second
+    assert_equal [(Date.current - 5.days).iso8601, "expense", "50.0", "Food", "Card", "Vacation", "Weekly groceries buy"], rows.second
   end
 end

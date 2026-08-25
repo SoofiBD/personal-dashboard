@@ -31,6 +31,13 @@
     <%= form.text_field :note, maxlength: 500, placeholder: t("transactions.note_placeholder", default: "Market alışverişi, fatura vb.") %>
   </div>
 
+  <div class="form-group tag-input-group">
+    <%= label_tag "transaction_tag_names", t("transactions.tags", default: "Etiketler") %>
+    <%= text_field_tag "transaction[tag_names]", @transaction.tags.order(:name).pluck(:name).join(", "), id: "transaction_tag_names", list: "transaction-tag-suggestions", maxlength: 300, placeholder: t("transactions.tags_placeholder", default: "Örn: tatil, iş, düğün") %>
+    <datalist id="transaction-tag-suggestions"><% PersonalFinance::Tag.where(user_id: current_panel_user.id).order(:name).each do |tag| %><option value="<%= tag.name %>"><% end %></datalist>
+    <p class="field-hint"><%= t("transactions.tags_hint", default: "Birden çok etiketi virgülle ayırın. Mevcut etiketler yazarken önerilir.") %></p>
+  </div>
+
   <% if @transaction.persisted? && @transaction.recurring_rule.present? %>
     <div class="recurrence-callout">
       <%= finance_svg_icon("recurring", class: "icon-sm") %>
