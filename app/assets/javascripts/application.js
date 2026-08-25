@@ -888,6 +888,11 @@
   };
 
   const init = () => {
+    document.querySelectorAll("[data-auto-submit]").forEach((element) => {
+      if (element.dataset.autoSubmitBound) return;
+      element.dataset.autoSubmitBound = "true";
+      element.addEventListener("change", () => element.form?.requestSubmit());
+    });
     animateDashboard();
     initBudgetSelector();
     initBudgetCalculator();
