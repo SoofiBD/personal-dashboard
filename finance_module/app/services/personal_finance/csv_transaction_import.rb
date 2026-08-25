@@ -2,6 +2,8 @@ require "csv"
 
 module PersonalFinance
   class CsvTransactionImport
+    MAX_ROWS = 10_000
+    MAX_COLUMNS = 100
     DATE_FORMATS = ["%Y-%m-%d", "%d.%m.%Y", "%d/%m/%Y", "%m/%d/%Y"].freeze
     TYPE_ALIASES = {"income" => "income", "gelir" => "income", "expense" => "expense", "gider" => "expense", "transfer" => "transfer"}.freeze
 
@@ -20,7 +22,17 @@ module PersonalFinance
 
       existing_keys = existing_duplicate_keys
       seen_keys = Set.new
-      CSV.parse(import.source_csv.delete_prefix("\uFEFF"), headers: true).each_with_index do |csv_row, index|
+      parsed = CSV.parse(import.source_csv.delete_prefix("\uFEFF"), headers: true)
+      if parsed.headers.compact.length > MAX_COLUMNS
+        errors << "CSV files may contain at most #{MAX_COLUMNS} columns."
+        return self
+      end
+      if parsed.length > MAX_ROWS
+        errors << "CSV files may contain at most #{MAX_ROWS} rows."
+        return self
+      end
+
+      parsed.each_with_index do |csv_row, index|
         row = parse_row(csv_row, index + 2)
         key = duplicate_key(row)
         row["status"] = if row["error"].present?

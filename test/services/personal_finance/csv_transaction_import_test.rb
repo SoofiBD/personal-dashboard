@@ -31,6 +31,16 @@ class PersonalFinance::CsvTransactionImportTest < ActiveSupport::TestCase
     assert_equal 1, PersonalFinance::Transaction.where(user: @user, note: "Lunch").count
   end
 
+  test "rejects oversized CSV shapes before building preview rows" do
+    source = ("date,amount\n" + (1..PersonalFinance::CsvTransactionImport::MAX_ROWS + 1).map { |index| "2026-08-01,#{index}" }.join("\n"))
+    parser = PersonalFinance::CsvTransactionImport.new(create_import(source), mapping)
+
+    parser.preview
+
+    assert_includes parser.errors, "CSV files may contain at most 10000 rows."
+    assert_empty parser.rows
+  end
+
   private
 
   def create_import(source)

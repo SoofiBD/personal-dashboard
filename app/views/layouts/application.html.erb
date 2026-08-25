@@ -17,8 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js", defer: true %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous" %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true, integrity: "sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF", crossorigin: "anonymous" %>
     <%= javascript_include_tag "application", defer: true %>
   </head>
 
@@ -65,7 +65,7 @@
         <div class="sidebar-footer">
           <div class="sidebar-footer-controls">
             <%= language_switcher %>
-            <%= form_with url: finance_theme_preference_path, method: :patch, class: "theme-form" do %><label class="sr-only" for="theme_preference">Tema</label><%= select_tag :theme_preference, options_for_select([["Sistem", "system"], ["Koyu", "dark"], ["Açık", "light"]], current_panel_user.theme_preference), onchange: "this.form.requestSubmit()", class: "theme-select" %><% end %>
+            <%= form_with url: finance_theme_preference_path, method: :patch, class: "theme-form" do %><label class="sr-only" for="theme_preference">Tema</label><%= select_tag :theme_preference, options_for_select([["Sistem", "system"], ["Koyu", "dark"], ["Açık", "light"]], current_panel_user.theme_preference), class: "theme-select", data: {auto_submit: true} %><% end %>
           </div>
           <div class="workspace-pill">
             <div class="status-indicator-dot"></div>
