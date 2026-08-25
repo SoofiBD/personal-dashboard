@@ -1,5 +1,139 @@
-<header class="page-header"><div><p class="eyebrow">HARCAMA UYARILARI</p><h1>Bildirimler</h1><p class="page-subtitle">Bütçe, limit ve tasarruf hedeflerinizdeki önemli gelişmeleri takip edin.</p></div><% if @unread_count.positive? %><%= button_to "Tümünü Okundu İşaretle", mark_all_read_finance_notifications_path, class: "button button-secondary" %><% end %></header>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <%= t("notifications.eyebrow", default: "AKILLI UYARILAR & LİMİTLER") %>
+    </p>
+    <h1><%= t("notifications.title", default: "Bildirimler & Limitler") %></h1>
+    <p class="page-subtitle"><%= t("notifications.subtitle", default: "Harcama eşiklerinizi belirleyin ve bütçenizdeki önemli gelişmeleri takip edin.") %></p>
+  </div>
+  <% if @unread_count.positive? %>
+    <%= button_to mark_all_read_finance_notifications_path, method: :post, class: "button button-secondary" do %>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span><%= t("notifications.mark_all_read", default: "Tümünü Okundu İşaretle") %></span>
+    <% end %>
+  <% end %>
+</header>
 
-<section class="panel" style="margin-bottom: 1.5rem;"><div class="panel-header"><div><h2>Harcama Limitleri</h2><p>Limit aşıldığında günlük veya haftalık bildirim alın. Boş bırakırsanız uyarı kapalı kalır.</p></div></div><%= form_with model: current_panel_user, url: finance_notification_settings_path, method: :patch, class: "notification-settings-form" do |form| %><div class="form-group"><%= form.label :daily_spending_limit, "Günlük limit" %><%= form.number_field :daily_spending_limit, min: 0, step: 0.01, placeholder: "Örn. 1000", class: "form-control" %></div><div class="form-group"><%= form.label :weekly_spending_limit, "Haftalık limit" %><%= form.number_field :weekly_spending_limit, min: 0, step: 0.01, placeholder: "Örn. 5000", class: "form-control" %></div><%= form.submit "Limitleri Kaydet", class: "button button-primary" %></div><% end %></section>
+<div class="notifications-layout">
+  <!-- Harcama Limitleri Kartı -->
+  <section class="panel limits-panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("notifications.limits_title", default: "Akıllı Harcama Limitleri") %></h2>
+        <p><%= t("notifications.limits_subtitle", default: "Limitler aşıldığında anlık bildirim alın. Devre dışı bırakmak için boş bırakabilirsiniz.") %></p>
+      </div>
+    </div>
 
-<section class="panel"><div class="panel-header"><div><h2>Bildirim Geçmişi</h2><p><%= @unread_count %> okunmamış bildirim</p></div></div><% if @notifications.any? %><div class="notification-history-list"><% @notifications.each do |notification| %><article class="notification-history-row <%= 'is-unread' unless notification.read? %>"><div><h3><%= notification.title %></h3><p><%= notification.body %></p></div><time datetime="<%= notification.created_at.iso8601 %>"><%= l(notification.created_at, format: :short) %></time></article><% end %></div><% else %><div class="empty-state"><p>Henüz bildiriminiz yok. Harcama uyarıları burada görünecek.</p></div><% end %></section>
+    <%= form_with model: current_panel_user, url: finance_notification_settings_path, method: :patch, class: "limits-form" do |form| %>
+      <div class="limits-inputs-grid">
+        <!-- Günlük Limit -->
+        <div class="limit-card">
+          <div class="limit-card-header">
+            <div class="limit-icon-wrap daily-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 14 14"/>
+              </svg>
+            </div>
+            <div>
+              <span class="limit-card-title"><%= t("notifications.daily_limit", default: "Günlük Harcama Limiti") %></span>
+              <p class="limit-card-desc"><%= t("notifications.daily_limit_desc", default: "Bir gün içindeki maksimum planlanan harcama") %></p>
+            </div>
+          </div>
+          <div class="currency-input-wrap">
+            <%= form.number_field :daily_spending_limit, min: 0, step: 0.01, placeholder: "0,00", class: "limit-input" %>
+            <span class="currency-addon"><%= current_panel_user.currency %></span>
+          </div>
+        </div>
+
+        <!-- Haftalık Limit -->
+        <div class="limit-card">
+          <div class="limit-card-header">
+            <div class="limit-icon-wrap weekly-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <span class="limit-card-title"><%= t("notifications.weekly_limit", default: "Haftalık Harcama Limiti") %></span>
+              <p class="limit-card-desc"><%= t("notifications.weekly_limit_desc", default: "Bir hafta içindeki toplam harcama tavanı") %></p>
+            </div>
+          </div>
+          <div class="currency-input-wrap">
+            <%= form.number_field :weekly_spending_limit, min: 0, step: 0.01, placeholder: "0,00", class: "limit-input" %>
+            <span class="currency-addon"><%= current_panel_user.currency %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit t("notifications.save_limits", default: "Limitleri Kaydet"), class: "button button-primary limits-save-btn" %>
+      </div>
+    <% end %>
+  </section>
+
+  <!-- Açılır / Kapanır Bildirim Geçmişi Paneli -->
+  <details class="panel notification-collapsible-panel" <%= "open" if @unread_count.positive? %>>
+    <summary class="notification-collapsible-summary">
+      <div class="collapsible-summary-left">
+        <div class="notification-bell-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div>
+          <h2><%= t("notifications.history_title", default: "Bildirim Geçmişi") %></h2>
+          <p><%= t("notifications.history_subtitle", count: @unread_count, default: "#{@unread_count} okunmamış bildirim") %></p>
+        </div>
+      </div>
+      <div class="collapsible-summary-right">
+        <% if @unread_count.positive? %>
+          <span class="badge badge-warning"><%= @unread_count %> <%= t("app.common.new", default: "Yeni") %></span>
+        <% else %>
+          <span class="badge badge-subtle"><%= @notifications.count %> <%= t("notifications.history_title", default: "Kayıt") %></span>
+        <% end %>
+        <svg class="collapsible-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+    </summary>
+
+    <div class="notification-collapsible-content">
+      <% if @notifications.any? %>
+        <div class="notification-history-list">
+          <% @notifications.each do |notification| %>
+            <article class="notification-history-row <%= 'is-unread' unless notification.read? %>">
+              <div class="notification-status-indicator"></div>
+              <div class="notification-body-content">
+                <h3><%= notification.title %></h3>
+                <p><%= notification.body %></p>
+              </div>
+              <time datetime="<%= notification.created_at.iso8601 %>"><%= l(notification.created_at, format: :short) %></time>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state notification-empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <h3><%= t("notifications.empty_title", default: "Henüz Bildiriminiz Yok") %></h3>
+          <p><%= t("notifications.empty_desc", default: "Günlük veya haftalık harcama limitiniz aşıldığında uyarılar burada listelenecektir.") %></p>
+        </div>
+      <% end %>
+    </div>
+  </details>
+</div>

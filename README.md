@@ -52,6 +52,12 @@ personal-dashboard/
 - **Transactions & Accounts:** Record and categorize expenses/incomes across bank accounts, cash, and credit cards.
 - **Category Analytics:** Clear insights into spending distribution and category breakdowns.
 
+### 🎨 Interface & Experience
+- **Obsidian Luxe design system:** Shared color, spacing, typography, motion, and status tokens across the dashboard.
+- **Responsive finance views:** Dashboard, transactions, budgets, reports, imports, and settings adapt to compact screens.
+- **Accessible interaction states:** Keyboard-friendly controls, focus treatment, reduced-motion support, and semantic labels.
+- **Localized UI:** Turkish and English copy share the same component and layout system.
+
 ---
 
 ## 🔮 Project Status & Roadmap
@@ -99,7 +105,7 @@ Make sure you have one of the following setups installed on your machine:
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine (v24+) & Docker Compose (v2+)
 - **For Local Native setup:**
   - Ruby 3.3.x
-  - Rails 7.1.x
+  - Rails 7.2.x
   - PostgreSQL 16+
   - Node.js & npm / yarn (for asset compilation if needed)
 
@@ -119,7 +125,7 @@ Make sure you have one of the following setups installed on your machine:
    ```bash
    cp .env.example .env.local
    ```
-   *Open `.env.local`, set a secure `POSTGRES_PASSWORD`, and personalize your settings. Do not persist the dashboard login password in this file.*
+   *Open `.env.local`, set a secure URI-safe `POSTGRES_PASSWORD`, and personalize your settings. Do not persist the dashboard login password in this file.*
 
 3. **Build and start the application:**
    ```bash
@@ -218,7 +224,7 @@ The following variables can be customized in `.env.local`:
 | `DASHBOARD_TIME_ZONE` | Time zone used for scheduling and timestamps | `Europe/Istanbul` |
 | `POSTGRES_DB` | PostgreSQL database name | `personal_dashboard_development` |
 | `POSTGRES_USER` | PostgreSQL username | `personal_dashboard` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `local-development-password` |
+| `POSTGRES_PASSWORD` | PostgreSQL password; required and never defaulted | None; generate a random value |
 
 ---
 

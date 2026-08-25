@@ -16,9 +16,12 @@
       <%= label_tag :to, t("spending_report.to", default: "Bitiş") %>
       <%= date_field_tag :to, @to, class: "filter-input", min: @from %>
     </div>
-    <div class="filter-actions">
-      <%= submit_tag t("spending_report.apply", default: "Raporu Güncelle"), class: "button button-primary button-sm" %>
-      <%= link_to t("spending_report.this_month", default: "Bu Ay"), finance_spending_report_path, class: "button button-secondary button-sm" %>
+    <div class="filter-actions-col">
+      <span class="filter-actions-label" aria-hidden="true">&nbsp;</span>
+      <div class="filter-actions">
+        <%= submit_tag t("spending_report.apply", default: "Raporu Güncelle"), class: "button button-primary filter-submit-btn" %>
+        <%= link_to t("spending_report.this_month", default: "Bu Ay"), finance_spending_report_path, class: "button button-secondary filter-month-btn" %>
+      </div>
     </div>
   <% end %>
 </section>

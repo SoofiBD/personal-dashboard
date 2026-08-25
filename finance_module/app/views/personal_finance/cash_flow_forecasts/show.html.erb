@@ -9,10 +9,24 @@
 <section class="panel forecast-assumptions" aria-labelledby="forecast-assumptions-title">
   <div class="panel-header"><div><h2 id="forecast-assumptions-title"><%= t("cash_flow_forecast.assumptions", default: "Varsayımlar") %></h2><p><%= t("cash_flow_forecast.assumptions_note", default: "Varsayımlar son üç aylık, tekrarlanmayan işlemlerin ortalamasıdır. Değerleri bu görünüm için değiştirebilirsiniz.") %></p></div></div>
   <%= form_with url: finance_cash_flow_forecast_path, method: :get, class: "forecast-assumptions-form" do %>
-    <div class="filter-field"><%= label_tag :months, t("cash_flow_forecast.horizon", default: "Tahmin Ufku") %><%= select_tag :months, options_for_select([[t("cash_flow_forecast.three_months", default: "3 ay"), 3], [t("cash_flow_forecast.six_months", default: "6 ay"), 6]], @forecast.months), class: "filter-input" %></div>
-    <div class="filter-field"><%= label_tag :baseline_income, t("cash_flow_forecast.baseline_income", default: "Aylık Baz Gelir") %><%= number_field_tag :baseline_income, @forecast.baseline_income.round(2), class: "filter-input", min: 0, step: 0.01 %></div>
-    <div class="filter-field"><%= label_tag :baseline_expenses, t("cash_flow_forecast.baseline_expenses", default: "Aylık Baz Gider") %><%= number_field_tag :baseline_expenses, @forecast.baseline_expenses.round(2), class: "filter-input", min: 0, step: 0.01 %></div>
-    <div class="filter-actions"><%= submit_tag t("cash_flow_forecast.update", default: "Tahmini Güncelle"), class: "button button-primary button-sm" %></div>
+    <div class="filter-field">
+      <%= label_tag :months, t("cash_flow_forecast.horizon", default: "Tahmin Ufku") %>
+      <%= select_tag :months, options_for_select([[t("cash_flow_forecast.three_months", default: "3 ay"), 3], [t("cash_flow_forecast.six_months", default: "6 ay"), 6]], @forecast.months), class: "filter-input" %>
+    </div>
+    <div class="filter-field">
+      <%= label_tag :baseline_income, t("cash_flow_forecast.baseline_income", default: "Aylık Baz Gelir") %>
+      <%= number_field_tag :baseline_income, @forecast.baseline_income.round(2), class: "filter-input", min: 0, step: 0.01 %>
+    </div>
+    <div class="filter-field">
+      <%= label_tag :baseline_expenses, t("cash_flow_forecast.baseline_expenses", default: "Aylık Baz Gider") %>
+      <%= number_field_tag :baseline_expenses, @forecast.baseline_expenses.round(2), class: "filter-input", min: 0, step: 0.01 %>
+    </div>
+    <div class="filter-actions-col">
+      <span class="filter-actions-label" aria-hidden="true">&nbsp;</span>
+      <div class="filter-actions">
+        <%= submit_tag t("cash_flow_forecast.update", default: "Tahmini Güncelle"), class: "button button-primary filter-submit-btn" %>
+      </div>
+    </div>
   <% end %>
 </section>
 
