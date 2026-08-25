@@ -1,49 +1,49 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow"><%= t("budgets.eyebrow", default: "AYLIK BÜTÇE PLANI") %></p>
-    <h1><%= t("budgets.title", month: l(@budget.starts_on, format: "%B %Y"), default: "#{l(@budget.starts_on, format: '%B %Y')} Bütçesi") %></h1>
+    <p class="eyebrow"><%= t("budgets.eyebrow") %></p>
+    <h1><%= t("budgets.title", month: l(@budget.starts_on, format: "%B %Y")) %></h1>
     <p class="page-subtitle">
-      <%= t("budgets.actual_spending", default: "Gerçekleşen Harcama:") %> <strong class="value-negative"><%= dashboard_currency @budget.actual_spending %></strong> · 
-      <%= t("budgets.remaining", default: "Kalan Bütçe:") %> <strong class="<%= @budget.remaining >= 0 ? 'value-positive' : 'value-negative' %>"><%= dashboard_currency @budget.remaining %></strong>
+      <%= t("budgets.actual_spending") %> <strong class="value-negative"><%= dashboard_currency @budget.actual_spending %></strong> ·
+      <%= t("budgets.remaining") %> <strong class="<%= @budget.remaining >= 0 ? 'value-positive' : 'value-negative' %>"><%= dashboard_currency @budget.remaining %></strong>
     </p>
   </div>
 
   <%= form_with url: currency_finance_budget_path(@budget.starts_on.strftime("%Y-%m")), method: :patch, class: "currency-form" do |form| %>
     <div>
-      <%= form.label :currency, t("budgets.display_currency", default: "Görüntüleme Para Birimi"), style: "font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;" %>
+      <%= form.label :currency, t("budgets.display_currency"), style: "font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.2rem;" %>
       <%= form.select :currency, %w[TRY USD EUR GBP], selected: current_panel_user.currency %>
     </div>
-    <%= form.submit t("app.common.change", default: "Değiştir"), class: "button button-secondary" %>
+    <%= form.submit t("app.common.change"), class: "button button-secondary" %>
   <% end %>
 </header>
 
 <section class="panel" style="margin-bottom: 1.5rem;">
   <div class="panel-header">
     <div>
-      <h2>Şablonlarla Başlayın</h2>
-      <p>Hazır dağılımları boş bir aya uygulayın veya bu ayın planını tekrar kullanmak üzere kaydedin.</p>
+      <h2><%= t("budget_templates.templates_title") %></h2>
+      <p><%= t("budget_templates.templates_desc") %></p>
     </div>
-    <%= link_to "Şablonları Yönet", finance_budget_templates_path, class: "button button-secondary button-sm" %>
+    <%= link_to t("budget_templates.manage_templates"), finance_budget_templates_path, class: "button button-secondary button-sm" %>
   </div>
 
   <% if @budget.allocations.none? %>
     <%= form_with url: apply_template_finance_budget_path(@budget.starts_on.strftime("%Y-%m")), class: "template-action-form" do |form| %>
       <div class="form-group" style="margin-bottom: 0; flex: 1;">
-        <%= form.label :template_id, "Uygulanacak şablon" %>
+        <%= form.label :template_id, t("budget_templates.select_template") %>
         <%= form.select :template_id, options_from_collection_for_select(@budget_templates, :id, :name), {}, class: "form-control" %>
       </div>
-      <%= form.submit "Şablonu Uygula", class: "button button-primary" %>
+      <%= form.submit t("budget_templates.apply_template"), class: "button button-primary" %>
     <% end %>
   <% else %>
-    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Mevcut tahsisler korunuyor. Şablon uygulamak için boş bir ay açın.</p>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;"><%= t("budget_templates.allocations_exist") %></p>
   <% end %>
 
   <%= form_with url: save_as_template_finance_budget_path(@budget.starts_on.strftime("%Y-%m")), class: "template-action-form" do |form| %>
     <div class="form-group" style="margin-bottom: 0; flex: 1;">
-      <%= form.label :name, "Bu ayı özel şablon olarak kaydet" %>
-      <%= form.text_field :name, maxlength: 80, required: true, placeholder: "Örn. Yaz tatili bütçesi", class: "form-control" %>
+      <%= form.label :name, t("budget_templates.save_as_template_label") %>
+      <%= form.text_field :name, maxlength: 80, required: true, placeholder: t("budget_templates.save_as_template_placeholder"), class: "form-control" %>
     </div>
-    <%= form.submit "Şablonu Kaydet", class: "button button-secondary" %>
+    <%= form.submit t("budget_templates.save_template"), class: "button button-secondary" %>
   <% end %>
 </section>
 
@@ -52,13 +52,13 @@
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
       <div>
         <p style="font-weight: 600; color: var(--text-main); margin-bottom: 0.25rem;">
-          <%= t("budgets.copy_previous_prompt", default: "Bu ay için henüz bütçe planı yok.") %>
+          <%= t("budgets.copy_previous_prompt") %>
         </p>
         <p style="font-size: 0.85rem; color: var(--text-muted);">
-          <%= t("budgets.copy_previous_hint", default: "Bir önceki ayın kategori limitlerini ve planlanan gelirini kopyalayabilirsiniz.") %>
+          <%= t("budgets.copy_previous_hint") %>
         </p>
       </div>
-      <%= button_to t("budgets.copy_previous", default: "Önceki Aydan Kopyala"),
+      <%= button_to t("budgets.copy_previous"),
             copy_previous_finance_budget_path(@budget.starts_on.strftime("%Y-%m")),
             method: :patch, class: "button button-primary" %>
     </div>
@@ -68,7 +68,7 @@
 <section class="panel form-panel">
   <%= form_with url: finance_budget_path(@budget.starts_on.strftime("%Y-%m")), method: :patch, id: "budget-edit-form" do |form| %>
     <div class="form-group">
-      <%= form.label :planned_income, t("budgets.planned_income", default: "Planlanan Toplam Bütçe") %>
+      <%= form.label :planned_income, t("budgets.planned_income") %>
       <div style="position: relative;">
         <input type="text"
                id="budget-total-planned-display"
@@ -78,13 +78,13 @@
                readonly />
       </div>
       <small style="display: block; margin-top: 0.35rem; color: var(--text-muted); font-size: 0.8rem;">
-        <%= t("budgets.planned_income_auto_note", default: "Kategori bazlı harcama limitlerinin toplamından otomatik olarak hesaplanır.") %>
+        <%= t("budgets.planned_income_auto_note") %>
       </small>
     </div>
 
     <div style="margin: 2rem 0 1rem;">
-      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;"><%= t("budgets.category_limits", default: "Kategori Bazlı Harcama Limitleri") %></h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted);"><%= t("budgets.category_limits_desc", default: "Her gider kategorisi için bu ay hedeflenen harcama miktarını belirleyin.") %></p>
+      <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem;"><%= t("budgets.category_limits") %></h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);"><%= t("budgets.category_limits_desc") %></p>
     </div>
 
     <div class="budget-allocation-list">
@@ -99,14 +99,14 @@
               <span class="tag-dot" style="background-color: <%= category.color.presence || '#3B82F6' %>;"></span>
               <span class="budget-cat-label"><%= category.name %></span>
               <% if is_sub %>
-                <span class="badge-sub-category"><%= t("budgets.sub_category", default: "Alt Kategori") %></span>
+                <span class="badge-sub-category"><%= t("budgets.sub_category") %></span>
               <% elsif category.children.any? %>
-                <span class="badge-parent-category"><%= t("budgets.parent_category", default: "Ana Kategori") %></span>
+                <span class="badge-parent-category"><%= t("budgets.parent_category") %></span>
               <% end %>
             </div>
             <% if current_spent > 0 %>
               <span class="budget-spent-hint">
-                <%= t("budgets.current_month_spent", amount: dashboard_currency(current_spent), default: "Bu ayki harcama: #{dashboard_currency(current_spent)}") %>
+                <%= t("budgets.current_month_spent", amount: dashboard_currency(current_spent)) %>
               </span>
             <% end %>
           </div>
@@ -117,9 +117,8 @@
     </div>
 
     <div class="form-actions">
-      <%= form.submit t("budgets.save", default: "Bütçeyi Kaydet"), class: "button button-primary" %>
-      <%= link_to t("budgets.back_to_dashboard", default: "Genel Bakışa Dön"), finance_root_path, class: "button button-secondary" %>
+      <%= form.submit t("budgets.save"), class: "button button-primary" %>
+      <%= link_to t("budgets.back_to_dashboard"), finance_root_path, class: "button button-secondary" %>
     </div>
   <% end %>
 </section>
-

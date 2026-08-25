@@ -1,11 +1,11 @@
 <header class="page-header">
-  <div><p class="eyebrow">CSV İÇE AKTARMA</p><h1>İşlemleri İçe Aktar</h1><p class="page-subtitle">Dosyanızı yükleyin; sütunları eşleyip işlemleri onaylamadan önce kontrol edin.</p></div>
+  <div><p class="eyebrow"><%= t("import.csv_eyebrow") %></p><h1><%= t("import.upload_title") %></h1><p class="page-subtitle"><%= t("import.upload_subtitle") %></p></div>
 </header>
 <section class="panel form-panel import-panel">
   <%= form_with url: import_finance_transactions_path, multipart: true do |form| %>
     <%= render "personal_finance/shared/errors", record: @transaction_import %>
-    <div class="form-group"><%= label_tag :csv_file, "CSV dosyası" %><%= file_field_tag :csv_file, accept: ".csv,text/csv", required: true %><p class="field-hint">Başlık satırı olan, en fazla 2 MB CSV dosyası yükleyin.</p></div>
-    <div class="form-group"><%= form.label :financial_account_id, "İşlemlerin ekleneceği hesap" %><%= form.collection_select :financial_account_id, @accounts, :id, :name, {include_blank: "Hesap seçin"}, {name: "financial_account_id", required: true} %></div>
-    <div class="form-actions"><%= form.submit "Sütunları Eşle", class: "button button-primary" %><%= link_to t("app.common.cancel", default: "İptal"), finance_transactions_path, class: "button button-secondary" %></div>
+    <div class="form-group"><%= label_tag :csv_file, t("import.csv_file") %><%= file_field_tag :csv_file, accept: ".csv,text/csv", required: true %><p class="field-hint"><%= t("import.csv_hint") %></p></div>
+    <div class="form-group"><%= form.label :financial_account_id, t("import.select_account") %><%= form.collection_select :financial_account_id, @accounts, :id, :name, {include_blank: t("import.select_account_placeholder")}, {name: "financial_account_id", required: true} %></div>
+    <div class="form-actions"><%= form.submit t("import.map_columns"), class: "button button-primary" %><%= link_to t("app.common.cancel"), finance_transactions_path, class: "button button-secondary" %></div>
   <% end %>
 </section>
