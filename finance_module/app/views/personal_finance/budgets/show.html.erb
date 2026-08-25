@@ -17,6 +17,36 @@
   <% end %>
 </header>
 
+<section class="panel" style="margin-bottom: 1.5rem;">
+  <div class="panel-header">
+    <div>
+      <h2>Şablonlarla Başlayın</h2>
+      <p>Hazır dağılımları boş bir aya uygulayın veya bu ayın planını tekrar kullanmak üzere kaydedin.</p>
+    </div>
+    <%= link_to "Şablonları Yönet", finance_budget_templates_path, class: "button button-secondary button-sm" %>
+  </div>
+
+  <% if @budget.allocations.none? %>
+    <%= form_with url: apply_template_finance_budget_path(@budget.starts_on.strftime("%Y-%m")), class: "template-action-form" do |form| %>
+      <div class="form-group" style="margin-bottom: 0; flex: 1;">
+        <%= form.label :template_id, "Uygulanacak şablon" %>
+        <%= form.select :template_id, options_from_collection_for_select(@budget_templates, :id, :name), {}, class: "form-control" %>
+      </div>
+      <%= form.submit "Şablonu Uygula", class: "button button-primary" %>
+    <% end %>
+  <% else %>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Mevcut tahsisler korunuyor. Şablon uygulamak için boş bir ay açın.</p>
+  <% end %>
+
+  <%= form_with url: save_as_template_finance_budget_path(@budget.starts_on.strftime("%Y-%m")), class: "template-action-form" do |form| %>
+    <div class="form-group" style="margin-bottom: 0; flex: 1;">
+      <%= form.label :name, "Bu ayı özel şablon olarak kaydet" %>
+      <%= form.text_field :name, maxlength: 80, required: true, placeholder: "Örn. Yaz tatili bütçesi", class: "form-control" %>
+    </div>
+    <%= form.submit "Şablonu Kaydet", class: "button button-secondary" %>
+  <% end %>
+</section>
+
 <% if @can_copy_previous %>
   <section class="panel" style="margin-bottom: 1.5rem; border-color: rgba(59, 130, 246, 0.35);">
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
@@ -92,5 +122,4 @@
     </div>
   <% end %>
 </section>
-
 
