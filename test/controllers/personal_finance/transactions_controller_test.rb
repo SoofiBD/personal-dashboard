@@ -1,7 +1,7 @@
 require "test_helper"
 require "csv"
 
-class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::TransactionsControllerTest < PersonalFinance::IntegrationTest
   setup do
     @user = User.first || User.create!(name: "Test User", currency: "TRY", time_zone: "Europe/Istanbul")
     @account = PersonalFinance::Account.create!(user: @user, name: "Card", kind: :bank, opening_balance: 1000)

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" data-theme="system">
+  <head>
+    <meta charset="utf-8">
+    <title>Personal Dashboard · Giriş</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application" %>
+  </head>
+  <body>
+    <main class="page-content" tabindex="-1">
+      <% if notice.present? || alert.present? %>
+        <div class="flash-stack" aria-live="polite">
+          <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
+          <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

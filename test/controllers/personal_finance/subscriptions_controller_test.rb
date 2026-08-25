@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::SubscriptionsControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::SubscriptionsControllerTest < PersonalFinance::IntegrationTest
   setup { User.dashboard_owner.update!(onboarded_at: Time.current) }
 
   test "creates a subscription" do

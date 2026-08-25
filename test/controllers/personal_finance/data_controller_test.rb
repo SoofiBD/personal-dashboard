@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::DataControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::DataControllerTest < PersonalFinance::IntegrationTest
   setup do
     @user = User.dashboard_owner
     @user.update!(onboarded_at: Time.current)
