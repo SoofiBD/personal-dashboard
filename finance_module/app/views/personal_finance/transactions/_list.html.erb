@@ -16,6 +16,11 @@
                 <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem; margin-left: 0.35rem;">— <%= transaction.note %></span>
               <% end %>
             </div>
+            <% if transaction.tags.any? %>
+              <div class="transaction-tag-list" aria-label="<%= t('transactions.tags', default: 'Etiketler') %>">
+                <% transaction.tags.order(:name).each do |tag| %><span class="transaction-tag"><%= tag.name %></span><% end %>
+              </div>
+            <% end %>
             <div class="transaction-submeta">
               <span><%= l(transaction.occurred_on, format: "%d %b %Y") rescue transaction.occurred_on %></span>
               <span>•</span>
@@ -59,4 +64,3 @@
     </div>
   <% end %>
 </div>
-
