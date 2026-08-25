@@ -1,7 +1,14 @@
 scope :finance, module: :personal_finance, as: :finance do
   root to: "dashboard#show"
   resource :dashboard, only: :show
-  resources :transactions, except: :show
+  resources :transactions, except: :show do
+    collection do
+      get :import
+      post :import, action: :create_import
+      post :preview_import
+      post :confirm_import
+    end
+  end
   resources :recurring_rules, only: %i[index edit update destroy] do
     patch :pause, on: :member
     patch :resume, on: :member
