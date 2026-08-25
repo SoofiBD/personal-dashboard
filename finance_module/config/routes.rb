@@ -2,6 +2,7 @@ scope :finance, module: :personal_finance, as: :finance do
   root to: "dashboard#show"
   resource :dashboard, only: :show
   resource :spending_report, only: :show
+  resource :cash_flow_forecast, only: :show
   resources :transactions, except: :show do
     collection do
       get :import
