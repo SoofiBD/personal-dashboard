@@ -12,6 +12,9 @@
           </div>
 
           <div class="transaction-actions">
+            <%= link_to finance_savings_goal_path(goal), class: "action-btn", title: t("savings_goals.details", default: "Detaylar") do %>
+              <%= finance_svg_icon("chart") %>
+            <% end %>
             <%= link_to edit_finance_savings_goal_path(goal), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
@@ -46,5 +49,4 @@
     </div>
   <% end %>
 </div>
-
 

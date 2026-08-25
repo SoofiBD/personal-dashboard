@@ -1,12 +1,18 @@
 module PersonalFinance
   class SavingsGoalsController < ApplicationController
-    before_action :set_goal, only: %i[edit update destroy]
+    before_action :set_goal, only: %i[show edit update destroy]
     def index
       @savings_goals = owned(SavingsGoal).order(:status, :target_date)
     end
 
     def new
       @savings_goal = owned(SavingsGoal).new(status: "active")
+    end
+
+    def show
+      @contributions = @savings_goal.contributions.includes(linked_transaction: :account).order(contributed_on: :desc, created_at: :desc)
+      @contribution = @savings_goal.contributions.new(contributed_on: Date.current)
+      @eligible_transfers = eligible_transfers
     end
 
     def edit
@@ -43,6 +49,10 @@ module PersonalFinance
       else
         render((action_name == "update") ? :edit : :new, status: :unprocessable_entity)
       end
+    end
+
+    def eligible_transfers
+      owned(Transaction).transfer.joins(:account).where(financial_accounts: {kind: "savings"}).where.not(id: GoalContribution.where.not(transaction_id: nil).select(:transaction_id)).order(occurred_on: :desc)
     end
   end
 end

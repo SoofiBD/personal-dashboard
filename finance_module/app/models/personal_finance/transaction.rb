@@ -11,13 +11,14 @@ module PersonalFinance
 
     enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
 
-    attr_accessor :recurrence_interval, :recurrence_end_date, :recurrence_count
+    attr_accessor :recurrence_interval, :recurrence_end_date, :recurrence_count, :savings_goal_id
 
     validates :amount, numericality: {greater_than: 0, less_than_or_equal_to: 99_999_999}
     validates :occurred_on, presence: true
     validates :note, length: {maximum: 500}
     validate :owned_account
     validate :matching_category_kind
+    validate :goal_contribution_requires_savings_transfer
 
     scope :during, ->(range) { where(occurred_on: range) }
     scope :search_notes, ->(query) { where("finance_transactions.note ILIKE ?", "%#{query}%") }
@@ -31,6 +32,11 @@ module PersonalFinance
     def matching_category_kind
       return unless category
       errors.add(:category, "is invalid") if category.user_id != user_id || category.kind != kind
+    end
+
+    def goal_contribution_requires_savings_transfer
+      return if savings_goal_id.blank?
+      errors.add(:base, "Goal contributions require a transfer to a savings account") unless transfer? && account&.savings?
     end
   end
 end
