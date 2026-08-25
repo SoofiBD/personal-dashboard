@@ -618,6 +618,43 @@
     });
   };
 
+  const initCashFlowForecast = () => {
+    const canvas = document.getElementById("cash-flow-forecast-chart");
+    const dataEl = document.getElementById("cash-flow-forecast-data");
+    if (!canvas || !dataEl || typeof window.Chart === "undefined") return;
+
+    let rows;
+    try {
+      rows = JSON.parse(dataEl.textContent);
+    } catch (e) {
+      return;
+    }
+    if (!Array.isArray(rows) || !rows.length) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const currentBalance = Number(canvas.dataset.startingBalance) || 0;
+    const labels = ["Bugün", ...rows.map((row) => row.label)];
+
+    new window.Chart(canvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Mevcut bakiye", data: [currentBalance, ...rows.map(() => null)], borderColor: "#3B82F6", backgroundColor: "#3B82F6", borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, spanGaps: false },
+          { label: "Tahmini bakiye", data: [currentBalance, ...rows.map((row) => Number(row.balance) || 0)], borderColor: "#F59E0B", backgroundColor: "rgba(245, 158, 11, 0.12)", borderWidth: 3, borderDash: [7, 5], pointRadius: 3, pointHoverRadius: 6, fill: true, tension: 0.25 },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: reduceMotion ? false : { duration: 600, easing: "easeOutQuart" },
+        interaction: { mode: "index", intersect: false },
+        plugins: { legend: { position: "bottom", labels: { color: "#94A3B8", usePointStyle: true, boxWidth: 8, padding: 16 } }, tooltip: { backgroundColor: "rgba(15, 23, 42, 0.95)", titleColor: "#F8FAFC", bodyColor: "#CBD5E1", padding: 12, cornerRadius: 8, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatChartCurrency(ctx.parsed.y)}` } } },
+        scales: { x: { grid: { color: "rgba(148, 163, 184, 0.12)" }, ticks: { color: "#94A3B8" } }, y: { grid: { color: "rgba(148, 163, 184, 0.12)" }, ticks: { color: "#94A3B8", callback: (value) => formatChartCurrency(value) } } },
+      },
+    });
+  };
+
   const initOnboardingWizard = () => {
     const wizardForm = document.getElementById("onboarding-form");
     if (!wizardForm) return;
@@ -851,6 +888,7 @@
     initQuickAdd();
     initCashFlowChart();
     initSpendingReport();
+    initCashFlowForecast();
     initOnboardingWizard();
     registerServiceWorker();
   };
