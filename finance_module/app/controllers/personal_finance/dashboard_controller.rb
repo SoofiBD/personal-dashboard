@@ -13,6 +13,8 @@ module PersonalFinance
       @recent_transactions = owned(Transaction).includes(:category).order(occurred_on: :desc, created_at: :desc).limit(8)
       @unread_notifications = owned(Notification).unread.recent_first.limit(3)
       @total_debt = owned(Debt).where(active: true).sum(:remaining_amount)
+      @financial_health = FinancialHealthScore.new(current_panel_user)
+      @financial_health_trend = FinancialHealthScore.trend(current_panel_user)
       @monthly_cash_flow = cash_flow_for_last_six_months
       prepare_budget_data(month) if @budget
     end
