@@ -4,6 +4,9 @@ module PersonalFinance
     def index
       @accounts = owned(Account).order(:name)
       @account_histories = @accounts.index_with { |account| account.balance_history }
+      converter = CurrencyConverter.new(current_panel_user)
+      @converted_total = @accounts.sum { |account| converter.convert(account.current_balance, account.currency) || 0 }
+      @unconverted_accounts = @accounts.reject { |account| converter.convert(account.current_balance, account.currency) }
       @net_worth_history = 6.times.map do |offset|
         month = Date.current.beginning_of_month - (5 - offset).months
         {month: month, balance: @account_histories.values.sum { |history| history.find { |point| point[:month] == month }[:balance] }}
@@ -39,7 +42,7 @@ module PersonalFinance
     end
 
     def account_params
-      params.require(:account).permit(:name, :kind, :opening_balance, :is_active)
+      params.require(:account).permit(:name, :kind, :opening_balance, :is_active, :currency)
     end
 
     def save_or_render
