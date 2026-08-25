@@ -1,6 +1,6 @@
 module PersonalFinance
   class BudgetsController < ApplicationController
-    before_action :set_budget, only: %i[show update currency copy_previous]
+    before_action :set_budget, only: %i[show update currency copy_previous apply_template save_as_template]
 
     SUPPORTED_CURRENCIES = %w[TRY USD EUR GBP].freeze
 
@@ -8,6 +8,8 @@ module PersonalFinance
       @allocations = @budget.allocations.includes(:category).order("finance_categories.name")
       @expense_categories = owned(Category).expense.includes(:parent, :children).order(:sort_order, :name)
       @can_copy_previous = @budget.allocations.none? && previous_budget_period.present?
+      BudgetTemplate.ensure_predefined_for!(current_panel_user)
+      @budget_templates = owned(BudgetTemplate).order(predefined: :desc, name: :asc)
       month = @budget.starts_on..@budget.ends_on
       category_spending = owned(Transaction).expense.during(month).group(:category_id).sum(:amount)
       @category_current_spent = {}
@@ -54,6 +56,26 @@ module PersonalFinance
 
       current_panel_user.update!(currency: currency)
       redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: t("budgets.flash.currency_changed", currency: currency, default: "Display currency changed to #{currency}. Amounts were not converted.")
+    end
+
+    def apply_template
+      template = owned(BudgetTemplate).find(params[:template_id])
+      if @budget.allocations.exists?
+        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablonlar yalnızca boş bir aylık bütçeye uygulanabilir."
+        return
+      end
+
+      template.apply_to!(@budget)
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: "#{template.name} şablonu bütçenize uygulandı."
+    rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablon uygulanamadı. Kategorilerinizi ve bütçe toplamını kontrol edin."
+    end
+
+    def save_as_template
+      template = BudgetTemplate.save_budget!(user: current_panel_user, budget: @budget, name: params[:name].to_s)
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: "#{template.name} şablonu kaydedildi."
+    rescue ActiveRecord::RecordInvalid
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablon adı boş olamaz ve hazır şablon adı kullanılamaz."
     end
 
     def year
