@@ -35,6 +35,10 @@ module PersonalFinance
       @transaction = owned(Transaction).new(occurred_on: Date.current, kind: "expense")
     end
 
+    def category_suggestion
+      render json: {category_id: CategorySuggester.call(current_panel_user, params[:note])}
+    end
+
     def import
       @transaction_import = owned(TransactionImport).new
       @accounts = owned(Account).where(is_active: true).order(:name)
