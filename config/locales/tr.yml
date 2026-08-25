@@ -1,297 +1,820 @@
 tr:
   date:
     formats:
-      default: "%d.%m.%Y"
-      short: "%d %b"
-      long: "%d %B %Y"
-    month_names: [~, "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
-    abbr_month_names: [~, "Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"]
-    day_names: ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]
-    abbr_day_names: ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"]
+      default: '%d.%m.%Y'
+      short: '%d %b'
+      long: '%d %B %Y'
+    month_names:
+    - null
+    - Ocak
+    - Şubat
+    - Mart
+    - Nisan
+    - Mayıs
+    - Haziran
+    - Temmuz
+    - Ağustos
+    - Eylül
+    - Ekim
+    - Kasım
+    - Aralık
+    abbr_month_names:
+    - null
+    - Oca
+    - Şub
+    - Mar
+    - Nis
+    - May
+    - Haz
+    - Tem
+    - Ağu
+    - Eyl
+    - Eki
+    - Kas
+    - Ara
+    day_names:
+    - Pazar
+    - Pazartesi
+    - Salı
+    - Çarşamba
+    - Perşembe
+    - Cuma
+    - Cumartesi
+    abbr_day_names:
+    - Paz
+    - Pzt
+    - Sal
+    - Çar
+    - Per
+    - Cum
+    - Cmt
   time:
     formats:
-      default: "%d.%m.%Y %H:%M"
-      short: "%d %b %H:%M"
-      long: "%d %B %Y %H:%M"
-    am: "öğleden önce"
-    pm: "öğleden sonra"
+      default: '%d.%m.%Y %H:%M'
+      short: '%d %b %H:%M'
+      long: '%d %B %Y %H:%M'
+    am: öğleden önce
+    pm: öğleden sonra
   app:
-    name: "Personal"
-    module: "Finance"
-    skip_link: "Ana içeriğe atla"
-    meta_description: "Kişisel finans ve bütçe yönetim paneli."
+    name: Personal
+    module: Finance
+    skip_link: Ana içeriğe atla
+    meta_description: Kişisel finans ve bütçe yönetim paneli.
     sidebar:
-      section_label: "FİNANS MODÜLÜ"
-      overview: "Genel Bakış"
-      transactions: "İşlemler"
-      accounts: "Hesaplar"
-      categories: "Kategoriler"
-      budget: "Aylık Bütçe"
-      savings_goals: "Tasarruf Hedefleri"
-      purchase_plans: "Satın Alma Planları"
-      workspace: "Çalışma Alanı"
-      language: "Dil"
-      nav_aria_label: "Ana Navigasyon"
+      section_label: FİNANS MODÜLÜ
+      section_overview: ÖZET & ANALİZ
+      section_transactions: İŞLEMLER & BORÇLAR
+      section_assets: VARLIK & BÜTÇE
+      section_system: SİSTEM & VERİ
+      overview: Genel Bakış
+      notifications: Bildirimler
+      spending_report: Harcama Analizi
+      cash_flow_forecast: Nakit Akışı
+      transactions: İşlemler
+      recurring_rules: Tekrarlayan
+      subscriptions: Abonelikler
+      debts: Borç & Taksit
+      accounts: Hesaplar
+      exchange_rates: Döviz Kurları
+      categories: Kategoriler
+      tags: Etiketler
+      budget: Aylık Bütçe
+      budget_templates: Bütçe Şablonları
+      yearly_budget: Yıllık Plan
+      savings_goals: Tasarruf Hedefleri
+      purchase_plans: Satın Alma
+      data: Veri Yedekleme
+      workspace: Çalışma Alanı
+      language: Dil
+      theme: Tema
+      theme_system: Sistem
+      theme_dark: Koyu
+      theme_light: Açık
+      logout: Oturumu Kapat
+      nav_aria_label: Ana Navigasyon
     common:
-      save: "Kaydet"
-      cancel: "İptal"
-      edit: "Düzenle"
-      delete: "Sil"
-      add: "Ekle"
-      change: "Değiştir"
-      actions: "İşlemler"
-      confirm_delete: "Silmek istediğinizden emin misiniz?"
-      empty_state: "Henüz bir kayıt bulunmuyor."
-      uncategorized: "Kategorisiz"
-      account: "Hesap"
-      errors_title: "Lütfen formdaki hataları düzeltin:"
+      save: Kaydet
+      cancel: İptal
+      edit: Düzenle
+      delete: Sil
+      add: Ekle
+      change: Değiştir
+      actions: İşlemler
+      confirm_delete: Silmek istediğinizden emin misiniz?
+      empty_state: Henüz bir kayıt bulunmuyor.
+      uncategorized: Kategorisiz
+      account: Hesap
+      errors_title: 'Lütfen formdaki hataları düzeltin:'
+      active: Aktif
+      new: Yeni
   dashboard:
-    eyebrow: "Aylık Finans Özeti"
-    title: "Genel Bakış"
-    subtitle: "%{month} dönemi için nakit akışı ve finansal hedefleriniz."
-    add_transaction: "İşlem Ekle"
-    first_transaction: "İlk işlemi ekle"
-    cards_aria_label: "Aylık Finans Kartları"
-    income: "Bu Ayki Gelir"
-    income_note: "Kayıtlı toplam gelir"
-    expenses: "Bu Ayki Gider"
-    expenses_note: "Kayıtlı toplam harcama"
-    net_cashflow: "Net Nakit Akışı"
-    net_cashflow_note: "Gelir ile gider farkı"
-    budget_remaining: "Kalan Bütçe"
-    no_budget: "Bütçe Belirlenmedi"
-    budget_remaining_note: "Planlanan harcama limiti"
-    no_budget_note: "Bu ay için plan yok"
-    cashflow_chart_title: "6 Aylık Nakit Akışı"
-    cashflow_chart_subtitle: "Gelir ve gider karşılaştırma geçmişi"
-    chart_aria_label: "Son altı ayın gelir, gider ve net nakit akışı grafiği"
-    chart_income: "Gelir"
-    chart_expense: "Gider"
-    chart_caption: "Grafik üzerinde detayları görmek için üzerine gelin veya odaklanın."
-    chart_table_caption: "Son altı ayın gelir, gider ve net nakit akışı"
-    category_progress_aria: "Kategori bazlı harcama ilerlemesi"
-    month: "Ay"
-    budget_status_title: "Bütçe Durumu"
-    budget_status_subtitle: "Bu ay için hedeflenen harcama limiti"
-    manage_budget: "Bütçeyi Yönet"
-    create_budget: "Bütçe Oluştur"
-    total_budget: "Tüm Bütçe (Genel Toplam)"
-    select_category: "Kategori Seç"
-    all_categories: "Tüm Kategoriler"
-    category_budgets: "Kategori Bütçe Dağılımı"
-    category_budgets_subtitle: "Belirlenen limitler ve gerçekleşen harcamalar"
-    spent_label: "Harcama"
-    limit_label: "Limit"
-    remaining_label: "Kalan"
-    over_budget_label: "Bütçe Aşımı"
-    percent_used: "%%%{percent} kullanıldı"
-    no_categories_allocated: "Henüz kategori bazlı limit belirlenmedi."
-    budget_progress_aria_label: "Bütçe kullanımı: %%%{percent}"
-    budget_over: "Aşıldı"
-    budget_left: "Kalan"
-    budget_over_note: "bütçe aşıldı"
-    budget_left_note: "kullanılabilir bütçe"
-    recent_transactions: "Son İşlemler"
-    recent_transactions_subtitle: "Hesaplarınızdaki en son hareketler"
-    view_all: "Tümünü Gör"
-    active_goals: "Tasarruf Hedefleri"
-    active_goals_subtitle: "Hedeflerinize olan ilerleme durumunuz"
-    view_goals: "Hedefleri Gör"
+    eyebrow: Aylık Finans Özeti
+    title: Genel Bakış
+    subtitle: '%{month} dönemi için nakit akışı ve finansal hedefleriniz.'
+    add_transaction: İşlem Ekle
+    first_transaction: İlk işlemi ekle
+    cards_aria_label: Aylık Finans Kartları
+    health_score: Finansal Sağlık Skoru
+    health_score_desc: Gelir, tasarruf, bütçe, acil durum fonu ve borç verilerine
+      göre hesaplanır.
+    suggestions: İyileştirme Önerileri
+    spending_alerts: Harcama Uyarıları
+    spending_alerts_desc: Finansal durumunuzda dikkat gerektiren gelişmeler.
+    see_all: Tümünü Gör
+    total_debt: Toplam Borç
+    remaining_active_debt: Kalan aktif borç
+    total_balance: Toplam Bakiye
+    pending_rates: Kur bekleyen hesaplar var
+    income: Bu Ayki Gelir
+    income_note: Kayıtlı toplam gelir
+    expenses: Bu Ayki Gider
+    expenses_note: Kayıtlı toplam harcama
+    net_cashflow: Net Nakit Akışı
+    net_cashflow_note: Gelir ile gider farkı
+    budget_remaining: Kalan Bütçe
+    no_budget: Bütçe Belirlenmedi
+    budget_remaining_note: Planlanan harcama limiti
+    no_budget_note: Bu ay için plan yok
+    cashflow_chart_title: 6 Aylık Nakit Akışı
+    cashflow_chart_subtitle: Gelir ve gider karşılaştırma geçmişi
+    chart_aria_label: Son altı ayın gelir, gider ve net nakit akışı grafiği
+    chart_income: Gelir
+    chart_expense: Gider
+    chart_caption: Grafik üzerinde detayları görmek için üzerine gelin veya odaklanın.
+    chart_table_caption: Son altı ayın gelir, gider ve net nakit akışı
+    category_progress_aria: Kategori bazlı harcama ilerlemesi
+    month: Ay
+    budget_status_title: Bütçe Durumu
+    budget_status_subtitle: Bu ay için hedeflenen harcama limiti
+    manage_budget: Bütçeyi Yönet
+    create_budget: Bütçe Oluştur
+    total_budget: Tüm Bütçe (Genel Toplam)
+    select_category: Kategori Seç
+    all_categories: Tüm Kategoriler
+    category_budgets: Kategori Bütçe Dağılımı
+    budget_left: Kalan
+    budget_left_note: kullanılabilir bütçe
+    budget_over: Aşıldı
+    budget_over_note: bütçe aşıldı
+    budget_progress_aria_label: 'Bütçe kullanımı: %%%{percent}'
+    recent_transactions: Son İşlemler
+    recent_transactions_subtitle: Hesaplarınızdaki en son hareketler
+    view_all: Tümünü Gör
+    active_goals: Tasarruf Hedefleri
+    active_goals_subtitle: Hedeflerinize olan ilerleme durumunuz
+    view_goals: Hedefleri Gör
+    filter_all: Tümü
+  exchange_rates:
+    eyebrow: PARA BİRİMLERİ & DÖNÜŞÜM
+    title: Döviz Kurları
+    subtitle: Manuel kurlar, yabancı para hesap bakiyelerini %{currency} cinsinden
+      birleştirmek için kullanılır.
+    form_title: Kur Ekle / Güncelle
+    form_subtitle: Para birimleri arasındaki çarpanı belirleyin
+    base_currency: Kaynak Para Birimi
+    quote_currency: Hedef Para Birimi
+    rate: Dönüşüm Kuru (1 Kaynak = Hedef)
+    rate_placeholder: 'Örn: 34.250000'
+    save_rate: Kuru Kaydet
+    defined_rates: Tanımlı Kurlar
+    defined_rates_subtitle: 1 kaynak para biriminin hedef para birimi karşılığı
+    empty_title: Henüz Tanımlı Kur Yok
+    empty_desc: Yabancı para hesaplarınızı ana para biriminize dönüştürmek için sol
+      taraftan kur ekleyin.
+    rate_multiplier: 1 %{base} = %{rate} %{quote}
+  notifications:
+    eyebrow: AKILLI UYARILAR & LİMİTLER
+    title: Bildirimler & Limitler
+    subtitle: Harcama eşiklerinizi belirleyin ve bütçenizdeki önemli gelişmeleri takip
+      edin.
+    mark_all_read: Tümünü Okundu İşaretle
+    limits_title: Akıllı Harcama Limitleri
+    limits_subtitle: Limitler aşıldığında anlık bildirim alın. Devre dışı bırakmak
+      için boş bırakabilirsiniz.
+    daily_limit: Günlük Harcama Limiti
+    daily_limit_desc: Bir gün içindeki maksimum planlanan harcama
+    weekly_limit: Haftalık Harcama Limiti
+    weekly_limit_desc: Bir hafta içindeki toplam harcama tavanı
+    save_limits: Limitleri Kaydet
+    history_title: Bildirim Geçmişi
+    history_subtitle: '%{count} okunmamış bildirim'
+    toggle_history: Bildirim Geçmişini Aç / Kapat
+    empty_title: Henüz Bildiriminiz Yok
+    empty_desc: Günlük veya haftalık harcama limitiniz aşıldığında uyarılar burada
+      listelenecektir.
+    category_budgets: Kategori Bütçe Dağılımı
+    category_budgets_subtitle: Belirlenen limitler ve gerçekleşen harcamalar
+    spent_label: Harcama
+    limit_label: Limit
+    remaining_label: Kalan
+    over_budget_label: Bütçe Aşımı
+    percent_used: '%%%{percent} kullanıldı'
+    no_categories_allocated: Henüz kategori bazlı limit belirlenmedi.
+    budget_progress_aria_label: 'Bütçe kullanımı: %%%{percent}'
+    budget_over: Aşıldı
+    budget_left: Kalan
+    budget_over_note: bütçe aşıldı
+    budget_left_note: kullanılabilir bütçe
+    recent_transactions: Son İşlemler
+    recent_transactions_subtitle: Hesaplarınızdaki en son hareketler
+    view_all: Tümünü Gör
+    active_goals: Tasarruf Hedefleri
+    active_goals_subtitle: Hedeflerinize olan ilerleme durumunuz
+    view_goals: Hedefleri Gör
   transactions:
-    eyebrow: "HESAP HAREKETLERİ"
-    title: "İşlemler"
-    subtitle: "Tüm hesaplarınızdaki gelir, gider ve transfer hareketlerini inceleyin."
-    new_title: "Yeni İşlem Ekle"
-    new_subtitle: "Gelir, gider veya transfer kaydı oluşturun."
-    edit_title: "İşlemi Düzenle"
-    edit_subtitle: "İşleme ait detayları ve tutarı güncelleyin."
-    kind: "İşlem Türü"
+    eyebrow: HESAP HAREKETLERİ
+    title: İşlemler
+    subtitle: Tüm hesaplarınızdaki gelir, gider ve transfer hareketlerini inceleyin.
+    new_title: Yeni İşlem Ekle
+    new_subtitle: Gelir, gider veya transfer kaydı oluşturun.
+    edit_title: İşlemi Düzenle
+    edit_subtitle: İşleme ait detayları ve tutarı güncelleyin.
+    kind: İşlem Türü
     kinds:
-      expense: "Gider"
-      income: "Gelir"
-      transfer: "Transfer"
-    amount: "Tutar"
-    occurred_on: "Tarih"
-    account: "Hesap"
-    category: "Kategori"
-    note: "Açıklama / Not (İsteğe bağlı)"
-    note_placeholder: "Market alışverişi, fatura, maaş vb."
-    save: "İşlemi Kaydet"
-    update: "İşlemi Güncelle"
-    empty_state: "Kayıtlı bir finansal işlem bulunmuyor."
+      expense: Gider
+      income: Gelir
+      transfer: Transfer
+    amount: Tutar
+    occurred_on: Tarih
+    account: Hesap
+    category: Kategori
+    note: Açıklama / Not (İsteğe bağlı)
+    note_placeholder: Market alışverişi, fatura, maaş vb.
+    save: İşlemi Kaydet
+    update: İşlemi Güncelle
+    empty_state: Kayıtlı bir finansal işlem bulunmuyor.
     flash:
-      saved: "İşlem başarıyla kaydedildi."
-      deleted: "İşlem başarıyla silindi."
+      saved: İşlem başarıyla kaydedildi.
+      deleted: İşlem başarıyla silindi.
+    empty_filtered: Seçilen filtrelere uygun işlem bulunamadı.
+    export_csv: CSV Olarak Dışa Aktar
+    import_csv: CSV
+    tags: Etiketler
+    tags_placeholder: 'Örn: tatil, iş, düğün'
+    tags_hint: Birden çok etiketi virgülle ayırın. Mevcut etiketler yazarken önerilir.
+    savings_goal: Tasarruf Hedefine Bağla
+    no_savings_goal: Hedefe bağlama
+    savings_goal_hint: Yalnızca tasarruf hesabına yapılan transferlerde kullanılabilir;
+      tutar hedef katkısı olarak kaydedilir.
+    filters:
+      search: Arama
+      search_placeholder: Notta ara...
+      type: Tür
+      all_types: Tümü
+      income: Gelir
+      expense: Gider
+      transfer: Transfer
+      account: Hesap
+      all_accounts: Tüm Hesaplar
+      from: Başlangıç
+      to: Bitiş
+      categories: Kategoriler
+      select_category: Kategori Seç
+      tag: Etiket
+      all_tags: Tüm Etiketler
+      apply: Uygula
+      clear: Filtreleri Temizle
+    recurrence:
+      legend: Tekrarlama
+      enable: Bu işlemi tekrarlayan olarak kaydet
+      hint: İlk işlem seçtiğiniz tarihte kaydedilir; sonraki işlemler planınıza göre
+        otomatik eklenir.
+      interval: Tekrarlama sıklığı
+      weekly: Her hafta
+      biweekly: İki haftada bir
+      monthly: Her ay
+      yearly: Her yıl
+      end_date: Bitiş tarihi (isteğe bağlı)
+      count: Toplam işlem sayısı (isteğe bağlı)
+      badge: Tekrarlayan
+      badge_title: Tekrarlayan işlem
+      edit_hint: Bu işlem bir tekrar eden plana bağlıdır. Gelecek işlemleri değiştirmek
+        için planı yönetin.
   accounts:
-    eyebrow: "FİNANSAL TEMELLER"
-    title: "Hesaplar"
-    subtitle: "Tüm banka, kredi kartı ve nakit bakiyelerinizi tek bir yerden yönetin."
-    new_title: "Yeni Hesap Ekle"
-    new_subtitle: "Banka, kredi kartı veya nakit hesabı ekleyin."
-    edit_title: "Hesabı Düzenle"
-    edit_subtitle: "Hesap adını veya başlangıç bakiyesini güncelleyin."
-    name: "Hesap Adı"
-    name_placeholder: "Örn: Garanti Vadesiz, Nakit Cüzdan, Bonus Kart"
-    kind: "Hesap Türü"
+    eyebrow: FİNANSAL TEMELLER
+    title: Hesaplar
+    subtitle: Tüm banka, kredi kartı ve nakit bakiyelerinizi tek bir yerden yönetin.
+    new_title: Yeni Hesap Ekle
+    new_subtitle: Banka, kredi kartı veya nakit hesabı ekleyin.
+    edit_title: Hesabı Düzenle
+    edit_subtitle: Hesap adını veya başlangıç bakiyesini güncelleyin.
+    name: Hesap Adı
+    name_placeholder: 'Örn: Garanti Vadesiz, Nakit Cüzdan, Bonus Kart'
+    kind: Hesap Türü
     kinds:
-      bank: "Banka Hesabı"
-      card: "Kredi Kartı"
-      cash: "Nakit Cüzdan"
-      savings: "Birikim Hesabı"
-    opening_balance: "Açılış Bakiyesi"
-    current_balance: "Mevcut Bakiye"
-    save: "Hesabı Kaydet"
-    update: "Hesabı Güncelle"
-    empty_state: "Kayıtlı bir hesap bulunmuyor."
-    add_first: "İlk Hesabı Ekle"
+      bank: Banka Hesabı
+      card: Kredi Kartı
+      cash: Nakit Cüzdan
+      savings: Birikim Hesabı
+    opening_balance: Açılış Bakiyesi
+    current_balance: Mevcut Bakiye
+    total_net_worth: Toplam Net Değer
+    net_worth_trend_aria: Son altı ay toplam net değer trendi
+    equivalent: karşılığı
+    excluded_no_rate: 'Kur girilmediği için hariç:'
+    balance_trend_aria: '%{name} son altı ay bakiye trendi'
+    save: Hesabı Kaydet
+    update: Hesabı Güncelle
+    empty_state: Kayıtlı bir hesap bulunmuyor.
+    add_first: İlk Hesabı Ekle
     flash:
-      saved: "Hesap başarıyla kaydedildi."
-      deleted: "Hesap başarıyla silindi."
+      saved: Hesap başarıyla kaydedildi.
+      deleted: Hesap başarıyla silindi.
+    currency: Hesap Para Birimi
   categories:
-    eyebrow: "ORGANİZASYON"
-    title: "Kategoriler"
-    subtitle: "Harcamalarınızı ve gelirlerinizi kategorize ederek düzenli tutun."
-    new_title: "Yeni Kategori Ekle"
-    new_subtitle: "Harcama veya gelirlerinizi sınıflandırmak için yeni kategori tanımlayın."
-    edit_title: "Kategoriyi Düzenle"
-    edit_subtitle: "Kategori adını, türünü veya renk rozetini değiştirin."
-    name: "Kategori Adı"
-    name_placeholder: "Örn: Market, Kira, Maaş, Ulaşım"
-    kind: "Kategori Türü"
-    color: "Renk Rozeti"
-    parent_category: "Üst Kategori"
-    save: "Kategoriyi Kaydet"
-    update: "Kategoriyi Güncelle"
-    empty_state: "Kayıtlı bir kategori bulunmuyor."
-    add_first: "İlk Kategoriyi Ekle"
+    eyebrow: ORGANİZASYON
+    title: Kategoriler
+    subtitle: Harcamalarınızı ve gelirlerinizi kategorize ederek düzenli tutun.
+    new_title: Yeni Kategori Ekle
+    new_subtitle: Harcama veya gelirlerinizi sınıflandırmak için yeni kategori tanımlayın.
+    edit_title: Kategoriyi Düzenle
+    edit_subtitle: Kategori adını, türünü veya renk rozetini değiştirin.
+    name: Kategori Adı
+    name_placeholder: 'Örn: Market, Kira, Maaş, Ulaşım'
+    kind: Kategori Türü
+    color: Renk Rozeti
+    parent_category: Üst Kategori
+    save: Kategoriyi Kaydet
+    update: Kategoriyi Güncelle
+    empty_state: Kayıtlı bir kategori bulunmuyor.
+    add_first: İlk Kategoriyi Ekle
     flash:
-      saved: "Kategori başarıyla kaydedildi."
-      deleted: "Kategori başarıyla silindi."
+      saved: Kategori başarıyla kaydedildi.
+      deleted: Kategori başarıyla silindi.
   budgets:
-    eyebrow: "AYLIK BÜTÇE PLANI"
-    title: "%{month} Bütçesi"
-    actual_spending: "Gerçekleşen Harcama:"
-    remaining: "Kalan Bütçe:"
-    display_currency: "Görüntüleme Para Birimi"
-    planned_income: "Planlanan Toplam Bütçe"
-    planned_income_auto_note: "Kategori bazlı harcama limitlerinin toplamından otomatik olarak hesaplanır."
-    category_limits: "Kategori Bazlı Harcama Limitleri"
-    category_limits_desc: "Her gider kategorisi için bu ay hedeflenen harcama miktarını belirleyin."
-    parent_category: "Ana Kategori"
-    sub_category: "Alt Kategori"
-    current_month_spent: "Bu ayki harcama: %{amount}"
-    total_allocated: "Toplam Planlanan Limit:"
-    save: "Bütçeyi Kaydet"
-    back_to_dashboard: "Genel Bakışa Dön"
+    eyebrow: AYLIK BÜTÇE PLANI
+    title: '%{month} Bütçesi'
+    actual_spending: 'Gerçekleşen Harcama:'
+    remaining: 'Kalan Bütçe:'
+    display_currency: Görüntüleme Para Birimi
+    planned_income: Planlanan Toplam Bütçe
+    planned_income_auto_note: Kategori bazlı harcama limitlerinin toplamından otomatik
+      olarak hesaplanır.
+    category_limits: Kategori Bazlı Harcama Limitleri
+    category_limits_desc: Her gider kategorisi için bu ay hedeflenen harcama miktarını
+      belirleyin.
+    parent_category: Ana Kategori
+    sub_category: Alt Kategori
+    current_month_spent: 'Bu ayki harcama: %{amount}'
+    total_allocated: 'Toplam Planlanan Limit:'
+    save: Bütçeyi Kaydet
+    back_to_dashboard: Genel Bakışa Dön
+    copy_previous_prompt: Bu ay için henüz bütçe planı yok.
+    copy_previous_hint: Bir önceki ayın kategori limitlerini ve planlanan gelirini
+      kopyalayabilirsiniz.
+    copy_previous: Önceki Aydan Kopyala
     flash:
-      saved: "Bütçe başarıyla kaydedildi."
-      currency_changed: "Görüntüleme para birimi %{currency} olarak değiştirildi. Tutarlar dönüştürülmedi."
-      invalid_currency: "Lütfen desteklenen bir para birimi seçin."
+      saved: Bütçe başarıyla kaydedildi.
+      currency_changed: Görüntüleme para birimi %{currency} olarak değiştirildi. Tutarlar
+        dönüştürülmedi.
+      invalid_currency: Lütfen desteklenen bir para birimi seçin.
+    year:
+      eyebrow: YILLIK BÜTÇE PLANI
+      monthly_summary: Aylık Özet
+      monthly_summary_desc: Her ay için planlanan ve gerçekleşen gelir/gider karşılaştırması
+      planned_income: Planlanan Gelir
+      actual_income: Gerçekleşen Gelir
+      planned_expense: Planlanan Harcama
+      actual_expense: Gerçekleşen Harcama
+      net: Net
+      status: Durum
+      on_track: Yolda
+      over: Aşıldı
+      total: Toplam
+      total_income: 'Toplam Gelir:'
+      total_expense: 'Toplam Gider:'
+      add_plan: Plan Ekle
+      cashflow_chart: 12 Aylık Nakit Akışı
+      cashflow_chart_desc: Gelir ve gider karşılaştırma grafiği
+      chart_aria_label: 12 ayın gelir ve gider tablosu
+      category_comparison: Kategori Bazlı Yıllık Karşılaştırma
+      category_comparison_desc: Yıllık planlanan harcama limitleri ve gerçekleşen
+        harcamalar
+      unlimited: Limitsiz
+      no_data: Bu yıl için henüz veri bulunmuyor.
+      table_aria_label: Yıllık bütçe özeti tablosu
+      month: Ay
   savings_goals:
-    eyebrow: "FİNANSAL PLANLAMA"
-    title: "Tasarruf Hedefleri"
-    subtitle: "Geleceğiniz için belirlediğiniz birikim ve tasarruf hedefleri."
-    new_title: "Yeni Tasarruf Hedefi"
-    new_subtitle: "Ulaşmak istediğiniz birikim hedefini ve aylık katkı tutarını belirleyin."
-    edit_title: "Hedefi Düzenle"
-    edit_subtitle: "Tasarruf hedefinize ait tutar ve süre detaylarını güncelleyin."
-    name: "Hedef Adı"
-    name_placeholder: "Örn: Acil Durum Fonu, Tatil Birikimi, Yeni Araba"
-    target_amount: "Hedeflenen Tutar"
-    starting_amount: "Başlangıç Tutarı (Varsa)"
-    monthly_contribution: "Planlanan Aylık Katkı Tutarı"
-    target_date: "Hedef Tarihi (İsteğe bağlı)"
-    status: "Durum"
+    eyebrow: FİNANSAL PLANLAMA
+    title: Tasarruf Hedefleri
+    subtitle: Geleceğiniz için belirlediğiniz birikim ve tasarruf hedefleri.
+    new_title: Yeni Tasarruf Hedefi
+    new_subtitle: Ulaşmak istediğiniz birikim hedefini ve aylık katkı tutarını belirleyin.
+    edit_title: Hedefi Düzenle
+    edit_subtitle: Tasarruf hedefinize ait tutar ve süre detaylarını güncelleyin.
+    name: Hedef Adı
+    name_placeholder: 'Örn: Acil Durum Fonu, Tatil Birikimi, Yeni Araba'
+    target_amount: Hedeflenen Tutar
+    starting_amount: Başlangıç Tutarı (Varsa)
+    monthly_contribution: Planlanan Aylık Katkı Tutarı
+    target_date: Hedef Tarihi (İsteğe bağlı)
+    status: Durum
     statuses:
-      active: "Aktif"
-      paused: "Durduruldu"
-      completed: "Tamamlandı"
-      archived: "Arşivlendi"
-    progress_aria_label: "Hedef tamamlama: %%%{percent}"
-    save: "Hedefi Kaydet"
-    update: "Hedefi Güncelle"
-    monthly_contrib_label: "Aylık Katkı:"
-    estimated_time: "Tahmini süre: ~%{months} ay"
-    no_target_date: "Hedef tarihi belirlenmedi"
-    empty_state: "Kayıtlı bir tasarruf hedefi bulunmuyor."
+      active: Aktif
+      paused: Durduruldu
+      completed: Tamamlandı
+      archived: Arşivlendi
+    progress_aria_label: 'Hedef tamamlama: %%%{percent}'
+    save: Hedefi Kaydet
+    update: Hedefi Güncelle
+    monthly_contrib_label: 'Aylık Katkı:'
+    estimated_time: 'Tahmini süre: ~%{months} ay'
+    no_target_date: Hedef tarihi belirlenmedi
+    empty_state: Kayıtlı bir tasarruf hedefi bulunmuyor.
     flash:
-      saved: "Tasarruf hedefi başarıyla kaydedildi."
-      deleted: "Tasarruf hedefi başarıyla silindi."
+      saved: Tasarruf hedefi başarıyla kaydedildi.
+      deleted: Tasarruf hedefi başarıyla silindi.
+    add_contribution: Katkı Ekle
+    add_contribution_note: Mevcut bir tasarruf transferini seçebilir veya bağımsız
+      katkı ekleyebilirsiniz.
+    contribution_amount: Katkı tutarı
+    contributed_on: Tarih
+    linked_transfer: Bağlantılı transfer
+    no_linked_transfer: Transfer bağlama
+    details: Detaylar
+    detail_subtitle: Hedef katkılarını ve bağlantılı tasarruf transferlerini inceleyin.
+    contribution_history: Katkı Geçmişi
+    contribution_history_note: Bağlantılı transferler gider olarak sayılmaz.
+    no_contributions: Henüz katkı kaydı bulunmuyor.
+    back: Hedeflere Dön
   purchase_plans:
-    eyebrow: "FİNANSAL PLANLAMA"
-    title: "Satın Alma Planları"
-    subtitle: "Büyük harcamaları bütçenizi zorlamadan, güvenle planlayın."
-    new_title: "Yeni Satın Alma Planı"
-    new_subtitle: "Almayı düşündüğünüz ürün veya hizmetin finansal fizibilitesini değerlendirin."
-    edit_title: "Planı Düzenle"
-    edit_subtitle: "Satın alma planına ait fiyat, peşinat veya taksit bilgilerini güncelleyin."
-    name: "Satın Alma Adı"
-    name_placeholder: "Örn: Yeni Bilgisayar, Ev Eşyası, Tatil Paketi"
-    price: "Toplam Fiyat"
-    down_payment: "Peşinat Tutarı"
-    down_payment_label: "Peşinat:"
-    monthly_cost: "Aylık Taksit / Ödeme Tutarı"
-    monthly_cost_label: "Aylık Taksit:"
-    planned_on: "Hedeflenen Satın Alma Tarihi"
-    planned_on_label: "Hedef Tarihi:"
-    save: "Planı Değerlendir ve Kaydet"
-    update: "Planı Güncelle"
-    status_comfortable: "Uygun (Rahatça Alınabilir)"
-    status_plan: "Plan Yapılmalı"
-    status_defer: "Ertelenmeli"
-    empty_state: "Kayıtlı bir satın alma planı bulunmuyor."
+    eyebrow: FİNANSAL PLANLAMA
+    title: Satın Alma Planları
+    subtitle: Büyük harcamaları bütçenizi zorlamadan, güvenle planlayın.
+    new_title: Yeni Satın Alma Planı
+    new_subtitle: Almayı düşündüğünüz ürün veya hizmetin finansal fizibilitesini değerlendirin.
+    edit_title: Planı Düzenle
+    edit_subtitle: Satın alma planına ait fiyat, peşinat veya taksit bilgilerini güncelleyin.
+    name: Satın Alma Adı
+    name_placeholder: 'Örn: Yeni Bilgisayar, Ev Eşyası, Tatil Paketi'
+    price: Toplam Fiyat
+    down_payment: Peşinat Tutarı
+    down_payment_label: 'Peşinat:'
+    monthly_cost: Aylık Taksit / Ödeme Tutarı
+    monthly_cost_label: 'Aylık Taksit:'
+    planned_on: Hedeflenen Satın Alma Tarihi
+    planned_on_label: 'Hedef Tarihi:'
+    save: Planı Değerlendir ve Kaydet
+    update: Planı Güncelle
+    status_comfortable: Uygun (Rahatça Alınabilir)
+    status_plan: Plan Yapılmalı
+    status_defer: Ertelenmeli
+    empty_state: Kayıtlı bir satın alma planı bulunmuyor.
     flash:
-      saved: "Satın alma planı başarıyla kaydedildi."
-      deleted: "Satın alma planı başarıyla silindi."
+      saved: Satın alma planı başarıyla kaydedildi.
+      deleted: Satın alma planı başarıyla silindi.
+    show_subtitle: Farklı ödeme senaryolarını karşılaştırın ve satın alma kararınızı
+      verin.
+    linked_goal: 'Hedef:'
+    back: Planlara Dön
+    inputs_title: Hesaplama Girdileri
+    inputs_desc: Değerleri değiştirin, senaryolar anlık olarak güncellenir.
+    save_inputs: Planı Güncelle
+    monthly_payment: Aylık Ödeme
+    safety_buffer: Sonraki Güvenlik Marjı
+    free_cash_after: Sonraki Aylık Boş Nakit
+    uses_goal: Birikim hedefi kullanılır
+    scenarios_title: Senaryo Karşılaştırması
+    scenarios_desc: Peşin, taksit ve birikim hedefi kullanımı yan yana.
+    assumptions_title: Varsayımlar ve Girdiler
+    assumptions_desc: Tüm hesaplamalar şu verilere dayanır (son 3 ay).
+    assum_income: Aylık Gelir
+    assum_expenses: Aylık Gider
+    assum_goal_contrib: Aktif Hedef Katkıları
+    assum_free_cash: Aylık Boş Nakit
+    assum_available_cash: Kullanılabilir Nakit
+    convert_title: Satın Alma İşlemine Dönüştür
+    convert_desc: Bu planı gerçekleşen bir işlem olarak kaydedin.
+    select_account: Hesap Seçin
+    no_category: Kategorisiz
+    assum_goal_remaining: Hedef Kalan Tutar
+    convert_account: Ödeme Yapılan Hesap
+    convert_category: Kategori (opsiyonel)
+    convert_button: İşleme Dönüştür
   onboarding:
-    eyebrow: "İLK KURULUM SİHİRBAZI"
-    title: "Finans Modülüne Hoş Geldiniz"
-    subtitle: "Finansal yolculuğunuzu birkaç kısa adımda kişiselleştirin."
-    skip_wizard: "Sihirbazı Atla (Doğrudan Başla)"
-    skip_step: "Bu Adımı Atla"
-    step_indicator: "Adım %{current} / %{total}"
-    completed_notice: "Tebrikler! Finans modülü kurulumunuz tamamlandı."
-    skipped_notice: "Kurulum atlandı. İstediğiniz zaman bütçe ve kategorilerinizi düzenleyebilirsiniz."
-    next_step: "Sonraki Adım →"
-    prev_step: "← Önceki Adım"
-    finish: "Kurulumu Tamamla ve Başla ✓"
+    eyebrow: İLK KURULUM SİHİRBAZI
+    title: Finans Modülüne Hoş Geldiniz
+    subtitle: Finansal yolculuğunuzu birkaç kısa adımda kişiselleştirin.
+    skip_wizard: Sihirbazı Atla (Doğrudan Başla)
+    skip_step: Bu Adımı Atla
+    step_indicator: Adım %{current} / %{total}
+    completed_notice: Tebrikler! Finans modülü kurulumunuz tamamlandı.
+    skipped_notice: Kurulum atlandı. İstediğiniz zaman bütçe ve kategorilerinizi düzenleyebilirsiniz.
+    next_step: Sonraki Adım →
+    prev_step: ← Önceki Adım
+    finish: Kurulumu Tamamla ve Başla ✓
     steps:
-      step1_title: "1. Temel Bilgiler"
-      step1_desc: "Kullanmak istediğiniz para birimini ve aylık net gelir beklentinizi belirleyin."
-      currency_label: "Para Birimi"
-      income_label: "Aylık Beklenen Net Gelir"
-      income_hint: "Düzensiz geliriniz varsa tahmini ortalama bir tutar girebilirsiniz."
-      step2_title: "2. Hesaplar (İsteğe Bağlı)"
-      step2_desc: "Nakit, banka ve birikim hesaplarınızı başlangıç bakiyeleriyle ekleyin."
-      account_name: "Hesap Adı"
-      account_kind: "Hesap Türü"
-      account_balance: "Açılış Bakiyesi"
-      add_account_btn: "+ Yeni Hesap Ekle"
-      remove_account: "Kaldır"
+      step1_title: 1. Temel Bilgiler
+      step1_desc: Kullanmak istediğiniz para birimini ve aylık net gelir beklentinizi
+        belirleyin.
+      currency_label: Para Birimi
+      income_label: Aylık Beklenen Net Gelir
+      income_hint: Düzensiz geliriniz varsa tahmini ortalama bir tutar girebilirsiniz.
+      step2_title: 2. Hesaplar (İsteğe Bağlı)
+      step2_desc: Nakit, banka ve birikim hesaplarınızı başlangıç bakiyeleriyle ekleyin.
+      account_name: Hesap Adı
+      account_kind: Hesap Türü
+      account_balance: Açılış Bakiyesi
+      add_account_btn: + Yeni Hesap Ekle
+      remove_account: Kaldır
       kinds:
-        cash: "Nakit / Cüzdan"
-        bank: "Banka Hesabı"
-        card: "Kredi Kartı"
-        savings: "Birikim Hesabı"
-      step3_title: "3. Harcama ve Gelir Kategorileri"
-      step3_desc: "Hazır kategorilerinizi inceleyin, istemediklerinizi çıkarın veya yenilerini ekleyin."
-      expense_cats: "Gider Kategorileri"
-      income_cats: "Gelir Kategorileri"
-      add_custom_cat: "+ Yeni Kategori Ekle"
-      step4_title: "4. Aylık Bütçe Limitleri (%{month})"
-      step4_desc: "Bu ay için kategorilere ayırmak istediğiniz harcama limitlerini belirleyin."
-      budget_income_summary: "Planlanan Gelir:"
-      budget_expense_summary: "Toplam Planlanan Gider:"
-      budget_remaining_summary: "Kalan Serbest Nakit:"
-      category_header: "Kategori"
-      limit_header: "Aylık Limit"
-      step5_title: "5. Birikim Hedefi (İsteğe Bağlı)"
-      step5_desc: "Kendinize ilk tasarruf hedefinizi koyun ve ilerlemenizi takip edin."
-      goal_name_label: "Hedef Adı"
-      goal_name_placeholder: "Örn: Acil Durum Fonu, Yeni Bilgisayar, Tatil"
-      goal_target_label: "Hedeflenen Tutar"
-      goal_starting_label: "Başlangıç Tutarı (Varsa)"
-      goal_monthly_label: "Aylık Katkı Tutarı"
-      goal_date_label: "Hedef Tarihi (İsteğe bağlı)"
-      estimated_months_preview: "Tahmini Tamamlanma:"
-
+        cash: Nakit / Cüzdan
+        bank: Banka Hesabı
+        card: Kredi Kartı
+        savings: Birikim Hesabı
+      step3_title: 3. Harcama ve Gelir Kategorileri
+      step3_desc: Hazır kategorilerinizi inceleyin, istemediklerinizi çıkarın veya
+        yenilerini ekleyin.
+      expense_cats: Gider Kategorileri
+      income_cats: Gelir Kategorileri
+      add_custom_cat: + Yeni Kategori Ekle
+      step4_title: 4. Aylık Bütçe Limitleri (%{month})
+      step4_desc: Bu ay için kategorilere ayırmak istediğiniz harcama limitlerini
+        belirleyin.
+      budget_income_summary: 'Planlanan Gelir:'
+      budget_expense_summary: 'Toplam Planlanan Gider:'
+      budget_remaining_summary: 'Kalan Serbest Nakit:'
+      category_header: Kategori
+      limit_header: Aylık Limit
+      step5_title: 5. Birikim Hedefi (İsteğe Bağlı)
+      step5_desc: Kendinize ilk tasarruf hedefinizi koyun ve ilerlemenizi takip edin.
+      goal_name_label: Hedef Adı
+      goal_name_placeholder: 'Örn: Acil Durum Fonu, Yeni Bilgisayar, Tatil'
+      goal_target_label: Hedeflenen Tutar
+      goal_starting_label: Başlangıç Tutarı (Varsa)
+      goal_monthly_label: Aylık Katkı Tutarı
+      goal_date_label: Hedef Tarihi (İsteğe bağlı)
+      estimated_months_preview: 'Tahmini Tamamlanma:'
+  subscriptions:
+    eyebrow: DÜZENLİ GİDERLER
+    title: Abonelik Takibi
+    subtitle: Tekrarlayan servislerinizi, yenilemeleri ve toplam maliyeti tek yerde
+      yönetin.
+    new_title: Yeni Abonelik
+    new_subtitle: Manuel ekleyin veya mevcut bir tekrarlayan işleme bağlayın.
+    edit_title: Aboneliği Düzenle
+    add: Abonelik Ekle
+    name: Abonelik adı
+    name_placeholder: Netflix, spor salonu…
+    amount: Tutar
+    billing_interval: Yenileme sıklığı
+    intervals:
+      monthly: Aylık
+      yearly: Yıllık
+    renewal_on: Sonraki yenileme
+    last_used_on: Son kullanım
+    link_recurring: Tekrarlayan işleme bağla
+    no_link: Bağlantı yok
+    active_subscription: Aktif abonelik
+    save: Aboneliği Kaydet
+    monthly_total: Aylık toplam
+    yearly_total: Yıllık toplam
+    upcoming_renewal: Yaklaşan yenileme
+    next_14_days: Önümüzdeki 14 gün
+    upcoming_renewals_title: Yaklaşan Yenilemeler
+    upcoming_renewals_desc: Önümüzdeki 14 gün içinde yenilenecek abonelikler.
+    list_title: Abonelikler
+    list_desc: Yüksek maliyetli veya uzun süredir kullanılmayan servisler incelenmek
+      üzere işaretlenir.
+    review: Gözden geçir
+    inactive: Pasif
+    linked_recurring: Tekrarlayan işleme bağlı
+    manual_entry: Manuel kayıt
+    last_used_prefix: 'Son kullanım:'
+    empty_state: Henüz abonelik eklenmedi.
+    add_first: İlk Aboneliği Ekle
+    confirm_delete: Bu aboneliği silmek istiyor musunuz?
+    flash:
+      saved: Abonelik başarıyla kaydedildi.
+      deleted: Abonelik başarıyla silindi.
+  debts:
+    eyebrow: BORÇ YÖNETİMİ
+    title: Borçlar ve Taksitler
+    subtitle: Ödeme planınızı, kalan bakiyeyi ve kapanış tarihlerini takip edin.
+    new_title: Yeni Borç
+    edit_title: Borcu Düzenle
+    add: Borç Ekle
+    name: Borç adı
+    total_amount: Toplam tutar
+    remaining_balance: Kalan bakiye
+    interest_rate: Faiz oranı (%)
+    monthly_payment: Aylık ödeme
+    remaining_installments: Kalan taksit
+    next_payment: Sonraki ödeme
+    save: Kaydet
+    total_debt_load: Toplam borç yükü
+    upcoming_payment: Yaklaşan ödeme
+    next_30_days: Önümüzdeki 30 gün
+    payment_schedule_title: Ödeme Takvimi
+    payment_schedule_desc: Yaklaşan taksitler ve kalan borçlar.
+    approaching: Yaklaşıyor
+    remaining_installments_label: taksit
+    estimated_payoff: 'Tahmini kapanış:'
+    record_payment: Ödeme Kaydet
+    empty_state: Henüz borç kaydı yok.
+    confirm_delete: Bu borcu silmek istediğinizden emin misiniz?
+    flash:
+      saved: Borç başarıyla kaydedildi.
+      deleted: Borç başarıyla silindi.
+  budget_templates:
+    eyebrow: TEKRAR KULLANILABİLİR PLANLAR
+    title: Bütçe Şablonları
+    subtitle: Hazır dağılımları kullanın, kendi aylık planlarınızı kaydedin ve zamanla
+      güncel tutun.
+    back_to_budget: Bu Ayın Bütçesine Dön
+    library_title: Şablon Kütüphanesi
+    library_desc: Hazır şablonlar korunur; özel şablonlarınızın adını, içeriğini ve
+      kullanımını yönetebilirsiniz.
+    predefined_badge: Hazır şablon
+    custom_badge: Özel şablon
+    template_name: Şablon adı
+    rename: Yeniden Adlandır
+    source_month: Kaynak ay
+    update_from_month: Bu Aydan Güncelle
+    confirm_delete: Bu şablonu silmek istediğinizden emin misiniz?
+    templates_title: Şablonlarla Başlayın
+    templates_desc: Hazır dağılımları boş bir aya uygulayın veya bu ayın planını tekrar
+      kullanmak üzere kaydedin.
+    manage_templates: Şablonları Yönet
+    select_template: Uygulanacak şablon
+    apply_template: Şablonu Uygula
+    allocations_exist: Mevcut tahsisler korunuyor. Şablon uygulamak için boş bir ay
+      açın.
+    save_as_template_label: Bu ayı özel şablon olarak kaydet
+    save_as_template_placeholder: Örn. Yaz tatili bütçesi
+    save_template: Şablonu Kaydet
+    copy_previous_prompt: Bu ay için henüz bütçe planı yok.
+    copy_previous_hint: Bir önceki ayın kategori limitlerini ve planlanan gelirini
+      kopyalayabilirsiniz.
+    copy_previous: Önceki Aydan Kopyala
+  import:
+    csv_eyebrow: CSV İÇE AKTARMA
+    upload_title: İşlemleri İçe Aktar
+    upload_subtitle: Dosyanızı yükleyin; sütunları eşleyip işlemleri onaylamadan önce
+      kontrol edin.
+    csv_file: CSV dosyası
+    csv_hint: Başlık satırı olan, en fazla 2 MB CSV dosyası yükleyin.
+    select_account: İşlemlerin ekleneceği hesap
+    select_account_placeholder: Hesap seçin
+    map_columns: Sütunları Eşle
+    map_eyebrow: CSV İÇE AKTARMA · 2 / 3
+    map_title: Sütunları Eşle
+    map_subtitle: Dosyanızdaki her alanın hangi işlem bilgisine karşılık geldiğini
+      seçin.
+    field_date: Tarih
+    field_amount: Tutar
+    field_type: Tür
+    field_category: Kategori
+    field_note: Not
+    optional: (isteğe bağlı)
+    select_column: Sütun seçin
+    show_preview: Önizlemeyi Göster
+    upload_different: Farklı Dosya Yükle
+    preview_eyebrow: CSV İÇE AKTARMA · 3 / 3
+    preview_title: İçe Aktarmayı Kontrol Et
+    preview_subtitle: Hazır satırlar eklenecek; yinelenenler atlanacak, hatalı satırlar
+      eklenmeyecek.
+    row: Satır
+    status: Durum
+    status_ready: Hazır
+    status_duplicate: Yinelenen
+    confirm_import: İçe Aktarmayı Onayla
+    back_to_mapping: Eşlemeye Dön
+    summary_eyebrow: CSV İÇE AKTARMA
+    summary_title: İçe Aktarma Tamamlandı
+    summary_subtitle: İçe aktarma sonucunuz aşağıda.
+    created: oluşturuldu
+    skipped_duplicates: yinelenen atlandı
+    errors: hatalı satır
+    back_to_transactions: İşlemlere Dön
+    import_another: Başka CSV İçe Aktar
+  quick_add:
+    open: Hızlı işlem ekle
+    close: Hızlı işlem penceresini kapat
+    eyebrow: HIZLI EKLE
+    title: Yeni işlem
+    swipe_hint: Kaydırarak seç
+    more: Not, tarih veya hesap ekle
+    save: İşlemi kaydet
+  spending_report:
+    eyebrow: HARCAMA ANALİZİ
+    title: Kategori Harcama Raporu
+    subtitle: Harcamalarınızı kategori bazında inceleyin ve dönemleri karşılaştırın.
+    period_aria: Rapor dönemi seçimi
+    from: Başlangıç
+    to: Bitiş
+    apply: Raporu Güncelle
+    this_month: Bu Ay
+    summary_aria: Harcama özeti
+    current: Seçili Dönem
+    previous: Önceki Dönem
+    change: Dönem Değişimi
+    no_comparison: Karşılaştırılacak önceki harcama yok
+    distribution: Kategori Dağılımı
+    distribution_note: Bir kategoriyi seçerek alt kategorilerini görüntüleyin.
+    donut_aria: Kategori bazında harcama dağılımı
+    chart_caption: Her dilim seçili dönemdeki kategori harcamasını gösterir.
+    legend_aria: Kategori grafiği açıklaması
+    top_five: En Çok Harcama Yapılan 5 Kategori
+    comparison_note: Seçili dönem ve önceki eşit uzunluktaki dönem
+    table_caption: Kategori bazında dönem harcamaları
+    category: Kategori
+    select_category: Bir kategori seçin
+    select_category_note: Alt kategori dağılımını görmek için grafik dilimlerinden
+      veya listeden bir kategori seçin.
+    empty: Bu dönem için kategorilendirilmiş bir harcama bulunmuyor.
+    add_transaction: Harcama Ekle
+  cash_flow_forecast:
+    eyebrow: İLERİYE DÖNÜK PLANLAMA
+    title: Nakit Akışı Tahmini
+    subtitle: Gelecek aylardaki tahmini dönem sonu bakiyenizi görün.
+    horizon: Tahmin Ufku
+    three_months: 3 ay
+    six_months: 6 ay
+    baseline_income: Aylık Baz Gelir
+    baseline_expenses: Aylık Baz Gider
+    update: Tahmini Güncelle
+    assumptions: Varsayımlar
+    assumptions_note: Varsayımlar son üç aylık, tekrarlanmayan işlemlerin ortalamasıdır.
+      Değerleri bu görünüm için değiştirebilirsiniz.
+    summary_aria: Tahmin özeti
+    current_balance: Bugünkü Bakiye
+    active_accounts: Aktif hesapların toplamı
+    end_balance: Tahmini Son Bakiye
+    commitments: Bilinen Taahhütler
+    recurring: Aktif tekrarlayan işlemler
+    goals: Hedefler
+    active_goals: aktif hedef
+    purchases: Planlar
+    purchase_plans: satın alma planı
+    timeline: Tahmini Bakiye Zaman Çizelgesi
+    timeline_note: Düz çizgi bugünkü bakiyeyi, kesikli çizgi tahmini gösterir.
+    chart_aria: Gelecek aylara ait tahmini dönem sonu bakiye grafiği
+    included: Tahmine Dahil Edilenler
+    included_note: Her dönemin hesaplamasında görünür şekilde yer alır.
+    recurring_note: Kural tarihleri ve sıklığına göre
+    goals_note: Hedef tamamlanana kadar aylık
+    purchases_note: Planlanan ayda toplam plan tutarı
+    monthly_breakdown: Aylık Tahmin Detayı
+    monthly_breakdown_note: Dönem sonu bakiyesinin nasıl hesaplandığını inceleyin.
+    month: Ay
+    income: Gelir
+    expenses: Gider
+    net: Net
+    balance: Dönem Sonu
+    disclaimer: Bu bir tahmindir; gerçekleşen gelir, gider ve planlar değişebilir.
+  tags:
+    eyebrow: ESNEK GRUPLAMA
+    title: İşlem Etiketleri
+    subtitle: İşlemleri proje, etkinlik veya geçici ihtiyaçlara göre gruplandırın.
+    report: Etiket Harcama Raporu
+    new: Etiket Ekle
+    quick_create: Hızlı Etiket Oluştur
+    quick_create_note: Etiketler işlem formunda otomatik tamamlamayla da oluşturulabilir.
+    manage: Etiket Yönetimi
+    manage_note: Adını değiştirin, silin veya yinelenen etiketleri birleştirin.
+    name: Etiket adı
+    transaction_count: işlem
+    merge_sources: Birleştirilecek etiketler
+    merge_target: Hedef etiket
+    merge: Etiketleri Birleştir
+    empty: Henüz etiket oluşturulmadı.
+    create: Etiket Oluştur
+    edit: Etiketi Düzenle
+    update: Etiketi Güncelle
+    report_subtitle: Etiketlenmiş giderleri kategori sınırlarından bağımsız inceleyin.
+    report_totals: Etikete Göre Giderler
+    report_empty: Bu dönem için etiketlenmiş bir gider bulunmuyor.
+  recurring_rules:
+    eyebrow: OTOMATİK İŞLEMLER
+    title: Tekrarlayan İşlemler
+    subtitle: Düzenli gelir ve gider planlarınızı yönetin.
+    add: Yeni Tekrarlayan İşlem
+    edit_title: Tekrarlayan Planı Düzenle
+    edit_subtitle: Gelecekteki işlemlerin sıklığını veya bitiş koşulunu değiştirin.
+    edit_hint: Sadece gelecek işlemler güncellenir; daha önce oluşturulan işlemler
+      aynı kalır.
+    interval: Tekrarlama sıklığı
+    end_date: Bitiş tarihi (isteğe bağlı)
+    count: Toplam işlem sayısı (isteğe bağlı)
+    manage: Tekrarlayan İşlemleri Yönet
+    update: Planı Güncelle
+    empty_state: Henüz tekrarlayan işlem planı yok.
+    active: Aktif
+    paused: Duraklatıldı
+    stopped: Durduruldu
+    pause: Duraklat
+    resume: Devam Et
+    stop: Durdur
+    confirm_stop: Bu planı durdurmak istiyor musunuz? Önceki işlemler korunur.
+    generated_count: '%{count} işlem üretildi'
+    next_on: 'Sonraki: %{date}'
+  data_backup:
+    eyebrow: VERİ EGEMENLİĞİ
+    title: Yedekleme ve Geri Yükleme
+    subtitle: Finans verilerinizin taşınabilir kopyasını indirin.
+    export_title: Veri Dışa Aktarma
+    export_desc: Tüm hesaplar, kategoriler, işlemler, bütçeler, hedefler ve planlar
+      sürüm ve kayıt sayısı metadatasıyla indirilir.
+    download_json: JSON Yedeğini İndir
+    download_csv: CSV Yedeğini İndir

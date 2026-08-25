@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>" data-theme="system">
+<html lang="<%= I18n.locale %>" data-theme="dark">
   <head>
     <meta charset="utf-8">
-    <title>Personal Dashboard · Giriş</title>
+    <title>Personal Dashboard · Güvenli Giriş</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#070A12">
     <meta name="robots" content="noindex, nofollow">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
     <%= stylesheet_link_tag "application" %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous" %>
+    <%= javascript_include_tag "application", defer: true %>
   </head>
-  <body>
-    <main class="page-content" tabindex="-1">
+  <body class="auth-body">
+    <div class="auth-shell">
       <% if notice.present? || alert.present? %>
-        <div class="flash-stack" aria-live="polite">
+        <div class="flash-stack auth-flash-stack" aria-live="polite">
           <% if notice.present? %><div class="flash flash-notice"><%= notice %></div><% end %>
           <% if alert.present? %><div class="flash flash-alert"><%= alert %></div><% end %>
         </div>
       <% end %>
       <%= yield %>
-    </main>
+    </div>
   </body>
 </html>

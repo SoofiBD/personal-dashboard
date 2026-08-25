@@ -1,37 +1,37 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow">TEKRAR KULLANILABİLİR PLANLAR</p>
-    <h1>Bütçe Şablonları</h1>
-    <p class="page-subtitle">Hazır dağılımları kullanın, kendi aylık planlarınızı kaydedin ve zamanla güncel tutun.</p>
+    <p class="eyebrow"><%= t("budget_templates.eyebrow") %></p>
+    <h1><%= t("budget_templates.title") %></h1>
+    <p class="page-subtitle"><%= t("budget_templates.subtitle") %></p>
   </div>
-  <%= link_to "Bu Ayın Bütçesine Dön", finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary" %>
+  <%= link_to t("budget_templates.back_to_budget"), finance_budget_path(Date.current.strftime("%Y-%m")), class: "button button-secondary" %>
 </header>
 
 <section class="panel">
-  <div class="panel-header"><div><h2>Şablon Kütüphanesi</h2><p>Hazır şablonlar korunur; özel şablonlarınızın adını, içeriğini ve kullanımını yönetebilirsiniz.</p></div></div>
+  <div class="panel-header"><div><h2><%= t("budget_templates.library_title") %></h2><p><%= t("budget_templates.library_desc") %></p></div></div>
   <div class="template-management-list">
     <% @templates.each do |template| %>
       <article class="template-management-row">
         <div class="template-details">
           <div class="template-title-row">
             <h3><%= template.name %></h3>
-            <% if template.predefined? %><span class="template-badge">Hazır şablon</span><% else %><span class="template-badge custom">Özel şablon</span><% end %>
+            <% if template.predefined? %><span class="template-badge"><%= t("budget_templates.predefined_badge") %></span><% else %><span class="template-badge custom"><%= t("budget_templates.custom_badge") %></span><% end %>
           </div>
           <p><%= template.allocation_data.map { |item| item["category_name"] }.join(" · ") %></p>
         </div>
         <% unless template.predefined? %>
           <div class="template-management-actions">
             <%= form_with model: template, url: finance_budget_template_path(template), method: :patch, class: "template-inline-form" do |form| %>
-              <%= form.label :name, "Şablon adı", class: "sr-only" %>
-              <%= form.text_field :name, maxlength: 80, required: true, class: "form-control", aria: {label: "#{template.name} şablon adı"} %>
-              <%= form.submit "Yeniden Adlandır", class: "button button-secondary button-sm" %>
+              <%= form.label :name, t("budget_templates.template_name"), class: "sr-only" %>
+              <%= form.text_field :name, maxlength: 80, required: true, class: "form-control", aria: {label: "#{template.name} #{t('budget_templates.template_name')}"} %>
+              <%= form.submit t("budget_templates.rename"), class: "button button-secondary button-sm" %>
             <% end %>
             <%= form_with url: refresh_finance_budget_template_path(template), method: :patch, class: "template-inline-form" do |form| %>
-              <%= label_tag :month, "Kaynak ay", class: "sr-only" %>
-              <%= month_field_tag :month, Date.current.strftime("%Y-%m"), required: true, class: "form-control", aria: {label: "#{template.name} için kaynak ay"} %>
-              <%= submit_tag "Bu Aydan Güncelle", class: "button button-secondary button-sm" %>
+              <%= label_tag :month, t("budget_templates.source_month"), class: "sr-only" %>
+              <%= month_field_tag :month, Date.current.strftime("%Y-%m"), required: true, class: "form-control", aria: {label: "#{template.name} #{t('budget_templates.source_month')}"} %>
+              <%= submit_tag t("budget_templates.update_from_month"), class: "button button-secondary button-sm" %>
             <% end %>
-            <%= button_to "Sil", finance_budget_template_path(template), method: :delete, data: {turbo_confirm: "Bu şablonu silmek istediğinizden emin misiniz?"}, class: "button button-danger button-sm" %>
+            <%= button_to t("app.common.delete"), finance_budget_template_path(template), method: :delete, data: {turbo_confirm: t("budget_templates.confirm_delete")}, class: "button button-danger button-sm" %>
           </div>
         <% end %>
       </article>
