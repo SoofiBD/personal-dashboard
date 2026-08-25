@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_30_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_31_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -150,6 +150,22 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_30_000000) do
     t.index ["user_id"], name: "index_finance_savings_goals_on_user_id"
   end
 
+  create_table "finance_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "recurring_rule_id"
+    t.string "name", null: false
+    t.decimal "amount", precision: 14, scale: 2, null: false
+    t.string "billing_interval", default: "monthly", null: false
+    t.date "renewal_on"
+    t.date "last_used_on"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recurring_rule_id"], name: "index_finance_subscriptions_on_recurring_rule_id"
+    t.index ["user_id", "active"], name: "index_finance_subscriptions_on_user_id_and_active"
+    t.index ["user_id"], name: "index_finance_subscriptions_on_user_id"
+  end
+
   create_table "finance_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "name", limit: 50, null: false
@@ -246,6 +262,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_30_000000) do
   add_foreign_key "finance_recurring_rules", "financial_accounts"
   add_foreign_key "finance_recurring_rules", "users"
   add_foreign_key "finance_savings_goals", "users"
+  add_foreign_key "finance_subscriptions", "finance_recurring_rules", column: "recurring_rule_id"
+  add_foreign_key "finance_subscriptions", "users"
   add_foreign_key "finance_tags", "users"
   add_foreign_key "finance_transaction_imports", "financial_accounts"
   add_foreign_key "finance_transaction_imports", "users"
