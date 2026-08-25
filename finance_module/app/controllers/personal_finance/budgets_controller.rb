@@ -90,14 +90,17 @@ module PersonalFinance
         @budgets_by_month[bp.starts_on.month] = bp
       end
 
+      income_by_month = monthly_totals(owned(Transaction).income.where(occurred_on: year_range))
+      expense_by_month = monthly_totals(owned(Transaction).expense.where(occurred_on: year_range))
+
       # Build 12-month data
       @months = (1..12).map do |month|
         date = Date.new(@year, month, 1)
         budget = @budgets_by_month[month]
         planned_income = budget&.planned_income.to_f
         planned_spending = budget&.planned_spending.to_f
-        actual_income = owned(Transaction).income.during(date.beginning_of_month..date.end_of_month).sum(:amount).to_f
-        actual_expense = budget ? budget.actual_spending : owned(Transaction).expense.during(date.beginning_of_month..date.end_of_month).sum(:amount).to_f
+        actual_income = income_by_month[month].to_f
+        actual_expense = expense_by_month[month].to_f
         {
           month: month,
           date: date,
@@ -158,6 +161,12 @@ module PersonalFinance
 
     def previous_budget_period
       owned(BudgetPeriod).where("starts_on < ?", @budget.starts_on).order(starts_on: :desc).first
+    end
+
+    def monthly_totals(scope)
+      scope.group(:occurred_on).sum(:amount).each_with_object(Hash.new(0)) do |(date, amount), totals|
+        totals[date.month] += amount.to_f
+      end
     end
 
     def set_budget
