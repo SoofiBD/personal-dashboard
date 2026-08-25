@@ -517,6 +517,107 @@
     });
   };
 
+  const initSpendingReport = () => {
+    const canvas = document.getElementById("spending-donut-chart");
+    const dataEl = document.getElementById("spending-report-data");
+    if (!canvas || !dataEl || typeof window.Chart === "undefined") return;
+
+    let categories;
+    try {
+      categories = JSON.parse(dataEl.textContent);
+    } catch (e) {
+      return;
+    }
+    if (!Array.isArray(categories) || !categories.length) return;
+
+    const title = document.getElementById("subcategory-title");
+    const description = document.getElementById("subcategory-description");
+    const content = document.getElementById("subcategory-content");
+    const legend = document.getElementById("spending-chart-legend");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const formatCurrency = (value) => formatChartCurrency(value);
+    const categoryById = (id) => categories.find((category) => String(category.id) === String(id));
+    const selectCategory = (id) => {
+      const category = categoryById(id);
+      if (!category || !title || !description || !content) return;
+
+      document.querySelectorAll("[data-spending-category-id]").forEach((button) => {
+        const selected = String(button.dataset.spendingCategoryId) === String(category.id);
+        button.classList.toggle("is-selected", selected);
+        button.setAttribute("aria-pressed", String(selected));
+      });
+
+      title.textContent = category.name;
+      content.replaceChildren();
+      if (!category.children || !category.children.length) {
+        description.textContent = "Bu kategoride seçili dönemde alt kategori harcaması bulunmuyor.";
+        content.className = "subcategory-empty";
+        content.textContent = "Harcama doğrudan ana kategoriye kaydedilmiş olabilir.";
+        return;
+      }
+
+      description.textContent = "Seçili dönemdeki alt kategori harcamaları";
+      content.className = "subcategory-list";
+      category.children.forEach((child) => {
+        const row = document.createElement("div");
+        row.className = "subcategory-row";
+        const label = document.createElement("span");
+        label.className = "subcategory-name";
+        const dot = document.createElement("span");
+        dot.className = "category-color-dot";
+        dot.style.backgroundColor = child.color;
+        const name = document.createElement("span");
+        name.textContent = child.name;
+        label.append(dot, name);
+        const amount = document.createElement("strong");
+        amount.textContent = formatCurrency(child.amount);
+        row.append(label, amount);
+        content.append(row);
+      });
+    };
+
+    if (legend) {
+      categories.forEach((category) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "spending-legend-item";
+        button.dataset.spendingCategoryId = category.id;
+        button.setAttribute("aria-pressed", "false");
+        const dot = document.createElement("span");
+        dot.className = "category-color-dot";
+        dot.style.backgroundColor = category.color;
+        const label = document.createElement("span");
+        label.textContent = `${category.name} · ${formatCurrency(category.current)}`;
+        button.append(dot, label);
+        button.addEventListener("click", () => selectCategory(category.id));
+        legend.append(button);
+      });
+    }
+
+    document.querySelectorAll(".top-category-button[data-spending-category-id]").forEach((button) => {
+      button.addEventListener("click", () => selectCategory(button.dataset.spendingCategoryId));
+    });
+
+    new window.Chart(canvas, {
+      type: "doughnut",
+      data: {
+        labels: categories.map((category) => category.name),
+        datasets: [{ data: categories.map((category) => Number(category.current) || 0), backgroundColor: categories.map((category) => category.color), borderColor: "transparent", borderWidth: 3, hoverOffset: 8 }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: reduceMotion ? false : { duration: 500, easing: "easeOutQuart" },
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: "rgba(15, 23, 42, 0.95)", titleColor: "#F8FAFC", bodyColor: "#CBD5E1", padding: 12, cornerRadius: 8, callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.parsed)}` } },
+        },
+        onClick: (_event, elements) => { if (elements.length) selectCategory(categories[elements[0].index].id); },
+      },
+    });
+  };
+
   const initOnboardingWizard = () => {
     const wizardForm = document.getElementById("onboarding-form");
     if (!wizardForm) return;
@@ -749,6 +850,7 @@
     initPurchaseScenario();
     initQuickAdd();
     initCashFlowChart();
+    initSpendingReport();
     initOnboardingWizard();
     registerServiceWorker();
   };
