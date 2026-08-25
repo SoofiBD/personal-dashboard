@@ -46,8 +46,7 @@ jobs:
         run: bundle exec brakeman --no-pager --quiet --except EOLRails
 
       - name: Run Bundler Audit (dependency audit)
-        run: |
-          bundle exec bundler-audit check --update || true
+        run: bundle exec bundler-audit check --update
 
   # ──────────────────────────────────────────────
   # 2. Tests
