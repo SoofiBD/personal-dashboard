@@ -187,6 +187,8 @@ Make sure you have one of the following setups installed on your machine:
 7. **Visit the app:**
    Navigate to `http://localhost:3000/finance`.
 
+   For deployments that use Rails encrypted credentials, provide `RAILS_MASTER_KEY` through the deployment secret manager. The key is intentionally not stored in this repository; rotate any key that was previously committed.
+
 ---
 
 ## 🧪 Running Tests
