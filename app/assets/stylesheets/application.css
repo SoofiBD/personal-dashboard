@@ -67,6 +67,11 @@
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; --bg-app: #F8FAFC; --surface-card: #FFFFFF; --surface-card-hover: #F1F5F9; --surface-elevated: #E2E8F0; --surface-input: #F8FAFC; --text-main: #0F172A; --text-muted: #475569; --text-subtle: #64748B; --border-subtle: rgba(15, 23, 42, .12); --border-card: rgba(15, 23, 42, .15); --sidebar-bg: #FFFFFF; --sidebar-link: #475569; --sidebar-link-hover: #0F172A; }
+html, body, .sidebar, .panel, .metric-card { transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease; }
+.theme-form { margin-top: .5rem; }.theme-select { width: 100%; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: .4rem; }
+
 @media (prefers-color-scheme: light) {
   :root {
     --bg-app: #F8FAFC;
