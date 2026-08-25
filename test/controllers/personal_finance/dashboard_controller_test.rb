@@ -61,4 +61,13 @@ class PersonalFinance::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-spending-category-id='#{food.id}']", text: /Food/
     assert_select "#subcategory-breakdown"
   end
+
+  test "cash flow forecast renders editable assumptions and projected balance chart" do
+    get finance_cash_flow_forecast_path(months: 3, baseline_income: 5000, baseline_expenses: 2000)
+
+    assert_response :success
+    assert_select "canvas#cash-flow-forecast-chart"
+    assert_select "input[name='baseline_income'][value='5000.0']"
+    assert_select "table.forecast-table"
+  end
 end
