@@ -3,6 +3,7 @@ require "csv"
 module PersonalFinance
   class TransactionsController < ApplicationController
     before_action :set_transaction, only: %i[edit update destroy]
+    before_action :set_transaction_import, only: %i[preview_import confirm_import]
 
     def index
       RecurringTransactionGenerator.generate_due_for(current_panel_user)
@@ -32,6 +33,61 @@ module PersonalFinance
       @transaction = owned(Transaction).new(occurred_on: Date.current, kind: "expense")
     end
 
+    def import
+      @transaction_import = owned(TransactionImport).new
+      @accounts = owned(Account).where(is_active: true).order(:name)
+    end
+
+    def create_import
+      upload = params[:csv_file]
+      @transaction_import = owned(TransactionImport).new(financial_account_id: params[:financial_account_id])
+      @accounts = owned(Account).where(is_active: true).order(:name)
+
+      if upload.blank?
+        @transaction_import.errors.add(:base, "Choose a CSV file to upload.")
+        return render :import, status: :unprocessable_entity
+      end
+      if upload.size > 2.megabytes
+        @transaction_import.errors.add(:base, "CSV files must be 2 MB or smaller.")
+        return render :import, status: :unprocessable_entity
+      end
+
+      @transaction_import.source_csv = upload.read.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+      unless @transaction_import.save
+        return render :import, status: :unprocessable_entity
+      end
+
+      @headers = csv_headers(@transaction_import.source_csv)
+      if @headers.empty?
+        @transaction_import.destroy!
+        @transaction_import = owned(TransactionImport).new
+        @transaction_import.errors.add(:base, "The CSV file needs a header row.")
+        return render :import, status: :unprocessable_entity
+      end
+      render :map_import
+    end
+
+    def preview_import
+      @headers = csv_headers(@transaction_import.source_csv)
+      parser = CsvTransactionImport.new(@transaction_import, import_mapping_params)
+      parser.preview
+      if parser.errors.any?
+        parser.errors.each { |error| @transaction_import.errors.add(:base, error) }
+        return render :map_import, status: :unprocessable_entity
+      end
+
+      @transaction_import.update!(column_mapping: import_mapping_params, preview_rows: parser.rows)
+      @preview_rows = parser.rows
+      render :preview_import
+    end
+
+    def confirm_import
+      return redirect_to finance_transactions_path, alert: "This CSV import was already completed." if @transaction_import.imported?
+
+      CsvTransactionImport.new(@transaction_import).confirm!
+      render :import_summary
+    end
+
     def edit
     end
 
@@ -54,6 +110,20 @@ module PersonalFinance
 
     def set_transaction
       @transaction = owned(Transaction).find(params[:id])
+    end
+
+    def set_transaction_import
+      @transaction_import = owned(TransactionImport).find(params[:import_id])
+    end
+
+    def csv_headers(source)
+      CSV.parse(source.delete_prefix("\uFEFF"), headers: true).headers.compact
+    rescue CSV::MalformedCSVError
+      []
+    end
+
+    def import_mapping_params
+      params.require(:column_mapping).permit(:date, :amount, :type, :category, :note).to_h
     end
 
     def filter_params

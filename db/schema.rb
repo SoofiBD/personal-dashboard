@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_25_000001) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_26_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -116,6 +116,22 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_25_000001) do
     t.index ["user_id"], name: "index_finance_savings_goals_on_user_id"
   end
 
+  create_table "finance_transaction_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "financial_account_id", null: false
+    t.text "source_csv", null: false
+    t.jsonb "column_mapping", default: {}, null: false
+    t.jsonb "preview_rows", default: [], null: false
+    t.integer "created_count", default: 0, null: false
+    t.integer "skipped_count", default: 0, null: false
+    t.integer "error_count", default: 0, null: false
+    t.datetime "imported_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["financial_account_id"], name: "index_finance_transaction_imports_on_financial_account_id"
+    t.index ["user_id"], name: "index_finance_transaction_imports_on_user_id"
+  end
+
   create_table "finance_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "financial_account_id", null: false
@@ -170,6 +186,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_25_000001) do
   add_foreign_key "finance_recurring_rules", "financial_accounts"
   add_foreign_key "finance_recurring_rules", "users"
   add_foreign_key "finance_savings_goals", "users"
+  add_foreign_key "finance_transaction_imports", "financial_accounts"
+  add_foreign_key "finance_transaction_imports", "users"
   add_foreign_key "finance_transactions", "finance_categories", column: "category_id"
   add_foreign_key "finance_transactions", "finance_recurring_rules", column: "recurring_rule_id"
   add_foreign_key "finance_transactions", "financial_accounts"

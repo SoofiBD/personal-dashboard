@@ -11,6 +11,9 @@
 </header>
 
 <div class="page-toolbar">
+  <%= link_to import_finance_transactions_path, class: "button button-secondary button-sm" do %>
+    <span><%= t("transactions.import_csv", default: "CSV'den İçe Aktar") %></span>
+  <% end %>
   <%= link_to finance_recurring_rules_path, class: "button button-secondary button-sm" do %>
     <%= finance_svg_icon("recurring", class: "icon-sm") %>
     <span><%= t("recurring_rules.manage", default: "Tekrarlayan İşlemleri Yönet") %></span>
