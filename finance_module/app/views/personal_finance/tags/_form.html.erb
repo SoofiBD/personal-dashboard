@@ -1,0 +1,5 @@
+<%= form_with model: @tag, scope: :tag, url: @tag.persisted? ? finance_tag_path(@tag) : finance_tags_path do |form| %>
+  <%= render "personal_finance/shared/errors", record: @tag %>
+  <div class="form-group"><%= form.label :name, t("tags.name", default: "Etiket adı") %><%= form.text_field :name, maxlength: 50, required: true, autocomplete: "off" %></div>
+  <div class="form-actions"><%= form.submit @tag.persisted? ? t("tags.update", default: "Etiketi Güncelle") : t("tags.create", default: "Etiket Oluştur"), class: "button button-primary" %><%= link_to t("app.common.cancel", default: "İptal"), finance_tags_path, class: "button button-secondary" %></div>
+<% end %>

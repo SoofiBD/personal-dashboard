@@ -6,6 +6,8 @@ module PersonalFinance
     belongs_to :account, class_name: "PersonalFinance::Account", foreign_key: :financial_account_id
     belongs_to :category, class_name: "PersonalFinance::Category", optional: true
     belongs_to :recurring_rule, class_name: "PersonalFinance::RecurringRule", optional: true
+    has_many :transaction_tags, class_name: "PersonalFinance::TransactionTag", foreign_key: :transaction_id, dependent: :destroy
+    has_many :tags, through: :transaction_tags, class_name: "PersonalFinance::Tag"
 
     enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
 

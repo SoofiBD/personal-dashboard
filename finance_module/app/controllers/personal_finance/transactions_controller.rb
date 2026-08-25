@@ -12,12 +12,14 @@ module PersonalFinance
       @transactions = filtered_transactions.order(occurred_on: :desc, created_at: :desc)
       @accounts = owned(Account).order(:name)
       @categories = owned(Category).order(:name)
+      @tags = owned(Tag).order(:name)
       @filters_active = @filters[:q].present? ||
         @filters[:kind].present? ||
         @filters[:account_id].present? ||
         @filters[:from].present? ||
         @filters[:to].present? ||
-        @filters[:category_id].any?
+        @filters[:category_id].any? ||
+        @filters[:tag_id].present?
 
       respond_to do |format|
         format.html
@@ -127,7 +129,7 @@ module PersonalFinance
     end
 
     def filter_params
-      raw = params.permit(:q, :kind, :account_id, :from, :to, category_id: []).to_h.symbolize_keys
+      raw = params.permit(:q, :kind, :account_id, :from, :to, :tag_id, category_id: []).to_h.symbolize_keys
       raw[:category_id] = Array(raw[:category_id])
       raw
     end
@@ -139,7 +141,7 @@ module PersonalFinance
     end
 
     def filtered_transactions
-      scope = owned(Transaction).includes(:account, :category)
+      scope = owned(Transaction).includes(:account, :category, :tags)
       scope = scope.search_notes(@filters[:q]) if @filters[:q].present?
       scope = scope.where(kind: @filters[:kind]) if @filters[:kind].present?
       scope = scope.where(financial_account_id: @filters[:account_id]) if @filters[:account_id].present?
@@ -148,6 +150,7 @@ module PersonalFinance
         category_ids = owned(Category).where(id: @filters[:category_id]).flat_map(&:self_and_descendant_ids).uniq
         scope = scope.where(category_id: category_ids)
       end
+      scope = scope.joins(:tags).where(finance_tags: {id: owned(Tag).where(id: @filters[:tag_id])}).distinct if @filters[:tag_id].present?
 
       from = parse_date(@filters[:from])
       to = parse_date(@filters[:to])
@@ -164,7 +167,7 @@ module PersonalFinance
 
     def transactions_csv(transactions)
       "\uFEFF" + CSV.generate do |csv|
-        csv << %w[date type amount category account note]
+        csv << %w[date type amount category account tags note]
         transactions.each do |transaction|
           csv << [
             transaction.occurred_on.iso8601,
@@ -172,6 +175,7 @@ module PersonalFinance
             transaction.amount.to_s("F"),
             transaction.category&.name,
             transaction.account&.name,
+            transaction.tags.order(:name).pluck(:name).join(", "),
             transaction.note
           ]
         end
@@ -200,6 +204,7 @@ module PersonalFinance
           @transaction.save!
           rule = owned(RecurringRule).create!(rule_attributes_for(@transaction))
           @transaction.update!(recurring_rule: rule)
+          sync_tags(@transaction)
         end
         redirect_to finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved.")
       else
@@ -229,10 +234,23 @@ module PersonalFinance
 
     def save_or_render
       if @transaction.save
+        sync_tags(@transaction)
         redirect_to(finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved."))
       else
         render((action_name == "update") ? :edit : :new, status: :unprocessable_entity)
       end
+    end
+
+    def sync_tags(transaction)
+      names = tag_names.split(",").map { |name| name.strip.gsub(/\s+/, " ") }.reject(&:blank?).uniq.first(12)
+      tags = names.map do |name|
+        owned(Tag).where("LOWER(name) = ?", name.downcase).first || owned(Tag).create!(name: name)
+      end
+      transaction.tags = tags
+    end
+
+    def tag_names
+      params.dig(:transaction, :tag_names).to_s
     end
   end
 end
