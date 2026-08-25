@@ -44,4 +44,21 @@ class PersonalFinance::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "canvas#cashflow-chart", count: 0
     assert_select ".empty-state"
   end
+
+  test "spending report renders category distribution, comparison, and sub-category drill-down data" do
+    user = User.dashboard_owner
+    account = PersonalFinance::Account.create!(user: user, name: "Bank", kind: "bank", opening_balance: 0)
+    food = PersonalFinance::Category.create!(user: user, name: "Food", kind: "expense", color: "#3B82F6")
+    groceries = PersonalFinance::Category.create!(user: user, parent: food, name: "Groceries", kind: "expense", color: "#60A5FA")
+    PersonalFinance::Transaction.create!(user: user, account: account, category: groceries, kind: "expense", amount: 1200, occurred_on: Date.current)
+    PersonalFinance::Transaction.create!(user: user, account: account, category: food, kind: "expense", amount: 300, occurred_on: 1.month.ago)
+
+    get finance_spending_report_path(from: Date.current.beginning_of_month, to: Date.current.end_of_month)
+
+    assert_response :success
+    assert_select "canvas#spending-donut-chart"
+    assert_select "script#spending-report-data"
+    assert_select "button[data-spending-category-id='#{food.id}']", text: /Food/
+    assert_select "#subcategory-breakdown"
+  end
 end
