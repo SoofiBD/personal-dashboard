@@ -225,6 +225,13 @@
 
       <!-- Kategori Limitleri Hızlı Liste / Dağılım -->
       <% if @budget_allocations_data.present? %>
+        <% attention_items = @budget_allocations_data.select { |item| item[:is_over] || item[:raw_percent] >= 80 } %>
+        <% if attention_items.any? %>
+          <section class="budget-attention" aria-label="Bütçe dikkat uyarıları">
+            <strong>Dikkat gerekli</strong>
+            <span><%= attention_items.map { |item| "#{item[:name]} (#{item[:raw_percent]}%)" }.join(", ") %></span>
+          </section>
+        <% end %>
         <div class="budget-categories-breakdown">
           <div class="breakdown-header">
             <h4><%= t("dashboard.category_budgets", default: "Kategori Bütçe Dağılımı") %></h4>
@@ -237,10 +244,12 @@
               <span class="chip-percent"><%= total_raw_percent %>%</span>
             </button>
             <% @budget_allocations_data.each do |item| %>
-              <button type="button" class="budget-chip <%= 'is-over' if item[:is_over] %>" data-category-target="cat-<%= item[:id] %>" title="<%= item[:name] %>: <%= dashboard_currency item[:spent] %> / <%= dashboard_currency item[:planned] %>">
+              <% alert_class = item[:is_over] ? "is-over" : (item[:raw_percent] >= 80 ? "is-warning" : "") %>
+              <button type="button" class="budget-chip <%= alert_class %>" data-category-target="cat-<%= item[:id] %>" title="<%= item[:name] %>: <%= dashboard_currency item[:spent] %> / <%= dashboard_currency item[:planned] %>">
                 <span class="chip-color-dot" style="background-color: <%= item[:color] %>;"></span>
                 <span class="chip-name"><%= item[:short_name] %></span>
                 <span class="chip-percent"><%= item[:raw_percent] %>%</span>
+                <% if alert_class.present? %><span class="budget-alert-label"><%= item[:is_over] ? "Aşıldı" : "Uyarı" %></span><% end %>
               </button>
             <% end %>
           </div>
@@ -262,7 +271,7 @@
               <div class="progress-track" role="progressbar"
                    aria-valuenow="<%= item[:percent] %>" aria-valuemin="0" aria-valuemax="100"
                    aria-label="<%= item[:name] %>: <%= dashboard_currency item[:spent] %> / <%= dashboard_currency item[:planned] %>">
-                <span class="progress-fill <%= 'is-over' if item[:is_over] %>"
+                <span class="progress-fill <%= item[:is_over] ? 'is-over' : ('is-warning' if item[:raw_percent] >= 80) %>"
                       data-target-width="<%= item[:percent] %>"
                       style="width: 0%;"></span>
               </div>
@@ -305,4 +314,3 @@
     <%= render "personal_finance/savings_goals/list", savings_goals: @goals %>
   </article>
 </section>
-
