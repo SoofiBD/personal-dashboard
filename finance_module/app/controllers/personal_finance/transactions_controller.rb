@@ -206,6 +206,7 @@ module PersonalFinance
           rule = owned(RecurringRule).create!(rule_attributes_for(@transaction))
           @transaction.update!(recurring_rule: rule)
           sync_tags(@transaction)
+          SpendingNotificationGenerator.call(@transaction)
         end
         redirect_to finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved.")
       else
@@ -236,7 +237,8 @@ module PersonalFinance
     def save_or_render
       if @transaction.save
         sync_tags(@transaction)
-        create_goal_contribution(@transaction)
+        goal = create_goal_contribution(@transaction)
+        SpendingNotificationGenerator.call(@transaction, goal: goal)
         redirect_to(finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved."))
       else
         render((action_name == "update") ? :edit : :new, status: :unprocessable_entity)
@@ -260,6 +262,7 @@ module PersonalFinance
 
       goal = owned(SavingsGoal).find(savings_goal_id)
       goal.contributions.create!(linked_transaction: transaction, amount: transaction.amount, contributed_on: transaction.occurred_on, note: transaction.note)
+      goal
     end
 
     def savings_goal_id
