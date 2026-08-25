@@ -181,6 +181,27 @@ body {
   .spending-legend-item, .top-category-button { transition: none; }
 }
 
+/* Cash flow forecast */
+.forecast-assumptions { margin-bottom: 1.5rem; }
+.forecast-assumptions-form { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; }
+.forecast-assumptions-form .filter-field { flex: 1 1 180px; }
+.forecast-metrics { margin-bottom: 1.5rem; }
+.forecast-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+.forecast-chart-container { position: relative; height: 320px; margin-top: 1.25rem; }
+.forecast-assumption-list { display: grid; gap: .85rem; margin-top: 1.2rem; }
+.forecast-assumption-list div { padding: .85rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--surface-input); }
+.forecast-assumption-list dt { font-weight: 700; }
+.forecast-assumption-list dd { margin: .2rem 0 0; color: var(--text-muted); font-size: .86rem; }
+.forecast-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.forecast-table th, .forecast-table td { padding: .8rem .9rem; border-bottom: 1px solid var(--border-subtle); text-align: right; white-space: nowrap; }
+.forecast-table th:first-child, .forecast-table td:first-child { text-align: left; }
+.forecast-table thead th { color: var(--text-muted); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+
+@media (max-width: 800px) {
+  .forecast-grid { grid-template-columns: 1fr; }
+  .forecast-chart-container { height: 270px; }
+}
+
 a {
   color: var(--primary);
   text-decoration: none;

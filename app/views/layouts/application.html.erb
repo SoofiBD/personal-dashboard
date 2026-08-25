@@ -49,6 +49,7 @@
             <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
             <%= finance_navigation_item t("app.sidebar.yearly_budget", default: "Yıllık Plan"), finance_year_budget_path(Date.current.year), "chart" %>
             <%= finance_navigation_item t("app.sidebar.spending_report", default: "Harcama Analizi"), finance_spending_report_path, "chart" %>
+            <%= finance_navigation_item t("app.sidebar.cash_flow_forecast", default: "Nakit Akışı Tahmini"), finance_cash_flow_forecast_path, "chart" %>
             <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
             <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma Planları"), finance_purchase_plans_path, "purchase_plans" %>
           </nav>
