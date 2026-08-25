@@ -34,7 +34,7 @@ Rails.application.routes.draw do
     resource :onboarding, only: %i[show create], controller: :onboarding do
       post :skip, on: :collection
     end
-    resources :savings_goals, except: :show do
+    resources :savings_goals do
       resources :goal_contributions, only: :create
     end
     resources :purchase_plans do
