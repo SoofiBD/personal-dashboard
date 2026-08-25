@@ -1,0 +1,76 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("spending_report.eyebrow", default: "HARCAMA ANALİZİ") %></p>
+    <h1><%= t("spending_report.title", default: "Kategori Harcama Raporu") %></h1>
+    <p class="page-subtitle"><%= t("spending_report.subtitle", default: "Harcamalarınızı kategori bazında inceleyin ve dönemleri karşılaştırın.") %></p>
+  </div>
+</header>
+
+<section class="panel report-filter-panel" aria-label="<%= t('spending_report.period_aria', default: 'Rapor dönemi seçimi') %>">
+  <%= form_with url: finance_spending_report_path, method: :get, class: "report-date-form" do %>
+    <div class="filter-field">
+      <%= label_tag :from, t("spending_report.from", default: "Başlangıç") %>
+      <%= date_field_tag :from, @from, class: "filter-input", max: @to %>
+    </div>
+    <div class="filter-field">
+      <%= label_tag :to, t("spending_report.to", default: "Bitiş") %>
+      <%= date_field_tag :to, @to, class: "filter-input", min: @from %>
+    </div>
+    <div class="filter-actions">
+      <%= submit_tag t("spending_report.apply", default: "Raporu Güncelle"), class: "button button-primary button-sm" %>
+      <%= link_to t("spending_report.this_month", default: "Bu Ay"), finance_spending_report_path, class: "button button-secondary button-sm" %>
+    </div>
+  <% end %>
+</section>
+
+<section class="finance-cards report-metrics" aria-label="<%= t('spending_report.summary_aria', default: 'Harcama özeti') %>">
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label"><%= t("spending_report.current", default: "Seçili Dönem") %></span><div class="metric-badge-icon icon-expense-badge"><%= finance_svg_icon("expense") %></div></div>
+    <strong class="value-negative"><%= dashboard_currency @total_spending %></strong>
+    <span class="metric-note"><%= l(@from) %> – <%= l(@to) %></span>
+  </article>
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label"><%= t("spending_report.previous", default: "Önceki Dönem") %></span><div class="metric-badge-icon icon-budget-badge"><%= finance_svg_icon("chart") %></div></div>
+    <strong><%= dashboard_currency @previous_total_spending %></strong>
+    <span class="metric-note"><%= l(@previous_from) %> – <%= l(@previous_to) %></span>
+  </article>
+  <article class="metric-card">
+    <div class="metric-card-top"><span class="metric-label"><%= t("spending_report.change", default: "Dönem Değişimi") %></span><div class="metric-badge-icon <%= @comparison_change.positive? ? 'icon-expense-badge' : 'icon-income-badge' %>"><%= finance_svg_icon(@comparison_change.positive? ? "expense" : "income") %></div></div>
+    <strong class="<%= @comparison_change.positive? ? 'value-negative' : 'value-positive' %>"><%= @comparison_change.positive? ? '+' : '' %><%= dashboard_currency @comparison_change %></strong>
+    <span class="metric-note"><%= @previous_total_spending.positive? ? number_to_percentage((@comparison_change / @previous_total_spending) * 100, precision: 1) : t('spending_report.no_comparison', default: 'Karşılaştırılacak önceki harcama yok') %></span>
+  </article>
+</section>
+
+<% if @category_data.any? %>
+  <% chart_data = @category_data.map { |item| item.slice(:id, :name, :color, :current, :previous, :children) } %>
+  <section class="spending-report-grid">
+    <article class="panel spending-donut-panel">
+      <div class="panel-header"><div><h2><%= t("spending_report.distribution", default: "Kategori Dağılımı") %></h2><p><%= t("spending_report.distribution_note", default: "Bir kategoriyi seçerek alt kategorilerini görüntüleyin.") %></p></div></div>
+      <figure class="spending-chart-figure">
+        <div class="spending-chart-container"><canvas id="spending-donut-chart" tabindex="0" role="img" aria-label="<%= t('spending_report.donut_aria', default: 'Kategori bazında harcama dağılımı') %>"></canvas></div>
+        <figcaption class="chart-caption"><%= t("spending_report.chart_caption", default: "Her dilim seçili dönemdeki kategori harcamasını gösterir.") %></figcaption>
+      </figure>
+      <div class="spending-chart-legend" id="spending-chart-legend" aria-label="<%= t('spending_report.legend_aria', default: 'Kategori grafiği açıklaması') %>"></div>
+    </article>
+
+    <article class="panel spending-breakdown-panel">
+      <div class="panel-header"><div><h2><%= t("spending_report.top_five", default: "En Çok Harcama Yapılan 5 Kategori") %></h2><p><%= t("spending_report.comparison_note", default: "Seçili dönem ve önceki eşit uzunluktaki dönem") %></p></div></div>
+      <ol class="top-category-list">
+        <% @top_categories.each do |item| %>
+          <% percentage = @total_spending.positive? ? (item[:current] / @total_spending * 100) : 0 %>
+          <li><button type="button" class="top-category-button" data-spending-category-id="<%= item[:id] %>" aria-pressed="false"><span class="category-color-dot" style="background-color: <%= item[:color] %>;"></span><span class="top-category-name"><%= item[:name] %></span><span class="top-category-amount"><%= dashboard_currency item[:current] %><small>%<%= number_with_precision(percentage, precision: 1) %></small></span></button></li>
+        <% end %>
+      </ol>
+    </article>
+  </section>
+
+  <section class="panel subcategory-panel" id="subcategory-breakdown" aria-live="polite">
+    <div class="panel-header"><div><h2 id="subcategory-title"><%= t("spending_report.select_category", default: "Bir kategori seçin") %></h2><p id="subcategory-description"><%= t("spending_report.select_category_note", default: "Alt kategori dağılımını görmek için grafik dilimlerinden veya listeden bir kategori seçin.") %></p></div></div>
+    <div id="subcategory-content" class="subcategory-empty"><%= t("spending_report.select_category_note", default: "Alt kategori dağılımını görmek için grafik dilimlerinden veya listeden bir kategori seçin.") %></div>
+  </section>
+
+  <table class="visually-hidden" id="spending-report-data-table"><caption><%= t("spending_report.table_caption", default: "Kategori bazında dönem harcamaları") %></caption><thead><tr><th scope="col"><%= t("spending_report.category", default: "Kategori") %></th><th scope="col"><%= t("spending_report.current", default: "Seçili Dönem") %></th><th scope="col"><%= t("spending_report.previous", default: "Önceki Dönem") %></th></tr></thead><tbody><% @category_data.each do |item| %><tr><th scope="row"><%= item[:name] %></th><td><%= dashboard_currency item[:current] %></td><td><%= dashboard_currency item[:previous] %></td></tr><% end %></tbody></table>
+  <script type="application/json" id="spending-report-data"><%= raw chart_data.to_json %></script>
+<% else %>
+  <section class="panel empty-state"><p><%= t("spending_report.empty", default: "Bu dönem için kategorilendirilmiş bir harcama bulunmuyor.") %></p><%= link_to t("spending_report.add_transaction", default: "Harcama Ekle"), new_finance_transaction_path, class: "button button-primary button-sm" %></section>
+<% end %>
