@@ -2881,6 +2881,10 @@ textarea:focus-visible {
 .status-badge.is-active { color: #a7f3d0; background: rgba(16, 185, 129, 0.14); }
 .status-badge.is-paused { color: #fde68a; background: rgba(245, 158, 11, 0.14); }
 .status-badge.is-stopped { color: #fecaca; background: rgba(220, 38, 38, 0.16); }
+.budget-attention { display:flex; gap:.6rem; align-items:center; padding:.8rem 1rem; margin:0 0 1rem; border:1px solid rgba(245,158,11,.5); border-radius:var(--radius-md); background:rgba(245,158,11,.12); color:#fde68a; }
+.budget-chip.is-warning { border-color:#f59e0b; }
+.budget-alert-label { font-size:.65rem; font-weight:700; color:#fde68a; }
+.progress-fill.is-warning { background:#f59e0b; }
 
 .recurring-rules-list { padding: 0; overflow: hidden; }
 .recurring-rule-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1.5rem; padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--border-subtle); }
