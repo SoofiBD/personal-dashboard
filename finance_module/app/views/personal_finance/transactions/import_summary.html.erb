@@ -1,0 +1,3 @@
+<header class="page-header"><div><p class="eyebrow">CSV İÇE AKTARMA</p><h1>İçe Aktarma Tamamlandı</h1><p class="page-subtitle">İçe aktarma sonucunuz aşağıda.</p></div></header>
+<section class="panel import-summary"><div><strong><%= @transaction_import.created_count %></strong><span>oluşturuldu</span></div><div><strong><%= @transaction_import.skipped_count %></strong><span>yinelenen atlandı</span></div><div><strong><%= @transaction_import.error_count %></strong><span>hatalı satır</span></div></section>
+<div class="form-actions"><%= link_to "İşlemlere Dön", finance_transactions_path, class: "button button-primary" %><%= link_to "Başka CSV İçe Aktar", import_finance_transactions_path, class: "button button-secondary" %></div>
