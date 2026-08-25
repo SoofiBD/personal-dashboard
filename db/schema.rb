@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_28_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_29_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,6 +34,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_28_000000) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "starts_on"], name: "index_finance_budget_periods_on_user_id_and_starts_on", unique: true
     t.index ["user_id"], name: "index_finance_budget_periods_on_user_id"
+  end
+
+  create_table "finance_budget_templates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "name", null: false
+    t.jsonb "allocation_data", default: [], null: false
+    t.boolean "predefined", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_finance_budget_templates_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_finance_budget_templates_on_user_id"
   end
 
   create_table "finance_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -208,6 +219,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_28_000000) do
   add_foreign_key "finance_budget_allocations", "finance_budget_periods", column: "budget_period_id"
   add_foreign_key "finance_budget_allocations", "finance_categories", column: "category_id"
   add_foreign_key "finance_budget_periods", "users"
+  add_foreign_key "finance_budget_templates", "users"
   add_foreign_key "finance_categories", "finance_categories", column: "parent_id"
   add_foreign_key "finance_categories", "users"
   add_foreign_key "finance_exchange_rates", "users"

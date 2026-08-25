@@ -31,6 +31,11 @@ Rails.application.routes.draw do
     resources :budgets, only: %i[show update], param: :month do
       patch :currency, on: :member
       patch :copy_previous, on: :member
+      post :apply_template, on: :member
+      post :save_as_template, on: :member
+    end
+    resources :budget_templates, only: %i[index update destroy] do
+      patch :refresh, on: :member
     end
     resource :onboarding, only: %i[show create], controller: :onboarding do
       post :skip, on: :collection
