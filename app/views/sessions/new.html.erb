@@ -1,0 +1,18 @@
+<section class="panel form-panel" aria-labelledby="login-title">
+  <div class="panel-header">
+    <div>
+      <h1 id="login-title">Dashboard girişi</h1>
+      <p>Finansal verilerinize erişmek için yönetici parolanızı girin.</p>
+    </div>
+  </div>
+
+  <%= form_with url: session_path, method: :post do |form| %>
+    <div class="form-group">
+      <%= form.label :password, "Parola" %>
+      <%= form.password_field :password, required: true, autofocus: true, autocomplete: "current-password" %>
+    </div>
+    <div class="form-actions">
+      <%= form.submit "Giriş yap", class: "button button-primary" %>
+    </div>
+  <% end %>
+</section>

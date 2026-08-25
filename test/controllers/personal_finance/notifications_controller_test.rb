@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::NotificationsControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::NotificationsControllerTest < PersonalFinance::IntegrationTest
   setup { User.dashboard_owner.update!(onboarded_at: Time.current) }
 
   test "shows notifications and saves spending limits" do

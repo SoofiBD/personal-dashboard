@@ -59,8 +59,9 @@ personal-dashboard/
 The project is evolving into an all-in-one personal workspace and life operating system. The following modules and features are actively planned or currently in development:
 
 ### 🔐 Authentication & Access Control
-- [ ] Multi-factor authentication (MFA) & secure Login Screen.
-- [ ] Role-based access and session management.
+- [x] Password-protected owner login and expiring secure session.
+- [ ] Multi-factor authentication (MFA).
+- [ ] Role-based access control for multiple users.
 - [ ] User profile customizations and localized preferences.
 
 ### 📄 PDF Tools & Document Management
@@ -118,7 +119,7 @@ Make sure you have one of the following setups installed on your machine:
    ```bash
    cp .env.example .env.local
    ```
-   *Open `.env.local` and set a secure `POSTGRES_PASSWORD` and personalize your settings.*
+   *Open `.env.local`, set a secure `POSTGRES_PASSWORD`, and personalize your settings. Do not persist the dashboard login password in this file.*
 
 3. **Build and start the application:**
    ```bash
@@ -126,14 +127,19 @@ Make sure you have one of the following setups installed on your machine:
    ```
    *(To run containers in the background as daemons, use `docker compose up --build -d`)*
 
-4. **Access the dashboard:**
+4. **Provision or rotate the dashboard password:**
+   ```bash
+   docker compose exec web ./bin/rails dashboard:credentials:set
+   ```
+
+5. **Access the dashboard:**
    Open your browser and navigate to:
    ```
    http://localhost:3000/finance
    ```
    *Migrations and initial database setup run automatically upon container boot.*
 
-5. **Stopping the containers:**
+6. **Stopping the containers:**
    ```bash
    docker compose down
    ```
@@ -166,12 +172,17 @@ Make sure you have one of the following setups installed on your machine:
    bin/rails db:seed # (if seed data is available)
    ```
 
-5. **Start the Rails development server:**
+5. **Provision or rotate the dashboard password:**
    ```bash
-   bin/rails server -b 0.0.0.0 -p 3000
+   bin/rails dashboard:credentials:set
    ```
 
-6. **Visit the app:**
+6. **Start the Rails development server:**
+   ```bash
+   bin/rails server -b 127.0.0.1 -p 3000
+   ```
+
+7. **Visit the app:**
    Navigate to `http://localhost:3000/finance`.
 
 ---
@@ -202,6 +213,7 @@ The following variables can be customized in `.env.local`:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `DASHBOARD_OWNER_NAME` | Display name of the dashboard owner | `Personal Dashboard` |
+| `DASHBOARD_AUTH_PASSWORD` | Optional non-interactive input for the credential provisioning task; do not persist it | None; minimum 16 characters |
 | `DASHBOARD_CURRENCY` | Default currency code (e.g., `USD`, `EUR`, `TRY`) | `TRY` |
 | `DASHBOARD_TIME_ZONE` | Time zone used for scheduling and timestamps | `Europe/Istanbul` |
 | `POSTGRES_DB` | PostgreSQL database name | `personal_dashboard_development` |

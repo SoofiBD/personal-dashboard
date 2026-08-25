@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
+  resource :session, only: %i[new create destroy]
 
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"

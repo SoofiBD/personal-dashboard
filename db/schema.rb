@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_09_01_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_03_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -269,6 +269,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_09_01_000000) do
     t.datetime "onboarded_at"
     t.decimal "daily_spending_limit", precision: 14, scale: 2
     t.decimal "weekly_spending_limit", precision: 14, scale: 2
+    t.string "theme_preference", default: "system", null: false
+    t.string "password_digest"
+    t.integer "authentication_version", default: 0, null: false
   end
 
   add_foreign_key "finance_budget_allocations", "finance_budget_periods", column: "budget_period_id"

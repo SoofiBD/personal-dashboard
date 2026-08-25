@@ -3,7 +3,7 @@ module ApplicationHelper
     currency = if respond_to?(:current_panel_user) && current_panel_user
       current_panel_user.currency
     else
-      ((defined?(User) && User.respond_to?(:dashboard_owner)) ? User.dashboard_owner.currency : "$")
+      current_user&.currency || "$"
     end
     number_to_currency(value || 0, unit: currency, format: "%n %u", delimiter: ".", separator: ",")
   end

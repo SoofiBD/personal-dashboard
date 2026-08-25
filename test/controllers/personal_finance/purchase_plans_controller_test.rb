@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::PurchasePlansControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::PurchasePlansControllerTest < PersonalFinance::IntegrationTest
   setup do
     @user = User.first || User.create!(name: "Test User", currency: "TRY", time_zone: "Europe/Istanbul")
     @account = PersonalFinance::Account.create!(user: @user, name: "Card", kind: :bank, opening_balance: 5000)

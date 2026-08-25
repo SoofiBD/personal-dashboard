@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::BudgetsControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::BudgetsControllerTest < PersonalFinance::IntegrationTest
   setup do
     User.dashboard_owner.update!(onboarded_at: Time.current)
   end

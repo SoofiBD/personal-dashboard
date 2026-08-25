@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PersonalFinance::TagsControllerTest < ActionDispatch::IntegrationTest
+class PersonalFinance::TagsControllerTest < PersonalFinance::IntegrationTest
   setup do
     @user = User.dashboard_owner
     @account = PersonalFinance::Account.create!(user: @user, name: "Bank", kind: "bank", opening_balance: 0)
