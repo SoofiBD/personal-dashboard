@@ -119,13 +119,13 @@ Make sure you have one of the following setups installed on your machine:
    ```bash
    cp .env.example .env.local
    ```
-   *Open `.env.local`, set a secure `POSTGRES_PASSWORD`, and personalize your settings. Do not persist the dashboard login password in this file.*
+   *Open `.env.local`, set a random URI-safe `POSTGRES_PASSWORD` (letters and numbers are simplest), and personalize your settings. Do not persist the dashboard login password in this file.*
 
 3. **Build and start the application:**
    ```bash
-   docker compose up --build
+   docker compose --env-file .env.local up --build
    ```
-   *(To run containers in the background as daemons, use `docker compose up --build -d`)*
+   *(To run containers in the background as daemons, use `docker compose --env-file .env.local up --build -d`)*
 
 4. **Provision or rotate the dashboard password:**
    ```bash
@@ -141,9 +141,11 @@ Make sure you have one of the following setups installed on your machine:
 
 6. **Stopping the containers:**
    ```bash
-   docker compose down
+   docker compose --env-file .env.local down
    ```
-   *(To reset everything including database volumes, run `docker compose down -v`)*
+   *(To reset everything including database volumes, run `docker compose --env-file .env.local down -v`. This permanently deletes local database data.)*
+
+   PostgreSQL credentials are read when Compose creates the database container. If `postgres_data` already exists, changing `POSTGRES_PASSWORD` does not rotate the password inside that volume; rotate the database role explicitly or recreate the volume only when discarding its data is acceptable.
 
 ---
 
@@ -185,6 +187,8 @@ Make sure you have one of the following setups installed on your machine:
 7. **Visit the app:**
    Navigate to `http://localhost:3000/finance`.
 
+   For deployments that use Rails encrypted credentials, provide `RAILS_MASTER_KEY` through the deployment secret manager. The key is intentionally not stored in this repository; rotate any key that was previously committed.
+
 ---
 
 ## 🧪 Running Tests
@@ -193,9 +197,9 @@ Run the comprehensive test suite to ensure system integrity:
 
 ### Inside Docker:
 ```bash
-docker compose exec -T \
+docker compose --env-file .env.local exec -T \
   -e RAILS_ENV=test \
-  -e DATABASE_URL=postgresql://personal_dashboard:local-development-password@db:5432/personal_dashboard_test \
+  -e DATABASE_URL=postgresql://personal_dashboard:YOUR_POSTGRES_PASSWORD@db:5432/personal_dashboard_test \
   web ./bin/rails test
 ```
 
@@ -218,7 +222,7 @@ The following variables can be customized in `.env.local`:
 | `DASHBOARD_TIME_ZONE` | Time zone used for scheduling and timestamps | `Europe/Istanbul` |
 | `POSTGRES_DB` | PostgreSQL database name | `personal_dashboard_development` |
 | `POSTGRES_USER` | PostgreSQL username | `personal_dashboard` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `local-development-password` |
+| `POSTGRES_PASSWORD` | PostgreSQL password; required and never defaulted | None; generate a random value |
 
 ---
 
