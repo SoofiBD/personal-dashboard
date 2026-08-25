@@ -4,9 +4,9 @@ module PersonalFinance
       goal = owned(SavingsGoal).find(params[:savings_goal_id])
       contribution = goal.contributions.new(contribution_params)
       if contribution.save
-        redirect_to finance_savings_goals_path, notice: "Contribution added."
+        redirect_to finance_savings_goal_path(goal), notice: "Contribution added."
       else
-        redirect_to finance_savings_goals_path, alert: contribution.errors.full_messages.to_sentence
+        redirect_to finance_savings_goal_path(goal), alert: contribution.errors.full_messages.to_sentence
       end
     end
 

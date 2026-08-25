@@ -95,6 +95,7 @@ module PersonalFinance
 
     def create
       @transaction = owned(Transaction).new(transaction_params)
+      @transaction.savings_goal_id = savings_goal_id
       create_transaction_and_rule
     end
 
@@ -235,6 +236,7 @@ module PersonalFinance
     def save_or_render
       if @transaction.save
         sync_tags(@transaction)
+        create_goal_contribution(@transaction)
         redirect_to(finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved."))
       else
         render((action_name == "update") ? :edit : :new, status: :unprocessable_entity)
@@ -251,6 +253,17 @@ module PersonalFinance
 
     def tag_names
       params.dig(:transaction, :tag_names).to_s
+    end
+
+    def create_goal_contribution(transaction)
+      return if savings_goal_id.blank?
+
+      goal = owned(SavingsGoal).find(savings_goal_id)
+      goal.contributions.create!(linked_transaction: transaction, amount: transaction.amount, contributed_on: transaction.occurred_on, note: transaction.note)
+    end
+
+    def savings_goal_id
+      params.dig(:transaction, :savings_goal_id)
     end
   end
 end
