@@ -15,6 +15,9 @@
     <%= finance_svg_icon("recurring", class: "icon-sm") %>
     <span><%= t("recurring_rules.manage", default: "Tekrarlayan İşlemleri Yönet") %></span>
   <% end %>
+  <%= link_to finance_transactions_path(@filters.merge(format: :csv)), class: "button button-secondary button-sm" do %>
+    <span><%= t("transactions.export_csv", default: "CSV Olarak Dışa Aktar") %></span>
+  <% end %>
 </div>
 
 <turbo-frame id="transactions_frame">
