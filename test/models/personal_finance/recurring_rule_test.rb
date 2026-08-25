@@ -38,6 +38,15 @@ class PersonalFinance::RecurringRuleTest < ActiveSupport::TestCase
     assert_equal 0, rule.transactions.count
   end
 
+  test "caps catch-up generation per run" do
+    rule = recurring_rule(starts_on: Date.current - 5_000.days, last_generated_on: Date.current - 5_000.days)
+    PersonalFinance::Transaction.create!(user: @user, account: @account, category: @category, recurring_rule: rule, kind: :expense, amount: 100, occurred_on: rule.starts_on, is_recurring: true)
+
+    PersonalFinance::RecurringTransactionGenerator.generate_due_for(@user)
+
+    assert_equal PersonalFinance::RecurringTransactionGenerator::MAX_OCCURRENCES_PER_RUN + 1, rule.transactions.count
+  end
+
   private
 
   def recurring_rule(attributes = {})

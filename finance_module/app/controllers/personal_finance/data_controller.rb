@@ -21,8 +21,13 @@ module PersonalFinance
     def csv_export(records)
       CSV.generate do |csv|
         csv << %w[table id attributes]
-        records.each { |table, rows| rows.each { |row| csv << [table, row["id"], row.except("id").to_json] } }
+        records.each { |table, rows| rows.each { |row| csv << [csv_safe(table), row["id"], csv_safe(row.except("id").to_json)] } }
       end
+    end
+
+    def csv_safe(value)
+      value = value.to_s
+      value.match?(/\A[=+\-@]/) ? "'#{value}" : value
     end
   end
 end
