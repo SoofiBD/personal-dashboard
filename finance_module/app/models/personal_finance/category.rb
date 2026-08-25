@@ -6,6 +6,7 @@ module PersonalFinance
     belongs_to :parent, class_name: "PersonalFinance::Category", optional: true
     has_many :children, class_name: "PersonalFinance::Category", foreign_key: :parent_id, dependent: :restrict_with_error
     has_many :transactions, class_name: "PersonalFinance::Transaction", dependent: :nullify
+    has_many :recurring_rules, class_name: "PersonalFinance::RecurringRule", dependent: :nullify
 
     enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
 

@@ -1,0 +1,11 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("recurring_rules.eyebrow", default: "OTOMATİK İŞLEMLER") %></p>
+    <h1><%= t("recurring_rules.edit_title", default: "Tekrarlayan Planı Düzenle") %></h1>
+    <p class="page-subtitle"><%= t("recurring_rules.edit_subtitle", default: "Gelecekteki işlemlerin sıklığını veya bitiş koşulunu değiştirin.") %></p>
+  </div>
+</header>
+
+<section class="panel form-panel">
+  <%= render "form" %>
+</section>

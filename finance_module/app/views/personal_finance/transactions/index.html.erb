@@ -10,6 +10,13 @@
   <% end %>
 </header>
 
+<div class="page-toolbar">
+  <%= link_to finance_recurring_rules_path, class: "button button-secondary button-sm" do %>
+    <%= finance_svg_icon("recurring", class: "icon-sm") %>
+    <span><%= t("recurring_rules.manage", default: "Tekrarlayan İşlemleri Yönet") %></span>
+  <% end %>
+</div>
+
 <turbo-frame id="transactions_frame">
   <%= form_with url: finance_transactions_path, method: :get, class: "transaction-filters", data: { turbo_action: "advance" } do %>
     <div class="filter-field filter-search">

@@ -2818,3 +2818,83 @@ textarea:focus-visible {
   align-items: center;
   gap: 0.75rem;
 }
+
+/* Recurring transactions */
+.page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.5rem 0 1rem;
+}
+
+.recurrence-fields {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+}
+
+.recurrence-fields legend {
+  padding: 0 0.35rem;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.recurrence-toggle, .recurrence-callout {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.recurrence-toggle { cursor: pointer; }
+.recurrence-toggle input { accent-color: var(--primary); }
+.field-hint { margin: 0.5rem 0 0.85rem; color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; }
+
+.recurrence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.recurrence-grid .form-group { margin-bottom: 0; }
+.recurrence-callout { margin: 1.25rem 0; padding: 0.85rem 1rem; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); }
+.recurrence-callout .text-link { margin-left: auto; white-space: nowrap; }
+
+.recurring-badge, .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.45rem;
+  padding: 0.14rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.recurring-badge { color: #bfdbfe; background: rgba(59, 130, 246, 0.18); }
+.icon-xs { width: 0.75rem; height: 0.75rem; }
+.status-badge.is-active { color: #a7f3d0; background: rgba(16, 185, 129, 0.14); }
+.status-badge.is-paused { color: #fde68a; background: rgba(245, 158, 11, 0.14); }
+.status-badge.is-stopped { color: #fecaca; background: rgba(220, 38, 38, 0.16); }
+
+.recurring-rules-list { padding: 0; overflow: hidden; }
+.recurring-rule-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 1.5rem; padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--border-subtle); }
+.recurring-rule-row:last-child { border-bottom: 0; }
+.recurring-rule-title { color: var(--text-main); font-weight: 700; }
+.recurring-rule-row p, .recurring-rule-row small { display: block; margin: 0.32rem 0 0; color: var(--text-muted); font-size: 0.82rem; }
+.recurring-rule-summary { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; white-space: nowrap; }
+.recurring-rule-summary span { color: var(--text-muted); font-size: 0.75rem; }
+.recurring-rule-actions { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; justify-content: flex-end; }
+
+@media (max-width: 760px) {
+  .recurrence-grid, .recurring-rule-row { grid-template-columns: 1fr; }
+  .recurring-rule-summary, .recurring-rule-actions { align-items: flex-start; justify-content: flex-start; }
+  .recurring-badge { margin: 0.25rem 0 0; }
+  .recurrence-callout { align-items: flex-start; flex-wrap: wrap; }
+  .recurrence-callout .text-link { margin-left: 0; }
+}
