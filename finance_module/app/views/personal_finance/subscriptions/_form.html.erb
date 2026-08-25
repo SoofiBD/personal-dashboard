@@ -1,0 +1,9 @@
+<%= form_with model: subscription, class: "subscription-form" do |form| %>
+  <% if subscription.errors.any? %><div class="form-errors"><%= subscription.errors.full_messages.to_sentence %></div><% end %>
+  <div class="form-group"><%= form.label :name, "Abonelik adı" %><%= form.text_field :name, required: true, maxlength: 100, class: "form-control", placeholder: "Netflix, spor salonu…" %></div>
+  <div class="form-grid"><div class="form-group"><%= form.label :amount, "Tutar" %><%= form.number_field :amount, min: 0.01, step: 0.01, required: true, class: "form-control" %></div><div class="form-group"><%= form.label :billing_interval, "Yenileme sıklığı" %><%= form.select :billing_interval, [["Aylık", "monthly"], ["Yıllık", "yearly"]], {}, class: "form-control" %></div></div>
+  <div class="form-grid"><div class="form-group"><%= form.label :renewal_on, "Sonraki yenileme" %><%= form.date_field :renewal_on, class: "form-control" %></div><div class="form-group"><%= form.label :last_used_on, "Son kullanım" %><%= form.date_field :last_used_on, class: "form-control" %></div></div>
+  <div class="form-group"><%= form.label :recurring_rule_id, "Tekrarlayan işleme bağla" %><%= form.select :recurring_rule_id, options_from_collection_for_select(@recurring_rules, :id, :note, subscription.recurring_rule_id), {include_blank: "Bağlantı yok"}, class: "form-control" %></div>
+  <label class="checkbox-label"><%= form.check_box :active %> Aktif abonelik</label>
+  <div class="form-actions"><%= form.submit "Aboneliği Kaydet", class: "button button-primary" %><%= link_to "İptal", finance_subscriptions_path, class: "button button-secondary" %></div>
+<% end %>
