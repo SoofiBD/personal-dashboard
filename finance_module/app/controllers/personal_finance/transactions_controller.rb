@@ -1,3 +1,5 @@
+require "csv"
+
 module PersonalFinance
   class TransactionsController < ApplicationController
     before_action :set_transaction, only: %i[edit update destroy]
@@ -6,28 +8,7 @@ module PersonalFinance
       RecurringTransactionGenerator.generate_due_for(current_panel_user)
       @filters = filter_params
 
-      scope = owned(Transaction).includes(:account, :category)
-
-      scope = scope.search_notes(@filters[:q]) if @filters[:q].present?
-      scope = scope.where(kind: @filters[:kind]) if @filters[:kind].present?
-      scope = scope.where(financial_account_id: @filters[:account_id]) if @filters[:account_id].present?
-
-      if @filters[:category_id].any?
-        category_ids = owned(Category).where(id: @filters[:category_id]).flat_map(&:self_and_descendant_ids).uniq
-        scope = scope.where(category_id: category_ids)
-      end
-
-      from = parse_date(@filters[:from])
-      to = parse_date(@filters[:to])
-      if from && to
-        scope = scope.where(occurred_on: from..to)
-      elsif from
-        scope = scope.where("finance_transactions.occurred_on >= ?", from)
-      elsif to
-        scope = scope.where("finance_transactions.occurred_on <= ?", to)
-      end
-
-      @transactions = scope.order(occurred_on: :desc, created_at: :desc)
+      @transactions = filtered_transactions.order(occurred_on: :desc, created_at: :desc)
       @accounts = owned(Account).order(:name)
       @categories = owned(Category).order(:name)
       @filters_active = @filters[:q].present? ||
@@ -36,6 +17,15 @@ module PersonalFinance
         @filters[:from].present? ||
         @filters[:to].present? ||
         @filters[:category_id].any?
+
+      respond_to do |format|
+        format.html
+        format.csv do
+          send_data transactions_csv(@transactions),
+            filename: transactions_csv_filename(@transactions),
+            type: "text/csv; charset=utf-8"
+        end
+      end
     end
 
     def new
@@ -76,6 +66,53 @@ module PersonalFinance
       Date.strptime(value, "%Y-%m-%d")
     rescue ArgumentError, TypeError
       nil
+    end
+
+    def filtered_transactions
+      scope = owned(Transaction).includes(:account, :category)
+      scope = scope.search_notes(@filters[:q]) if @filters[:q].present?
+      scope = scope.where(kind: @filters[:kind]) if @filters[:kind].present?
+      scope = scope.where(financial_account_id: @filters[:account_id]) if @filters[:account_id].present?
+
+      if @filters[:category_id].any?
+        category_ids = owned(Category).where(id: @filters[:category_id]).flat_map(&:self_and_descendant_ids).uniq
+        scope = scope.where(category_id: category_ids)
+      end
+
+      from = parse_date(@filters[:from])
+      to = parse_date(@filters[:to])
+      if from && to
+        scope.where(occurred_on: from..to)
+      elsif from
+        scope.where("finance_transactions.occurred_on >= ?", from)
+      elsif to
+        scope.where("finance_transactions.occurred_on <= ?", to)
+      else
+        scope
+      end
+    end
+
+    def transactions_csv(transactions)
+      "\uFEFF" + CSV.generate do |csv|
+        csv << %w[date type amount category account note]
+        transactions.each do |transaction|
+          csv << [
+            transaction.occurred_on.iso8601,
+            transaction.kind,
+            transaction.amount.to_s("F"),
+            transaction.category&.name,
+            transaction.account&.name,
+            transaction.note
+          ]
+        end
+      end
+    end
+
+    def transactions_csv_filename(transactions)
+      dates = transactions.pluck(:occurred_on)
+      return "transactions_empty.csv" if dates.empty?
+
+      "transactions_#{dates.min.strftime("%Y-%m")}_#{dates.max.strftime("%Y-%m")}.csv"
     end
 
     def transaction_params
