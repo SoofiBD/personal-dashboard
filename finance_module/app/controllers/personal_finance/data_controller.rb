@@ -4,7 +4,7 @@ module PersonalFinance
   class DataController < ApplicationController
     TABLES = {accounts: Account, categories: Category, transactions: Transaction, budget_periods: BudgetPeriod, savings_goals: SavingsGoal, purchase_plans: PurchasePlan, recurring_rules: RecurringRule, subscriptions: Subscription, debts: Debt}.freeze
 
-    def index
+    def show
     end
 
     def export

@@ -8,7 +8,7 @@ scope :finance, module: :personal_finance, as: :finance do
   end
   resource :notification_settings, only: :update
   resource :theme_preference, only: :update
-  resource :data, only: :index do
+  resource :data, only: :show do
     get :export
   end
   resources :subscriptions, except: :show
