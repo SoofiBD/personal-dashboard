@@ -1,0 +1,10 @@
+<header class="page-header"><div><p class="eyebrow">CSV İÇE AKTARMA · 2 / 3</p><h1>Sütunları Eşle</h1><p class="page-subtitle">Dosyanızdaki her alanın hangi işlem bilgisine karşılık geldiğini seçin.</p></div></header>
+<section class="panel form-panel import-panel">
+  <%= form_with url: preview_import_finance_transactions_path do |form| %>
+    <%= hidden_field_tag :import_id, @transaction_import.id %><%= render "personal_finance/shared/errors", record: @transaction_import %>
+    <% [["date", "Tarih", true], ["amount", "Tutar", true], ["type", "Tür", false], ["category", "Kategori", false], ["note", "Not", false]].each do |field, label, required| %>
+      <div class="form-group"><%= label_tag "column_mapping_#{field}", "#{label}#{required ? " *" : " (isteğe bağlı)"}" %><%= select_tag "column_mapping[#{field}]", options_for_select([["Sütun seçin", ""]] + @headers.map { |header| [header, header] }, @transaction_import.column_mapping[field]), id: "column_mapping_#{field}", required: required %></div>
+    <% end %>
+    <div class="form-actions"><%= form.submit "Önizlemeyi Göster", class: "button button-primary" %><%= link_to "Farklı Dosya Yükle", import_finance_transactions_path, class: "button button-secondary" %></div>
+  <% end %>
+</section>
