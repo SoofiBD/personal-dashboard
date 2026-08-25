@@ -25,6 +25,7 @@
 <% end %>
 
 <section class="finance-cards" aria-label="<%= t('dashboard.cards_aria_label', default: 'Aylık Finans Kartları') %>">
+  <article class="metric-card"><span class="metric-label">Toplam Borç</span><strong class="value-negative"><%= dashboard_currency @total_debt %></strong><span class="metric-note">Kalan aktif borç</span></article>
   <article class="metric-card"><div class="metric-card-top"><span class="metric-label"><%= t("dashboard.total_balance", default: "Toplam Bakiye") %></span><div class="metric-badge-icon icon-budget-badge"><%= finance_svg_icon("accounts") %></div></div><strong><%= dashboard_currency @total_balance %></strong><span class="metric-note"><%= current_panel_user.currency %> karşılığı<%= @unconverted_balance_accounts.any? ? " · Kur bekleyen hesaplar var" : "" %></span></article>
   <!-- Gelir -->
   <article class="metric-card">
