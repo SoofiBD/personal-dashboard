@@ -24,6 +24,8 @@
   </section>
 <% end %>
 
+<section class="panel health-score-panel"><div class="panel-header"><div><h2>Finansal Sağlık Skoru</h2><p>Gelir, tasarruf, bütçe, acil durum fonu ve borç verilerine göre hesaplanır.</p></div></div><div class="health-score-layout"><div class="health-gauge" style="--score: <%= @financial_health.score %>;"><strong><%= @financial_health.score %></strong><span>/100</span></div><div><h3>İyileştirme Önerileri</h3><ul class="health-suggestions"><% @financial_health.suggestions.each do |suggestion| %><li><%= suggestion %></li><% end %></ul></div></div><div class="health-trend"><% @financial_health_trend.each do |point| %><div><span style="height: <%= [point[:score], 5].max %>%"></span><small><%= point[:label] %></small></div><% end %></div></section>
+
 <section class="finance-cards" aria-label="<%= t('dashboard.cards_aria_label', default: 'Aylık Finans Kartları') %>">
   <article class="metric-card"><span class="metric-label">Toplam Borç</span><strong class="value-negative"><%= dashboard_currency @total_debt %></strong><span class="metric-note">Kalan aktif borç</span></article>
   <article class="metric-card"><div class="metric-card-top"><span class="metric-label"><%= t("dashboard.total_balance", default: "Toplam Bakiye") %></span><div class="metric-badge-icon icon-budget-badge"><%= finance_svg_icon("accounts") %></div></div><strong><%= dashboard_currency @total_balance %></strong><span class="metric-note"><%= current_panel_user.currency %> karşılığı<%= @unconverted_balance_accounts.any? ? " · Kur bekleyen hesaplar var" : "" %></span></article>
