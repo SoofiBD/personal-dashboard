@@ -9,6 +9,9 @@
           <div class="transaction-meta">
             <div class="transaction-category">
               <%= transaction.category&.name || t("app.common.uncategorized", default: "Kategorisiz") %>
+              <% if transaction.recurring_rule_id.present? %>
+                <span class="recurring-badge" title="<%= t('transactions.recurrence.badge_title', default: 'Recurring transaction') %>"><%= finance_svg_icon("recurring", class: "icon-xs") %><%= t("transactions.recurrence.badge", default: "Tekrarlayan") %></span>
+              <% end %>
               <% if transaction.note.present? %>
                 <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem; margin-left: 0.35rem;">— <%= transaction.note %></span>
               <% end %>
@@ -29,6 +32,11 @@
             <%= transaction.kind == "expense" ? "−" : "+" %><%= dashboard_currency transaction.amount %>
           </strong>
           <div class="transaction-actions">
+            <% if transaction.recurring_rule_id.present? %>
+              <%= link_to edit_finance_recurring_rule_path(transaction.recurring_rule_id), class: "action-btn", title: t("recurring_rules.manage", default: "Planı Yönet") do %>
+                <%= finance_svg_icon("recurring") %>
+              <% end %>
+            <% end %>
             <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
@@ -51,5 +59,4 @@
     </div>
   <% end %>
 </div>
-
 

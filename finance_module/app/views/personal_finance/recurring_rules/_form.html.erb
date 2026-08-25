@@ -1,0 +1,22 @@
+<%= form_with model: @recurring_rule, scope: :recurring_rule, url: finance_recurring_rule_path(@recurring_rule) do |form| %>
+  <%= render "personal_finance/shared/errors", record: @recurring_rule %>
+  <div class="recurrence-grid">
+    <div class="form-group">
+      <%= form.label :recurrence_interval, t("recurring_rules.interval", default: "Tekrarlama sıklığı") %>
+      <%= form.select :recurrence_interval, [[t("transactions.recurrence.weekly", default: "Her hafta"), "weekly"], [t("transactions.recurrence.biweekly", default: "İki haftada bir"), "biweekly"], [t("transactions.recurrence.monthly", default: "Her ay"), "monthly"], [t("transactions.recurrence.yearly", default: "Her yıl"), "yearly"]] %>
+    </div>
+    <div class="form-group">
+      <%= form.label :recurrence_end_date, t("recurring_rules.end_date", default: "Bitiş tarihi (isteğe bağlı)") %>
+      <%= form.date_field :recurrence_end_date, min: @recurring_rule.starts_on %>
+    </div>
+    <div class="form-group">
+      <%= form.label :recurrence_count, t("recurring_rules.count", default: "Toplam işlem sayısı (isteğe bağlı)") %>
+      <%= form.number_field :recurrence_count, min: @recurring_rule.generated_count, step: 1 %>
+    </div>
+  </div>
+  <p class="field-hint"><%= t("recurring_rules.edit_hint", default: "Sadece gelecek işlemler güncellenir; daha önce oluşturulan işlemler aynı kalır.") %></p>
+  <div class="form-actions">
+    <%= form.submit t("recurring_rules.update", default: "Planı Güncelle"), class: "button button-primary" %>
+    <%= link_to t("app.common.cancel", default: "İptal"), finance_recurring_rules_path, class: "button button-secondary" %>
+  </div>
+<% end %>
