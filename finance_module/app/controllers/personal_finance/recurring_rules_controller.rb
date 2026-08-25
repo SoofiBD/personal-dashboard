@@ -7,7 +7,8 @@ module PersonalFinance
       @recurring_rules = owned(RecurringRule).includes(:account, :category).order(is_paused: :asc, created_at: :desc)
     end
 
-    def edit; end
+    def edit
+    end
 
     def update
       if @recurring_rule.update(rule_params)
