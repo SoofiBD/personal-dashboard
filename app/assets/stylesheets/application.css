@@ -183,8 +183,18 @@ body {
 .tag-merge-form .filter-field { flex: 1 1 220px; }
 .tag-merge-form select[multiple] { min-height: 110px; }
 
+/* Savings goal contributions */
+.goal-detail-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 1.5rem; }
+.goal-contribution-list { display: grid; gap: .65rem; margin-top: 1rem; }
+.goal-contribution-row { padding: .8rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--surface-input); }
+.goal-contribution-row > div { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.goal-contribution-row span { color: var(--text-muted); font-size: .84rem; }
+.goal-contribution-row .recurring-badge { color: var(--text-main); }
+.goal-contribution-note { width: 100%; }
+
 @media (max-width: 520px) {
   .tag-management-row { align-items: flex-start; }
+  .goal-detail-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 520px) {
