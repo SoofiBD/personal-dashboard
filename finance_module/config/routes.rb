@@ -2,6 +2,10 @@ scope :finance, module: :personal_finance, as: :finance do
   root to: "dashboard#show"
   resource :dashboard, only: :show
   resources :transactions, except: :show
+  resources :recurring_rules, only: %i[index edit update destroy] do
+    patch :pause, on: :member
+    patch :resume, on: :member
+  end
   resources :accounts, except: :show
   resources :categories, except: :show
   get "budget/year/:year", to: "budgets#year", as: :year_budget
