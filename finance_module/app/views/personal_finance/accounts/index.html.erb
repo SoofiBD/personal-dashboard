@@ -11,6 +11,14 @@
 </header>
 
 <% if @accounts.any? %>
+  <section class="panel" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-top:0;">Toplam Net Değer</h2>
+    <svg viewBox="0 0 300 70" role="img" aria-label="Son altı ay toplam net değer trendi" style="width:100%;max-width:520px;height:90px;">
+      <% values = @net_worth_history.map { |point| point[:balance] }; min = values.min; range = values.max - min; points = values.each_with_index.map { |value, index| "#{index * 60},#{60 - ((value - min) / (range.zero? ? 1 : range) * 50)}" }.join(" ") %>
+      <polyline points="<%= points %>" fill="none" stroke="#60A5FA" stroke-width="3" />
+    </svg>
+    <p class="metric-note"><%= dashboard_currency @net_worth_history.last[:balance] %> · son 6 ay</p>
+  </section>
   <div class="card-grid">
     <% @accounts.each do |account| %>
       <div class="card-item">
@@ -37,6 +45,8 @@
             <%= dashboard_currency account.current_balance %>
           </div>
           <p class="metric-note"><%= t("accounts.opening_balance", default: "Açılış bakiyesi") %>: <%= dashboard_currency account.opening_balance %></p>
+          <% history = @account_histories[account]; values = history.map { |point| point[:balance] }; minimum = values.min; range = values.max - minimum; points = values.each_with_index.map { |value, index| "#{index * 20},#{42 - ((value - minimum) / (range.zero? ? 1 : range) * 34)}" }.join(" ") %>
+          <svg viewBox="0 0 100 45" role="img" aria-label="<%= account.name %> son altı ay bakiye trendi" style="width:100%;height:50px;margin-top:.75rem;"><polyline points="<%= points %>" fill="none" stroke="#34D399" stroke-width="3" /></svg>
         </div>
       </div>
     <% end %>
@@ -49,5 +59,4 @@
     </div>
   </section>
 <% end %>
-
 
