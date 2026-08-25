@@ -9,6 +9,7 @@ scope :finance, module: :personal_finance, as: :finance do
       patch :merge
     end
   end
+  resources :exchange_rates, only: %i[index create edit update destroy]
   resources :transactions, except: :show do
     collection do
       get :import

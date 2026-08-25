@@ -7,6 +7,11 @@
   </div>
 
   <div class="form-group">
+    <%= form.label :currency, t("accounts.currency", default: "Hesap Para Birimi") %>
+    <%= form.select :currency, %w[TRY USD EUR GBP], selected: @account.currency.presence || current_panel_user.currency %>
+  </div>
+
+  <div class="form-group">
     <%= form.label :kind, t("accounts.kind", default: "Hesap Türü") %>
     <%= form.select :kind, [[t("accounts.kinds.bank", default: "Banka Hesabı"), "bank"], [t("accounts.kinds.card", default: "Kredi Kartı"), "card"], [t("accounts.kinds.cash", default: "Nakit Cüzdan"), "cash"], [t("accounts.kinds.savings", default: "Birikim Hesabı"), "savings"]] %>
   </div>

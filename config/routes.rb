@@ -12,6 +12,7 @@ Rails.application.routes.draw do
         patch :merge
       end
     end
+    resources :exchange_rates, only: %i[index create edit update destroy]
     resources :transactions, except: :show do
       collection do
         get :import

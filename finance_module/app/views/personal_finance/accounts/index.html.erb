@@ -17,7 +17,8 @@
       <% values = @net_worth_history.map { |point| point[:balance] }; min = values.min; range = values.max - min; points = values.each_with_index.map { |value, index| "#{index * 60},#{60 - ((value - min) / (range.zero? ? 1 : range) * 50)}" }.join(" ") %>
       <polyline points="<%= points %>" fill="none" stroke="#60A5FA" stroke-width="3" />
     </svg>
-    <p class="metric-note"><%= dashboard_currency @net_worth_history.last[:balance] %> · son 6 ay</p>
+    <p class="metric-note"><%= dashboard_currency @converted_total %> · <%= current_panel_user.currency %> karşılığı</p>
+    <% if @unconverted_accounts.any? %><p class="metric-note">Kur girilmediği için hariç: <%= @unconverted_accounts.map(&:name).join(", ") %></p><% end %>
   </section>
   <div class="card-grid">
     <% @accounts.each do |account| %>
@@ -42,9 +43,9 @@
         <div>
           <span class="metric-label"><%= t("accounts.current_balance", default: "Mevcut Bakiye") %></span>
           <div class="card-item-balance <%= account.current_balance >= 0 ? "value-positive" : "value-negative" %>">
-            <%= dashboard_currency account.current_balance %>
+            <%= account_currency account.current_balance, account %>
           </div>
-          <p class="metric-note"><%= t("accounts.opening_balance", default: "Açılış bakiyesi") %>: <%= dashboard_currency account.opening_balance %></p>
+          <p class="metric-note"><%= t("accounts.opening_balance", default: "Açılış bakiyesi") %>: <%= account_currency account.opening_balance, account %></p>
           <% history = @account_histories[account]; values = history.map { |point| point[:balance] }; minimum = values.min; range = values.max - minimum; points = values.each_with_index.map { |value, index| "#{index * 20},#{42 - ((value - minimum) / (range.zero? ? 1 : range) * 34)}" }.join(" ") %>
           <svg viewBox="0 0 100 45" role="img" aria-label="<%= account.name %> son altı ay bakiye trendi" style="width:100%;height:50px;margin-top:.75rem;"><polyline points="<%= points %>" fill="none" stroke="#34D399" stroke-width="3" /></svg>
         </div>
@@ -59,4 +60,3 @@
     </div>
   </section>
 <% end %>
-

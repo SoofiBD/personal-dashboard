@@ -5,6 +5,9 @@ module PersonalFinance
       month = Date.current.all_month
       @income = owned(Transaction).income.during(month).sum(:amount)
       @expenses = owned(Transaction).expense.during(month).sum(:amount)
+      converter = CurrencyConverter.new(current_panel_user)
+      @total_balance = owned(Account).where(is_active: true).sum { |account| converter.convert(account.current_balance, account.currency) || 0 }
+      @unconverted_balance_accounts = owned(Account).where(is_active: true).reject { |account| converter.convert(account.current_balance, account.currency) }
       @budget = owned(BudgetPeriod).includes(allocations: {category: %i[parent children]}).find_by(starts_on: month.begin)
       @goals = owned(SavingsGoal).active.order(:target_date).limit(3)
       @recent_transactions = owned(Transaction).includes(:category).order(occurred_on: :desc, created_at: :desc).limit(8)

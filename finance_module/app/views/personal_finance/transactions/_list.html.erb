@@ -34,7 +34,7 @@
 
         <div class="transaction-right">
           <strong class="transaction-amount <%= transaction.kind == "expense" ? "value-negative" : "value-positive" %>">
-            <%= transaction.kind == "expense" ? "−" : "+" %><%= dashboard_currency transaction.amount %>
+            <%= transaction.kind == "expense" ? "−" : "+" %><%= account_currency transaction.amount, transaction.account %>
           </strong>
           <div class="transaction-actions">
             <% if transaction.recurring_rule_id.present? %>
