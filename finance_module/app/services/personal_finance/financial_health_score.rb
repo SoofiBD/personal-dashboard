@@ -26,7 +26,7 @@ module PersonalFinance
       budget = BudgetPeriod.find_by(user: @user, starts_on: @month.beginning_of_month)
       within_budget = budget ? budget.allocations.count { |a| a.spent <= a.planned_amount } : 0
       budget_ratio = budget&.allocations&.any? ? within_budget.to_f / budget.allocations.size : 0.5
-      balance = Account.where(user: @user, is_active: true).sum(:current_balance).to_f
+      balance = Account.where(user: @user, is_active: true).sum { |account| account.current_balance.to_f }
       debt = Debt.where(user: @user, active: true).sum(:remaining_amount).to_f
       income_ratio = income.positive? ? [income / [expenses, 1].max, 2].min / 2 : 0
       savings_rate = income.positive? ? [savings / income, 1].min : 0
