@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_29_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_30_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -83,6 +83,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_29_000000) do
     t.datetime "updated_at", null: false
     t.index ["savings_goal_id"], name: "index_finance_goal_contributions_on_savings_goal_id"
     t.index ["transaction_id"], name: "index_finance_goal_contributions_on_transaction_id"
+  end
+
+  create_table "finance_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "kind", null: false
+    t.string "title", null: false
+    t.text "body", null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "read_at", "created_at"], name: "idx_on_user_id_read_at_created_at_d9bdbdd28b"
+    t.index ["user_id"], name: "index_finance_notifications_on_user_id"
   end
 
   create_table "finance_purchase_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -214,6 +226,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_29_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "onboarded_at"
+    t.decimal "daily_spending_limit", precision: 14, scale: 2
+    t.decimal "weekly_spending_limit", precision: 14, scale: 2
   end
 
   add_foreign_key "finance_budget_allocations", "finance_budget_periods", column: "budget_period_id"
@@ -225,6 +239,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_29_000000) do
   add_foreign_key "finance_exchange_rates", "users"
   add_foreign_key "finance_goal_contributions", "finance_savings_goals", column: "savings_goal_id"
   add_foreign_key "finance_goal_contributions", "finance_transactions", column: "transaction_id"
+  add_foreign_key "finance_notifications", "users"
   add_foreign_key "finance_purchase_plans", "finance_savings_goals", column: "savings_goal_id"
   add_foreign_key "finance_purchase_plans", "users"
   add_foreign_key "finance_recurring_rules", "finance_categories", column: "category_id"

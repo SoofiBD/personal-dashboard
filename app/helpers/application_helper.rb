@@ -12,13 +12,14 @@ module ApplicationHelper
     number_to_currency(value || 0, unit: account.currency, format: "%n %u", delimiter: ".", separator: ",")
   end
 
-  def finance_navigation_item(label, path, icon_name = nil)
+  def finance_navigation_item(label, path, icon_name = nil, badge: nil)
     is_active = current_page?(path)
     class_name = is_active ? "sidebar-link is-active" : "sidebar-link"
 
     link_to path, class: class_name, "aria-current": (is_active ? "page" : nil) do
       concat finance_svg_icon(icon_name, class: "nav-icon") if icon_name
       concat content_tag(:span, label, class: "nav-label")
+      concat content_tag(:span, badge, class: "nav-unread-badge", "aria-label": "#{badge} okunmamış bildirim") if badge.to_i.positive?
       if is_active
         concat content_tag(:span, "", class: "nav-active-pill")
       end

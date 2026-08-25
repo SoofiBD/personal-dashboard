@@ -13,6 +13,17 @@
   <% end %>
 </header>
 
+<% if @unread_notifications.any? %>
+  <section class="panel notification-dashboard-card" aria-label="Yeni harcama bildirimleri">
+    <div class="panel-header"><div><h2>Harcama Uyarıları</h2><p>Finansal durumunuzda dikkat gerektiren gelişmeler.</p></div><%= link_to "Tümünü Gör", finance_notifications_path, class: "text-link" %></div>
+    <div class="notification-preview-list">
+      <% @unread_notifications.each do |notification| %>
+        <article class="notification-preview"><div><strong><%= notification.title %></strong><p><%= notification.body %></p></div><time datetime="<%= notification.created_at.iso8601 %>"><%= l(notification.created_at.to_date, format: :short) %></time></article>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
 <section class="finance-cards" aria-label="<%= t('dashboard.cards_aria_label', default: 'Aylık Finans Kartları') %>">
   <article class="metric-card"><div class="metric-card-top"><span class="metric-label"><%= t("dashboard.total_balance", default: "Toplam Bakiye") %></span><div class="metric-badge-icon icon-budget-badge"><%= finance_svg_icon("accounts") %></div></div><strong><%= dashboard_currency @total_balance %></strong><span class="metric-note"><%= current_panel_user.currency %> karşılığı<%= @unconverted_balance_accounts.any? ? " · Kur bekleyen hesaplar var" : "" %></span></article>
   <!-- Gelir -->
