@@ -214,6 +214,14 @@
     });
   };
 
+  const initCategorySuggestion = () => {
+    const note = document.querySelector("[data-category-suggestion-target='note']");
+    const select = document.querySelector("[data-category-suggestion-target='select']");
+    if (!note || !select) return;
+    let timer;
+    note.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(async () => { if (note.value.trim().length < 2) return; const response = await fetch(`${note.dataset.categorySuggestionUrl}?note=${encodeURIComponent(note.value)}`); const data = await response.json(); if (data.category_id) select.value = data.category_id; }, 250); });
+  };
+
   const initQuickAdd = () => {
     const quickAdd = document.querySelector("[data-quick-add]");
     if (!quickAdd || quickAdd.dataset.initialized === "true") return;
@@ -884,6 +892,7 @@
     initBudgetSelector();
     initBudgetCalculator();
     initTransactionFilters();
+    initCategorySuggestion();
     initPurchaseScenario();
     initQuickAdd();
     initCashFlowChart();

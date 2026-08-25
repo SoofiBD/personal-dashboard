@@ -20,6 +20,7 @@ scope :finance, module: :personal_finance, as: :finance do
   resources :exchange_rates, only: %i[index create edit update destroy]
   resources :transactions, except: :show do
     collection do
+      get :category_suggestion
       get :import
       post :import, action: :create_import
       post :preview_import
