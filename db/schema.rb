@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_27_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_28_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,6 +49,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_27_000000) do
     t.index ["parent_id"], name: "index_finance_categories_on_parent_id"
     t.index ["user_id", "name"], name: "index_finance_categories_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_finance_categories_on_user_id"
+  end
+
+  create_table "finance_exchange_rates", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "base_currency", limit: 3, null: false
+    t.string "quote_currency", limit: 3, null: false
+    t.decimal "rate", precision: 18, scale: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "base_currency", "quote_currency"], name: "index_exchange_rates_on_user_and_currencies", unique: true
+    t.index ["user_id"], name: "index_finance_exchange_rates_on_user_id"
   end
 
   create_table "finance_goal_contributions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -180,6 +191,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_27_000000) do
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "currency", default: "TRY", null: false
+    t.index ["currency"], name: "index_financial_accounts_on_currency"
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
   end
 
@@ -197,6 +210,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_27_000000) do
   add_foreign_key "finance_budget_periods", "users"
   add_foreign_key "finance_categories", "finance_categories", column: "parent_id"
   add_foreign_key "finance_categories", "users"
+  add_foreign_key "finance_exchange_rates", "users"
   add_foreign_key "finance_goal_contributions", "finance_savings_goals", column: "savings_goal_id"
   add_foreign_key "finance_goal_contributions", "finance_transactions", column: "transaction_id"
   add_foreign_key "finance_purchase_plans", "finance_savings_goals", column: "savings_goal_id"

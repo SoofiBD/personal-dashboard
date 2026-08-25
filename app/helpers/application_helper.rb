@@ -8,6 +8,10 @@ module ApplicationHelper
     number_to_currency(value || 0, unit: currency, format: "%n %u", delimiter: ".", separator: ",")
   end
 
+  def account_currency(value, account)
+    number_to_currency(value || 0, unit: account.currency, format: "%n %u", delimiter: ".", separator: ",")
+  end
+
   def finance_navigation_item(label, path, icon_name = nil)
     is_active = current_page?(path)
     class_name = is_active ? "sidebar-link is-active" : "sidebar-link"

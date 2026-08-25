@@ -70,4 +70,16 @@ class PersonalFinance::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='baseline_income'][value='5000.0']"
     assert_select "table.forecast-table"
   end
+
+  test "dashboard shows a primary-currency total for foreign-currency accounts" do
+    user = User.dashboard_owner
+    PersonalFinance::ExchangeRate.create!(user: user, base_currency: "USD", quote_currency: user.currency, rate: 30)
+    PersonalFinance::Account.create!(user: user, name: "USD Account", kind: "bank", currency: "USD", opening_balance: 100)
+
+    get finance_root_path
+
+    assert_response :success
+    assert_select ".metric-label", text: "Toplam Bakiye"
+    assert_select "strong", text: /3\.000,00/
+  end
 end
