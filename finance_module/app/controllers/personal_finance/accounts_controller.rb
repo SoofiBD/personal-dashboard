@@ -3,6 +3,11 @@ module PersonalFinance
     before_action :set_account, only: %i[edit update destroy]
     def index
       @accounts = owned(Account).order(:name)
+      @account_histories = @accounts.index_with { |account| account.balance_history }
+      @net_worth_history = 6.times.map do |offset|
+        month = Date.current.beginning_of_month - (5 - offset).months
+        {month: month, balance: @account_histories.values.sum { |history| history.find { |point| point[:month] == month }[:balance] }}
+      end
     end
 
     def new
