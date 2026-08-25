@@ -178,10 +178,10 @@ module PersonalFinance
             transaction.occurred_on.iso8601,
             transaction.kind,
             transaction.amount.to_s("F"),
-            transaction.category&.name,
-            transaction.account&.name,
+            csv_safe(transaction.category&.name),
+            csv_safe(transaction.account&.name),
             transaction.tags.order(:name).pluck(:name).join(", "),
-            transaction.note
+            csv_safe(transaction.note)
           ]
         end
       end
@@ -192,6 +192,11 @@ module PersonalFinance
       return "transactions_empty.csv" if dates.empty?
 
       "transactions_#{dates.min.strftime("%Y-%m")}_#{dates.max.strftime("%Y-%m")}.csv"
+    end
+
+    def csv_safe(value)
+      value = value.to_s
+      value.match?(/\A[=+\-@]/) ? "'#{value}" : value
     end
 
     def transaction_params
