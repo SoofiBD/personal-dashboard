@@ -6,20 +6,166 @@
   const animateDashboard = () => {
     if (motionQuery.matches || typeof window.gsap === "undefined") return;
 
-    const timeline = window.gsap.timeline({ defaults: { ease: "power1.out", clearProps: "all" } });
+    const timeline = window.gsap.timeline({ defaults: { ease: "power2.out", clearProps: "transform,opacity" } });
     const sidebar = document.querySelector(".sidebar");
     const header = document.querySelector(".page-header");
-    const cards = document.querySelectorAll(".metric-card");
+    const cards = document.querySelectorAll(".metric-card, .kinetic-card");
     const panels = document.querySelectorAll(".panel");
-    const items = document.querySelectorAll(".finance-list article, .card-item");
+    const items = document.querySelectorAll(".finance-list article, .card-item, .subscription-row, .notification-preview, .debt-card");
     const flashes = document.querySelectorAll(".flash");
 
-    if (sidebar) timeline.from(sidebar, { x: -12, opacity: 0, duration: 0.28 });
-    if (header) timeline.from(header, { y: 12, opacity: 0, duration: 0.32 }, "-=0.12");
-    if (cards.length) timeline.from(cards, { y: 12, opacity: 0, duration: 0.3, stagger: 0.055 }, "-=0.12");
-    if (panels.length) timeline.from(panels, { y: 10, opacity: 0, duration: 0.3, stagger: 0.045 }, "-=0.18");
-    if (items.length) timeline.from(items, { y: 8, opacity: 0, duration: 0.24, stagger: 0.025 }, "-=0.2");
-    if (flashes.length) timeline.from(flashes, { y: -8, opacity: 0, duration: 0.22 }, 0);
+    if (sidebar) timeline.fromTo(sidebar, { x: -16, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.32 });
+    if (header) timeline.fromTo(header, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.35 }, "-=0.15");
+    if (cards.length) timeline.fromTo(cards, { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.38, stagger: 0.045 }, "-=0.18");
+    if (panels.length) timeline.fromTo(panels, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.36, stagger: 0.04 }, "-=0.22");
+    if (items.length) timeline.fromTo(items, { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.28, stagger: 0.02 }, "-=0.24");
+    if (flashes.length) timeline.fromTo(flashes, { y: -10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.25 }, 0);
+  };
+
+  const initKineticTiltCards = () => {
+    if (motionQuery.matches || typeof window.gsap === "undefined") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const cards = document.querySelectorAll(".metric-card, .panel, .card-item, [data-kinetic-card]");
+    cards.forEach((card) => {
+      if (card.dataset.kineticBound) return;
+      card.dataset.kineticBound = "true";
+
+      if (!card.querySelector(".card-sheen")) {
+        const sheen = document.createElement("div");
+        sheen.className = "card-sheen";
+        card.appendChild(sheen);
+      }
+
+      const rotXTo = window.gsap.quickTo(card, "rotationX", { duration: 0.35, ease: "power2.out" });
+      const rotYTo = window.gsap.quickTo(card, "rotationY", { duration: 0.35, ease: "power2.out" });
+
+      const onMouseMove = (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = -((y - centerY) / centerY) * 7.5;
+        const rotateY = ((x - centerX) / centerX) * 7.5;
+
+        card.style.setProperty("--mouse-x", `${(x / rect.width) * 100}%`);
+        card.style.setProperty("--mouse-y", `${(y / rect.height) * 100}%`);
+
+        rotXTo(rotateX);
+        rotYTo(rotateY);
+      };
+
+      const onMouseLeave = () => {
+        rotXTo(0);
+        rotYTo(0);
+      };
+
+      card.addEventListener("mousemove", onMouseMove);
+      card.addEventListener("mouseleave", onMouseLeave);
+    });
+  };
+
+  const initMagneticButtons = () => {
+    if (motionQuery.matches || typeof window.gsap === "undefined") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    const buttons = document.querySelectorAll(".button-primary, .button-accent, [data-quick-add-open], .btn-magnetic");
+    buttons.forEach((btn) => {
+      if (btn.dataset.magneticBound) return;
+      btn.dataset.magneticBound = "true";
+
+      const xTo = window.gsap.quickTo(btn, "x", { duration: 0.3, ease: "power2.out" });
+      const yTo = window.gsap.quickTo(btn, "y", { duration: 0.3, ease: "power2.out" });
+
+      btn.addEventListener("mousemove", (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.28;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.28;
+        xTo(x);
+        yTo(y);
+      });
+
+      btn.addEventListener("mouseleave", () => {
+        window.gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)", clearProps: "transform" });
+      });
+    });
+  };
+
+  const initLiveCounters = () => {
+    if (motionQuery.matches || typeof window.gsap === "undefined") return;
+
+    const userCurrency = document.querySelector(".workspace-currency")?.textContent?.trim() || "TRY";
+    const targets = document.querySelectorAll(".metric-card strong, .summary-metric-val");
+
+    targets.forEach((el) => {
+      if (el.dataset.counterBound) return;
+      el.dataset.counterBound = "true";
+
+      const rawText = el.textContent.trim();
+      const isNegative = rawText.includes("-") || el.classList.contains("value-negative");
+      const isPositive = rawText.includes("+") || el.classList.contains("value-positive");
+
+      const match = rawText.replace(/[^0-9,.-]/g, "").replace(/\./g, "").replace(",", ".");
+      const numValue = parseFloat(match);
+      if (isNaN(numValue) || numValue === 0) return;
+
+      const obj = { val: 0 };
+      const prefix = isPositive && rawText.startsWith("+") ? "+" : (isNegative && rawText.startsWith("-") ? "-" : "");
+
+      window.gsap.to(obj, {
+        val: numValue,
+        duration: 0.8,
+        ease: "power2.out",
+        onUpdate: () => {
+          const formatted = obj.val.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          el.textContent = `${prefix}${formatted} ${userCurrency}`;
+        }
+      });
+    });
+  };
+
+  const initHealthScoreGauge = () => {
+    const gauge = document.querySelector(".health-gauge");
+    if (!gauge || motionQuery.matches || typeof window.gsap === "undefined") return;
+
+    const score = parseFloat(getComputedStyle(gauge).getPropertyValue("--score")) || 0;
+    const strong = gauge.querySelector("strong");
+
+    const obj = { s: 0 };
+    window.gsap.to(obj, {
+      s: score,
+      duration: 0.9,
+      ease: "power2.out",
+      onUpdate: () => {
+        const current = Math.round(obj.s);
+        gauge.style.setProperty("--score", current);
+        if (strong) strong.textContent = current;
+      }
+    });
+
+    const trendBars = document.querySelectorAll(".health-trend span");
+    if (trendBars.length) {
+      window.gsap.from(trendBars, {
+        scaleY: 0,
+        transformOrigin: "bottom",
+        duration: 0.6,
+        stagger: 0.05,
+        ease: "back.out(1.4)"
+      });
+    }
+  };
+
+  const initProgressBarAnimations = () => {
+    if (motionQuery.matches || typeof window.gsap === "undefined") return;
+
+    const bars = document.querySelectorAll(".progress-bar, .progress-fill, .debt-progress-fill");
+    bars.forEach((bar) => {
+      const targetWidth = bar.style.width || "0%";
+      if (targetWidth === "0%") return;
+      window.gsap.fromTo(bar, { width: "0%" }, { width: targetWidth, duration: 0.7, ease: "power2.out" });
+    });
   };
 
   const initBudgetSelector = () => {
@@ -894,6 +1040,11 @@
       element.addEventListener("change", () => element.form?.requestSubmit());
     });
     animateDashboard();
+    initKineticTiltCards();
+    initMagneticButtons();
+    initLiveCounters();
+    initHealthScoreGauge();
+    initProgressBarAnimations();
     initBudgetSelector();
     initBudgetCalculator();
     initTransactionFilters();

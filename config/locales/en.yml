@@ -1,297 +1,815 @@
 en:
   date:
     formats:
-      default: "%Y-%m-%d"
-      short: "%b %d"
-      long: "%B %d, %Y"
-    month_names: [~, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    abbr_month_names: [~, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    day_names: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    abbr_day_names: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      default: '%Y-%m-%d'
+      short: '%b %d'
+      long: '%B %d, %Y'
+    month_names:
+    - null
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December
+    abbr_month_names:
+    - null
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
+    day_names:
+    - Sunday
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    abbr_day_names:
+    - Sun
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
   time:
     formats:
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      short: "%d %b %H:%M"
-      long: "%B %d, %Y %H:%M"
-    am: "am"
-    pm: "pm"
+      default: '%a, %d %b %Y %H:%M:%S %z'
+      short: '%d %b %H:%M'
+      long: '%B %d, %Y %H:%M'
+    am: am
+    pm: pm
   app:
-    name: "Personal"
-    module: "Finance"
-    skip_link: "Skip to main content"
-    meta_description: "Personal finance and budget management dashboard."
+    name: Personal
+    module: Finance
+    skip_link: Skip to main content
+    meta_description: Personal finance and budget management dashboard.
     sidebar:
-      section_label: "FINANCE MODULE"
-      overview: "Overview"
-      transactions: "Transactions"
-      accounts: "Accounts"
-      categories: "Categories"
-      budget: "Monthly Budget"
-      savings_goals: "Savings Goals"
-      purchase_plans: "Purchase Plans"
-      workspace: "Workspace"
-      language: "Language"
-      nav_aria_label: "Main Navigation"
+      section_label: FINANCE MODULE
+      section_overview: OVERVIEW & ANALYSIS
+      section_transactions: TRANSACTIONS & DEBTS
+      section_assets: ASSETS & BUDGET
+      section_system: SYSTEM & DATA
+      overview: Overview
+      notifications: Notifications
+      spending_report: Spending Report
+      cash_flow_forecast: Cash Flow
+      transactions: Transactions
+      recurring_rules: Recurring
+      subscriptions: Subscriptions
+      debts: Debts & Loans
+      accounts: Accounts
+      exchange_rates: Exchange Rates
+      categories: Categories
+      tags: Tags
+      budget: Monthly Budget
+      budget_templates: Budget Templates
+      yearly_budget: Yearly Plan
+      savings_goals: Savings Goals
+      purchase_plans: Purchase Plans
+      data: Data Backup
+      workspace: Workspace
+      language: Language
+      theme: Theme
+      theme_system: System
+      theme_dark: Dark
+      theme_light: Light
+      logout: Sign Out
+      nav_aria_label: Main Navigation
     common:
-      save: "Save"
-      cancel: "Cancel"
-      edit: "Edit"
-      delete: "Delete"
-      add: "Add"
-      change: "Change"
-      actions: "Actions"
-      confirm_delete: "Are you sure you want to delete this item?"
-      empty_state: "No records found yet."
-      uncategorized: "Uncategorized"
-      account: "Account"
-      errors_title: "Please fix the errors in the form:"
+      save: Save
+      cancel: Cancel
+      edit: Edit
+      delete: Delete
+      add: Add
+      change: Change
+      actions: Actions
+      confirm_delete: Are you sure you want to delete this item?
+      empty_state: No records found yet.
+      uncategorized: Uncategorized
+      account: Account
+      errors_title: 'Please fix the errors in the form:'
+      active: Active
+      new: New
   dashboard:
-    eyebrow: "Monthly Finance Summary"
-    title: "Overview"
-    subtitle: "Cash flow and financial goals for %{month}."
-    add_transaction: "Add Transaction"
-    first_transaction: "Add first transaction"
-    cards_aria_label: "Monthly Financial Cards"
-    income: "Income This Month"
-    income_note: "Total recorded income"
-    expenses: "Expenses This Month"
-    expenses_note: "Total recorded expenses"
-    net_cashflow: "Net Cash Flow"
-    net_cashflow_note: "Income minus expenses"
-    budget_remaining: "Budget Remaining"
-    no_budget: "No Budget Set"
-    budget_remaining_note: "Based on planned spending"
-    no_budget_note: "No budget set for this month."
-    cashflow_chart_title: "Six-Month Cash Flow"
-    cashflow_chart_subtitle: "Income and expense history"
-    chart_aria_label: "Income, expense and net cash flow chart for the last six months"
-    chart_income: "Income"
-    chart_expense: "Expenses"
-    chart_caption: "Hover or focus the chart to see details."
-    chart_table_caption: "Income, expense and net cash flow for the last six months"
-    category_progress_aria: "Per-category spending progress"
-    month: "Month"
-    budget_status_title: "Budget Status"
-    budget_status_subtitle: "Target spending limit for this month"
-    manage_budget: "Manage Budget"
-    create_budget: "Create Budget"
-    total_budget: "All Budget (Overall Total)"
-    select_category: "Select Category"
-    all_categories: "All Categories"
-    category_budgets: "Category Budgets Breakdown"
-    category_budgets_subtitle: "Planned limits and actual spending"
-    spent_label: "Spent"
-    limit_label: "Limit"
-    remaining_label: "Remaining"
-    over_budget_label: "Over Budget"
-    percent_used: "%{percent}%% used"
-    no_categories_allocated: "No category limits set yet."
-    budget_progress_aria_label: "Budget usage: %{percent}%%"
-    budget_over: "Over Budget"
-    budget_left: "Remaining"
-    budget_over_note: "over budget"
-    budget_left_note: "available budget"
-    recent_transactions: "Recent Transactions"
-    recent_transactions_subtitle: "Latest activity across your accounts"
-    view_all: "View All"
-    active_goals: "Savings Goals"
-    active_goals_subtitle: "Your savings progress"
-    view_goals: "View Goals"
+    eyebrow: Monthly Finance Summary
+    title: Overview
+    subtitle: Cash flow and financial goals for %{month}.
+    add_transaction: Add Transaction
+    first_transaction: Add first transaction
+    cards_aria_label: Monthly Financial Cards
+    health_score: Financial Health Score
+    health_score_desc: Calculated from income, savings, budget, emergency fund, and
+      debt data.
+    suggestions: Improvement Suggestions
+    spending_alerts: Spending Alerts
+    spending_alerts_desc: Developments that require attention in your financial status.
+    see_all: View All
+    total_debt: Total Debt
+    remaining_active_debt: Remaining active debt
+    total_balance: Total Balance
+    pending_rates: Pending exchange rates
+    income: Income This Month
+    income_note: Total recorded income
+    expenses: Expenses This Month
+    expenses_note: Total recorded expenses
+    net_cashflow: Net Cash Flow
+    net_cashflow_note: Income minus expenses
+    budget_remaining: Budget Remaining
+    no_budget: No Budget Set
+    budget_remaining_note: Based on planned spending
+    no_budget_note: No budget set for this month.
+    cashflow_chart_title: Six-Month Cash Flow
+    cashflow_chart_subtitle: Income and expense history
+    chart_aria_label: Income, expense and net cash flow chart for the last six months
+    chart_income: Income
+    chart_expense: Expenses
+    chart_caption: Hover or focus the chart to see details.
+    chart_table_caption: Income, expense and net cash flow for the last six months
+    category_progress_aria: Per-category spending progress
+    month: Month
+    budget_status_title: Budget Status
+    budget_status_subtitle: Target spending limit for this month
+    manage_budget: Manage Budget
+    create_budget: Create Budget
+    total_budget: All Budget (Overall Total)
+    select_category: Select Category
+    all_categories: All Categories
+    category_budgets: Category Budgets Breakdown
+    budget_left: Remaining
+    budget_left_note: available budget
+    budget_over: Over Budget
+    budget_over_note: over budget
+    budget_progress_aria_label: 'Budget usage: %{percent}%%'
+    recent_transactions: Recent Transactions
+    recent_transactions_subtitle: Latest activity across your accounts
+    view_all: View All
+    active_goals: Savings Goals
+    active_goals_subtitle: Your savings progress
+    view_goals: View Goals
+    filter_all: All
+  exchange_rates:
+    eyebrow: CURRENCIES & CONVERSION
+    title: Exchange Rates
+    subtitle: Manual exchange rates are used to aggregate multi-currency account balances
+      in %{currency}.
+    form_title: Add / Update Exchange Rate
+    form_subtitle: Set the multiplier between currencies
+    base_currency: Base Currency
+    quote_currency: Quote Currency
+    rate: Conversion Rate (1 Base = Quote)
+    rate_placeholder: e.g. 34.250000
+    save_rate: Save Exchange Rate
+    defined_rates: Active Exchange Rates
+    defined_rates_subtitle: 1 base currency value in quote currency
+    empty_title: No Exchange Rates Defined Yet
+    empty_desc: Add your first currency pair on the left to automatically convert
+      foreign accounts.
+    rate_multiplier: 1 %{base} = %{rate} %{quote}
+  notifications:
+    eyebrow: SMART ALERTS & THRESHOLDS
+    title: Notifications & Limits
+    subtitle: Monitor spending thresholds and keep track of important budget alerts.
+    mark_all_read: Mark All as Read
+    limits_title: Smart Spending Limits
+    limits_subtitle: Receive automatic notifications when spending exceeds your thresholds.
+      Leave blank to disable.
+    daily_limit: Daily Spending Limit
+    daily_limit_desc: Maximum planned spending per single day
+    weekly_limit: Weekly Spending Limit
+    weekly_limit_desc: Maximum accumulated spending per week
+    save_limits: Save Limit Preferences
+    history_title: Notification History
+    history_subtitle: '%{count} unread notifications'
+    toggle_history: Toggle Notification History
+    empty_title: No Notifications Yet
+    empty_desc: When daily or weekly spending exceeds your limits, alerts will appear
+      here.
+    category_budgets: Category Budgets Breakdown
+    category_budgets_subtitle: Planned limits and actual spending
+    spent_label: Spent
+    limit_label: Limit
+    remaining_label: Remaining
+    over_budget_label: Over Budget
+    percent_used: '%{percent}%% used'
+    no_categories_allocated: No category limits set yet.
+    budget_progress_aria_label: 'Budget usage: %{percent}%%'
+    budget_over: Over Budget
+    budget_left: Remaining
+    budget_over_note: over budget
+    budget_left_note: available budget
+    recent_transactions: Recent Transactions
+    recent_transactions_subtitle: Latest activity across your accounts
+    view_all: View All
+    active_goals: Savings Goals
+    active_goals_subtitle: Your savings progress
+    view_goals: View Goals
   transactions:
-    eyebrow: "ACTIVITY"
-    title: "Transactions"
-    subtitle: "Review every movement in your accounts."
-    new_title: "New Transaction"
-    new_subtitle: "Record an income, expense, or transfer."
-    edit_title: "Edit Transaction"
-    edit_subtitle: "Update transaction details and amount."
-    kind: "Transaction Type"
+    eyebrow: ACTIVITY
+    title: Transactions
+    subtitle: Review every movement in your accounts.
+    new_title: New Transaction
+    new_subtitle: Record an income, expense, or transfer.
+    edit_title: Edit Transaction
+    edit_subtitle: Update transaction details and amount.
+    kind: Transaction Type
     kinds:
-      expense: "Expense"
-      income: "Income"
-      transfer: "Transfer"
-    amount: "Amount"
-    occurred_on: "Date"
-    account: "Account"
-    category: "Category"
-    note: "Note / Description (Optional)"
-    note_placeholder: "Groceries, utility bill, salary, etc."
-    save: "Save Transaction"
-    update: "Update Transaction"
-    empty_state: "No financial transactions recorded yet."
+      expense: Expense
+      income: Income
+      transfer: Transfer
+    amount: Amount
+    occurred_on: Date
+    account: Account
+    category: Category
+    note: Note / Description (Optional)
+    note_placeholder: Groceries, utility bill, salary, etc.
+    save: Save Transaction
+    update: Update Transaction
+    empty_state: No financial transactions recorded yet.
     flash:
-      saved: "Transaction saved successfully."
-      deleted: "Transaction deleted successfully."
+      saved: Transaction saved successfully.
+      deleted: Transaction deleted successfully.
+    empty_filtered: No transactions match the selected filters.
+    export_csv: Export as CSV
+    import_csv: CSV
+    tags: Tags
+    tags_placeholder: e.g. vacation, work, wedding
+    tags_hint: Separate multiple tags with commas. Suggestions appear as you type.
+    savings_goal: Link to Savings Goal
+    no_savings_goal: Do not link to goal
+    savings_goal_hint: Only available for transfers to savings accounts; amount is
+      credited toward the goal.
+    filters:
+      search: Search
+      search_placeholder: Search in notes...
+      type: Type
+      all_types: All
+      income: Income
+      expense: Expense
+      transfer: Transfer
+      account: Account
+      all_accounts: All Accounts
+      from: From
+      to: To
+      categories: Categories
+      select_category: Select Category
+      tag: Tag
+      all_tags: All Tags
+      apply: Apply
+      clear: Clear Filters
+    recurrence:
+      legend: Recurrence
+      enable: Save as recurring transaction
+      hint: First transaction is recorded on selected date; subsequent ones are added
+        automatically.
+      interval: Recurrence frequency
+      weekly: Every week
+      biweekly: Every two weeks
+      monthly: Every month
+      yearly: Every year
+      end_date: End date (optional)
+      count: Total transaction count (optional)
+      badge: Recurring
+      badge_title: Recurring transaction
+      edit_hint: This transaction is linked to a recurring plan. Manage the plan to
+        edit future occurrences.
   accounts:
-    eyebrow: "FOUNDATIONS"
-    title: "Accounts"
-    subtitle: "Keep all your bank, credit card, and cash balances organized."
-    new_title: "New Account"
-    new_subtitle: "Add a bank, credit card, or cash account."
-    edit_title: "Edit Account"
-    edit_subtitle: "Update account name or opening balance."
-    name: "Account Name"
-    name_placeholder: "e.g. Checking Account, Cash Wallet, Credit Card"
-    kind: "Account Type"
+    eyebrow: FOUNDATIONS
+    title: Accounts
+    subtitle: Keep all your bank, credit card, and cash balances organized.
+    new_title: New Account
+    new_subtitle: Add a bank, credit card, or cash account.
+    edit_title: Edit Account
+    edit_subtitle: Update account name or opening balance.
+    name: Account Name
+    name_placeholder: e.g. Checking Account, Cash Wallet, Credit Card
+    kind: Account Type
     kinds:
-      bank: "Bank Account"
-      card: "Credit Card"
-      cash: "Cash Wallet"
-      savings: "Savings Account"
-    opening_balance: "Opening Balance"
-    current_balance: "Current Balance"
-    save: "Save Account"
-    update: "Update Account"
-    empty_state: "No accounts found yet."
-    add_first: "Add First Account"
+      bank: Bank Account
+      card: Credit Card
+      cash: Cash Wallet
+      savings: Savings Account
+    opening_balance: Opening Balance
+    current_balance: Current Balance
+    total_net_worth: Total Net Worth
+    net_worth_trend_aria: Total net worth trend over the last six months
+    equivalent: equivalent
+    excluded_no_rate: 'Excluded (no exchange rate):'
+    balance_trend_aria: '%{name} balance trend over the last six months'
+    save: Save Account
+    update: Update Account
+    empty_state: No accounts found yet.
+    add_first: Add First Account
     flash:
-      saved: "Account saved successfully."
-      deleted: "Account deleted successfully."
+      saved: Account saved successfully.
+      deleted: Account deleted successfully.
+    currency: Account Currency
   categories:
-    eyebrow: "ORGANIZATION"
-    title: "Categories"
-    subtitle: "Give every transaction a clear home."
-    new_title: "New Category"
-    new_subtitle: "Define a category to classify your spending or earnings."
-    edit_title: "Edit Category"
-    edit_subtitle: "Update category name, type, or color badge."
-    name: "Category Name"
-    name_placeholder: "e.g. Groceries, Rent, Salary, Transportation"
-    kind: "Category Type"
-    color: "Color Badge"
-    parent_category: "Parent Category"
-    save: "Save Category"
-    update: "Update Category"
-    empty_state: "No categories found yet."
-    add_first: "Add First Category"
+    eyebrow: ORGANIZATION
+    title: Categories
+    subtitle: Give every transaction a clear home.
+    new_title: New Category
+    new_subtitle: Define a category to classify your spending or earnings.
+    edit_title: Edit Category
+    edit_subtitle: Update category name, type, or color badge.
+    name: Category Name
+    name_placeholder: e.g. Groceries, Rent, Salary, Transportation
+    kind: Category Type
+    color: Color Badge
+    parent_category: Parent Category
+    save: Save Category
+    update: Update Category
+    empty_state: No categories found yet.
+    add_first: Add First Category
     flash:
-      saved: "Category saved successfully."
-      deleted: "Category deleted successfully."
+      saved: Category saved successfully.
+      deleted: Category deleted successfully.
   budgets:
-    eyebrow: "MONTHLY PLAN"
-    title: "%{month} Budget"
-    actual_spending: "Actual Spending:"
-    remaining: "Remaining Budget:"
-    display_currency: "Display Currency"
-    planned_income: "Planned Total Budget"
-    planned_income_auto_note: "Automatically calculated from the sum of category spending limits."
-    category_limits: "Category Spending Limits"
-    category_limits_desc: "Set the planned spending amount for each expense category this month."
-    parent_category: "Parent Category"
-    sub_category: "Subcategory"
-    current_month_spent: "This month's spent: %{amount}"
-    total_allocated: "Total Planned Limit:"
-    save: "Save Budget"
-    back_to_dashboard: "Back to Overview"
+    eyebrow: MONTHLY PLAN
+    title: '%{month} Budget'
+    actual_spending: 'Actual Spending:'
+    remaining: 'Remaining Budget:'
+    display_currency: Display Currency
+    planned_income: Planned Total Budget
+    planned_income_auto_note: Automatically calculated from the sum of category spending
+      limits.
+    category_limits: Category Spending Limits
+    category_limits_desc: Set the planned spending amount for each expense category
+      this month.
+    parent_category: Parent Category
+    sub_category: Subcategory
+    current_month_spent: 'This month''s spent: %{amount}'
+    total_allocated: 'Total Planned Limit:'
+    save: Save Budget
+    back_to_dashboard: Back to Overview
+    copy_previous_prompt: No budget plan for this month yet.
+    copy_previous_hint: You can copy the category limits and planned income from the
+      previous month.
+    copy_previous: Copy from Previous Month
     flash:
-      saved: "Budget saved successfully."
-      currency_changed: "Display currency changed to %{currency}. Amounts were not converted."
-      invalid_currency: "Please choose a supported currency."
+      saved: Budget saved successfully.
+      currency_changed: Display currency changed to %{currency}. Amounts were not
+        converted.
+      invalid_currency: Please choose a supported currency.
+    year:
+      eyebrow: YEARLY BUDGET PLAN
+      monthly_summary: Monthly Summary
+      monthly_summary_desc: Planned vs. actual income and expense comparison for each
+        month
+      planned_income: Planned Income
+      actual_income: Actual Income
+      planned_expense: Planned Expense
+      actual_expense: Actual Expense
+      net: Net
+      status: Status
+      on_track: On Track
+      over: Over Budget
+      total: Total
+      total_income: 'Total Income:'
+      total_expense: 'Total Expenses:'
+      add_plan: Add Plan
+      cashflow_chart: 12-Month Cash Flow
+      cashflow_chart_desc: Income and expense comparison chart
+      chart_aria_label: 12-month income and expense chart
+      category_comparison: Category-Based Yearly Comparison
+      category_comparison_desc: Annual planned spending limits and actual spending
+      unlimited: Unlimited
+      no_data: No data available for this year yet.
+      table_aria_label: Yearly budget summary table
+      month: Month
   savings_goals:
-    eyebrow: "FINANCIAL PLANNING"
-    title: "Savings Goals"
-    subtitle: "Track progress toward what matters most."
-    new_title: "New Savings Goal"
-    new_subtitle: "Set a savings target and planned monthly contribution."
-    edit_title: "Edit Goal"
-    edit_subtitle: "Update savings target and timeframe details."
-    name: "Goal Name"
-    name_placeholder: "e.g. Emergency Fund, Vacation, New Car"
-    target_amount: "Target Amount"
-    starting_amount: "Starting Amount (If any)"
-    monthly_contribution: "Planned Monthly Contribution"
-    target_date: "Target Date (Optional)"
-    status: "Status"
+    eyebrow: FINANCIAL PLANNING
+    title: Savings Goals
+    subtitle: Track progress toward what matters most.
+    new_title: New Savings Goal
+    new_subtitle: Set a savings target and planned monthly contribution.
+    edit_title: Edit Goal
+    edit_subtitle: Update savings target and timeframe details.
+    name: Goal Name
+    name_placeholder: e.g. Emergency Fund, Vacation, New Car
+    target_amount: Target Amount
+    starting_amount: Starting Amount (If any)
+    monthly_contribution: Planned Monthly Contribution
+    target_date: Target Date (Optional)
+    status: Status
     statuses:
-      active: "Active"
-      paused: "Paused"
-      completed: "Completed"
-      archived: "Archived"
-    progress_aria_label: "Goal progress: %{percent}%%"
-    save: "Save Goal"
-    update: "Update Goal"
-    monthly_contrib_label: "Monthly Contribution:"
-    estimated_time: "Estimated time: ~%{months} months"
-    no_target_date: "No target date set"
-    empty_state: "No savings goals recorded yet."
+      active: Active
+      paused: Paused
+      completed: Completed
+      archived: Archived
+    progress_aria_label: 'Goal progress: %{percent}%%'
+    save: Save Goal
+    update: Update Goal
+    monthly_contrib_label: 'Monthly Contribution:'
+    estimated_time: 'Estimated time: ~%{months} months'
+    no_target_date: No target date set
+    empty_state: No savings goals recorded yet.
     flash:
-      saved: "Savings goal saved successfully."
-      deleted: "Savings goal deleted successfully."
+      saved: Savings goal saved successfully.
+      deleted: Savings goal deleted successfully.
+    add_contribution: Add Contribution
+    add_contribution_note: Select an existing savings transfer or add an independent
+      contribution.
+    contribution_amount: Contribution amount
+    contributed_on: Date
+    linked_transfer: Linked transfer
+    no_linked_transfer: Do not link transfer
+    details: Details
+    detail_subtitle: Review goal contributions and linked savings transfers.
+    contribution_history: Contribution History
+    contribution_history_note: Linked transfers are not counted as expenses.
+    no_contributions: No contributions recorded yet.
+    back: Back to Goals
   purchase_plans:
-    eyebrow: "FINANCIAL PLANNING"
-    title: "Purchase Plans"
-    subtitle: "Make major purchases with confidence."
-    new_title: "New Purchase Plan"
-    new_subtitle: "Evaluate the affordability of a planned purchase."
-    edit_title: "Edit Plan"
-    edit_subtitle: "Update purchase price, down payment, or installment details."
-    name: "Purchase Name"
-    name_placeholder: "e.g. New Laptop, Home Furniture, Vacation Package"
-    price: "Total Price"
-    down_payment: "Down Payment"
-    down_payment_label: "Down Payment:"
-    monthly_cost: "Monthly Installment"
-    monthly_cost_label: "Monthly Installment:"
-    planned_on: "Target Purchase Date"
-    planned_on_label: "Target Date:"
-    save: "Assess Plan & Save"
-    update: "Update Plan"
-    status_comfortable: "Comfortable"
-    status_plan: "Plan Ahead"
-    status_defer: "Defer"
-    empty_state: "No purchase plans recorded yet."
+    eyebrow: FINANCIAL PLANNING
+    title: Purchase Plans
+    subtitle: Make major purchases with confidence.
+    new_title: New Purchase Plan
+    new_subtitle: Evaluate the affordability of a planned purchase.
+    edit_title: Edit Plan
+    edit_subtitle: Update purchase price, down payment, or installment details.
+    name: Purchase Name
+    name_placeholder: e.g. New Laptop, Home Furniture, Vacation Package
+    price: Total Price
+    down_payment: Down Payment
+    down_payment_label: 'Down Payment:'
+    monthly_cost: Monthly Installment
+    monthly_cost_label: 'Monthly Installment:'
+    planned_on: Target Purchase Date
+    planned_on_label: 'Target Date:'
+    save: Assess Plan & Save
+    update: Update Plan
+    status_comfortable: Comfortable
+    status_plan: Plan Ahead
+    status_defer: Defer
+    empty_state: No purchase plans recorded yet.
     flash:
-      saved: "Purchase plan saved successfully."
-      deleted: "Purchase plan deleted successfully."
+      saved: Purchase plan saved successfully.
+      deleted: Purchase plan deleted successfully.
+    show_subtitle: Compare different payment scenarios and make confident purchasing
+      decisions.
+    linked_goal: 'Goal:'
+    back: Back to Plans
+    inputs_title: Calculation Inputs
+    inputs_desc: Change values to update scenarios in real time.
+    save_inputs: Update Plan
+    monthly_payment: Monthly Payment
+    safety_buffer: Remaining Safety Buffer
+    free_cash_after: Remaining Free Cash After
+    uses_goal: Uses savings goal
+    scenarios_title: Scenario Comparison
+    scenarios_desc: Upfront, installment, and savings goal options side by side.
+    assumptions_title: Assumptions and Inputs
+    assumptions_desc: All calculations are based on the following data (last 3 months).
+    assum_income: Monthly Income
+    assum_expenses: Monthly Expenses
+    assum_goal_contrib: Active Goal Contributions
+    assum_free_cash: Monthly Free Cash
+    assum_available_cash: Available Cash
+    convert_title: Convert to Purchased Transaction
+    convert_desc: Record this purchase as an actual transaction in your account.
+    select_account: Select Account
+    no_category: Uncategorized
+    assum_goal_remaining: Remaining Goal Amount
+    convert_account: Payment Account
+    convert_category: Category (Optional)
+    convert_button: Convert to Transaction
   onboarding:
-    eyebrow: "SETUP WIZARD"
-    title: "Welcome to Personal Finance"
-    subtitle: "Tailor your financial tracking in a few quick steps."
-    skip_wizard: "Skip Wizard (Go to Dashboard)"
-    skip_step: "Skip This Step"
-    step_indicator: "Step %{current} of %{total}"
-    completed_notice: "Congratulations! Your finance setup is complete."
-    skipped_notice: "Setup wizard skipped. You can customize your budget and categories anytime."
-    next_step: "Next Step →"
-    prev_step: "← Previous Step"
-    finish: "Finish Setup & Start ✓"
+    eyebrow: SETUP WIZARD
+    title: Welcome to Personal Finance
+    subtitle: Tailor your financial tracking in a few quick steps.
+    skip_wizard: Skip Wizard (Go to Dashboard)
+    skip_step: Skip This Step
+    step_indicator: Step %{current} of %{total}
+    completed_notice: Congratulations! Your finance setup is complete.
+    skipped_notice: Setup wizard skipped. You can customize your budget and categories
+      anytime.
+    next_step: Next Step →
+    prev_step: ← Previous Step
+    finish: Finish Setup & Start ✓
     steps:
-      step1_title: "1. Basics"
-      step1_desc: "Select your primary currency and estimated monthly net income."
-      currency_label: "Currency"
-      income_label: "Expected Monthly Net Income"
-      income_hint: "If your income varies, enter an estimated average amount."
-      step2_title: "2. Accounts (Optional)"
-      step2_desc: "Add your cash, bank, and savings accounts with their opening balances."
-      account_name: "Account Name"
-      account_kind: "Account Type"
-      account_balance: "Opening Balance"
-      add_account_btn: "+ Add Account"
-      remove_account: "Remove"
+      step1_title: 1. Basics
+      step1_desc: Select your primary currency and estimated monthly net income.
+      currency_label: Currency
+      income_label: Expected Monthly Net Income
+      income_hint: If your income varies, enter an estimated average amount.
+      step2_title: 2. Accounts (Optional)
+      step2_desc: Add your cash, bank, and savings accounts with their opening balances.
+      account_name: Account Name
+      account_kind: Account Type
+      account_balance: Opening Balance
+      add_account_btn: + Add Account
+      remove_account: Remove
       kinds:
-        cash: "Cash / Wallet"
-        bank: "Bank Account"
-        card: "Credit Card"
-        savings: "Savings Account"
-      step3_title: "3. Spending & Income Categories"
-      step3_desc: "Review suggested categories, toggle off what you don't need, or add new ones."
-      expense_cats: "Expense Categories"
-      income_cats: "Income Categories"
-      add_custom_cat: "+ Add New Category"
-      step4_title: "4. Monthly Budget Limits (%{month})"
-      step4_desc: "Set planned expense limits for the current month."
-      budget_income_summary: "Planned Income:"
-      budget_expense_summary: "Total Planned Expenses:"
-      budget_remaining_summary: "Remaining Free Cash:"
-      category_header: "Category"
-      limit_header: "Monthly Limit"
-      step5_title: "5. Savings Goal (Optional)"
-      step5_desc: "Set your first savings goal and track your progress."
-      goal_name_label: "Goal Name"
-      goal_name_placeholder: "e.g. Emergency Fund, New Laptop, Vacation"
-      goal_target_label: "Target Amount"
-      goal_starting_label: "Starting Amount (If any)"
-      goal_monthly_label: "Monthly Contribution"
-      goal_date_label: "Target Date (Optional)"
-      estimated_months_preview: "Estimated Completion:"
-
+        cash: Cash / Wallet
+        bank: Bank Account
+        card: Credit Card
+        savings: Savings Account
+      step3_title: 3. Spending & Income Categories
+      step3_desc: Review suggested categories, toggle off what you don't need, or
+        add new ones.
+      expense_cats: Expense Categories
+      income_cats: Income Categories
+      add_custom_cat: + Add New Category
+      step4_title: 4. Monthly Budget Limits (%{month})
+      step4_desc: Set planned expense limits for the current month.
+      budget_income_summary: 'Planned Income:'
+      budget_expense_summary: 'Total Planned Expenses:'
+      budget_remaining_summary: 'Remaining Free Cash:'
+      category_header: Category
+      limit_header: Monthly Limit
+      step5_title: 5. Savings Goal (Optional)
+      step5_desc: Set your first savings goal and track your progress.
+      goal_name_label: Goal Name
+      goal_name_placeholder: e.g. Emergency Fund, New Laptop, Vacation
+      goal_target_label: Target Amount
+      goal_starting_label: Starting Amount (If any)
+      goal_monthly_label: Monthly Contribution
+      goal_date_label: Target Date (Optional)
+      estimated_months_preview: 'Estimated Completion:'
+  subscriptions:
+    eyebrow: RECURRING EXPENSES
+    title: Subscription Tracker
+    subtitle: Manage recurring services, renewals, and total costs in one place.
+    new_title: New Subscription
+    new_subtitle: Add manually or link to an existing recurring transaction.
+    edit_title: Edit Subscription
+    add: Add Subscription
+    name: Subscription name
+    name_placeholder: Netflix, gym membership…
+    amount: Amount
+    billing_interval: Renewal frequency
+    intervals:
+      monthly: Monthly
+      yearly: Yearly
+    renewal_on: Next renewal
+    last_used_on: Last used
+    link_recurring: Link to recurring transaction
+    no_link: No link
+    active_subscription: Active subscription
+    save: Save Subscription
+    monthly_total: Monthly total
+    yearly_total: Yearly total
+    upcoming_renewal: Upcoming renewal
+    next_14_days: Next 14 days
+    upcoming_renewals_title: Upcoming Renewals
+    upcoming_renewals_desc: Subscriptions renewing in the next 14 days.
+    list_title: Subscriptions
+    list_desc: High-cost or long-unused services are flagged for review.
+    review: Review
+    inactive: Inactive
+    linked_recurring: Linked to recurring
+    manual_entry: Manual entry
+    last_used_prefix: 'Last used:'
+    empty_state: No subscriptions added yet.
+    add_first: Add First Subscription
+    confirm_delete: Are you sure you want to delete this subscription?
+    flash:
+      saved: Subscription saved successfully.
+      deleted: Subscription deleted successfully.
+  debts:
+    eyebrow: DEBT MANAGEMENT
+    title: Debts & Installments
+    subtitle: Track your payment schedule, remaining balance, and payoff dates.
+    new_title: New Debt
+    edit_title: Edit Debt
+    add: Add Debt
+    name: Debt name
+    total_amount: Total amount
+    remaining_balance: Remaining balance
+    interest_rate: Interest rate (%)
+    monthly_payment: Monthly payment
+    remaining_installments: Remaining installments
+    next_payment: Next payment
+    save: Save
+    total_debt_load: Total debt load
+    upcoming_payment: Upcoming payment
+    next_30_days: Next 30 days
+    payment_schedule_title: Payment Schedule
+    payment_schedule_desc: Upcoming installments and remaining debts.
+    approaching: Approaching
+    remaining_installments_label: remaining installments
+    estimated_payoff: 'Estimated payoff:'
+    record_payment: Record Payment
+    empty_state: No debts recorded yet.
+    confirm_delete: Are you sure you want to delete this debt?
+    flash:
+      saved: Debt saved successfully.
+      deleted: Debt deleted successfully.
+  budget_templates:
+    eyebrow: REUSABLE PLANS
+    title: Budget Templates
+    subtitle: Use ready-made distributions, save your monthly plans, and keep them
+      up to date.
+    back_to_budget: Back to This Month's Budget
+    library_title: Template Library
+    library_desc: Ready-made templates are preserved; manage the name, content, and
+      usage of your custom templates.
+    predefined_badge: Built-in
+    custom_badge: Custom
+    template_name: Template name
+    rename: Rename
+    source_month: Source month
+    update_from_month: Update from This Month
+    confirm_delete: Are you sure you want to delete this template?
+    templates_title: Start with Templates
+    templates_desc: Apply ready-made distributions to an empty month or save this
+      month's plan for reuse.
+    manage_templates: Manage Templates
+    select_template: Template to apply
+    apply_template: Apply Template
+    allocations_exist: Existing allocations preserved. Open an empty month to apply
+      a template.
+    save_as_template_label: Save this month as a custom template
+    save_as_template_placeholder: e.g. Summer vacation budget
+    save_template: Save Template
+    copy_previous_prompt: No budget plan for this month yet.
+    copy_previous_hint: You can copy the category limits and planned income from the
+      previous month.
+    copy_previous: Copy from Previous Month
+  import:
+    csv_eyebrow: CSV IMPORT
+    upload_title: Import Transactions
+    upload_subtitle: Upload your file; map columns and verify transactions before
+      importing.
+    csv_file: CSV file
+    csv_hint: Upload a CSV file with headers, max 2 MB.
+    select_account: Account for transactions
+    select_account_placeholder: Select account
+    map_columns: Map Columns
+    map_eyebrow: CSV IMPORT · 2 / 3
+    map_title: Map Columns
+    map_subtitle: Select which transaction field each column in your file corresponds
+      to.
+    field_date: Date
+    field_amount: Amount
+    field_type: Type
+    field_category: Category
+    field_note: Note
+    optional: (optional)
+    select_column: Select column
+    show_preview: Show Preview
+    upload_different: Upload Different File
+    preview_eyebrow: CSV IMPORT · 3 / 3
+    preview_title: Review Import
+    preview_subtitle: Ready rows will be added; duplicates skipped, invalid rows excluded.
+    row: Row
+    status: Status
+    status_ready: Ready
+    status_duplicate: Duplicate
+    confirm_import: Confirm Import
+    back_to_mapping: Back to Mapping
+    summary_eyebrow: CSV IMPORT
+    summary_title: Import Completed
+    summary_subtitle: Your import results are shown below.
+    created: created
+    skipped_duplicates: duplicates skipped
+    errors: error rows
+    back_to_transactions: Back to Transactions
+    import_another: Import Another CSV
+  quick_add:
+    open: Quick add transaction
+    close: Close quick transaction modal
+    eyebrow: QUICK ADD
+    title: New Transaction
+    swipe_hint: Swipe to select
+    more: Add note, date or account
+    save: Save transaction
+  spending_report:
+    eyebrow: SPENDING ANALYSIS
+    title: Category Spending Report
+    subtitle: Analyze your spending by category and compare time periods.
+    period_aria: Report period selection
+    from: From
+    to: To
+    apply: Update Report
+    this_month: This Month
+    summary_aria: Spending summary
+    current: Selected Period
+    previous: Previous Period
+    change: Period Change
+    no_comparison: No previous spending to compare
+    distribution: Category Breakdown
+    distribution_note: Select a category to view its subcategories.
+    donut_aria: Spending breakdown by category
+    chart_caption: Each slice represents category spending in the selected period.
+    legend_aria: Category chart legend
+    top_five: Top 5 Spending Categories
+    comparison_note: Selected period vs. previous period of equal length
+    table_caption: Period spending by category
+    category: Category
+    select_category: Select a category
+    select_category_note: Click a chart slice or table row to view subcategories.
+    empty: No categorized spending found for this period.
+    add_transaction: Add Expense
+  cash_flow_forecast:
+    eyebrow: FORWARD PLANNING
+    title: Cash Flow Forecast
+    subtitle: See your projected end-of-period balance for upcoming months.
+    horizon: Forecast Horizon
+    three_months: 3 months
+    six_months: 6 months
+    baseline_income: Monthly Base Income
+    baseline_expenses: Monthly Base Expense
+    update: Update Forecast
+    assumptions: Assumptions
+    assumptions_note: Assumptions are 3-month averages of non-recurring transactions.
+      You can adjust them for this view.
+    summary_aria: Forecast summary
+    current_balance: Current Balance
+    active_accounts: Total of active accounts
+    end_balance: Estimated End Balance
+    commitments: Known Commitments
+    recurring: Active recurring transactions
+    goals: Goals
+    active_goals: active goals
+    purchases: Plans
+    purchase_plans: purchase plans
+    timeline: Projected Balance Timeline
+    timeline_note: Solid line shows current balance; dashed line shows projection.
+    chart_aria: Projected end-of-month balance chart for future months
+    included: Included in Forecast
+    included_note: Calculated transparently for each period.
+    recurring_note: Based on rule schedules and frequency
+    goals_note: Monthly until target completed
+    purchases_note: Total cost in the planned month
+    monthly_breakdown: Monthly Forecast Breakdown
+    monthly_breakdown_note: Review how each end-of-period balance is calculated.
+    month: Month
+    income: Income
+    expenses: Expenses
+    net: Net
+    balance: Ending Balance
+    disclaimer: This is a projection; actual income, expenses, and plans may vary.
+  tags:
+    eyebrow: FLEXIBLE GROUPING
+    title: Transaction Tags
+    subtitle: Group transactions by project, event, or custom needs.
+    report: Tag Spending Report
+    new: Add Tag
+    quick_create: Quick Create Tag
+    quick_create_note: Tags can also be created via autocomplete in the transaction
+      form.
+    manage: Tag Management
+    manage_note: Rename, delete, or merge duplicate tags.
+    name: Tag name
+    transaction_count: transactions
+    merge_sources: Tags to merge
+    merge_target: Target tag
+    merge: Merge Tags
+    empty: No tags created yet.
+    create: Create Tag
+    edit: Edit Tag
+    update: Update Tag
+    report_subtitle: Analyze tagged expenses independently of categories.
+    report_totals: Expenses by Tag
+    report_empty: No tagged expenses found for this period.
+  recurring_rules:
+    eyebrow: AUTOMATED TRANSACTIONS
+    title: Recurring Transactions
+    subtitle: Manage your regular income and expense schedules.
+    add: New Recurring Transaction
+    edit_title: Edit Recurring Plan
+    edit_subtitle: Change the frequency or end condition of future transactions.
+    edit_hint: Only future transactions are updated; previously created transactions
+      remain unchanged.
+    interval: Recurrence frequency
+    end_date: End date (optional)
+    count: Total transaction count (optional)
+    manage: Manage Recurring Transactions
+    update: Update Plan
+    empty_state: No recurring transaction plans yet.
+    active: Active
+    paused: Paused
+    stopped: Stopped
+    pause: Pause
+    resume: Resume
+    stop: Stop
+    confirm_stop: Are you sure you want to stop this plan? Past transactions are preserved.
+    generated_count: '%{count} generated'
+    next_on: 'Next: %{date}'
+  data_backup:
+    eyebrow: DATA SOVEREIGNTY
+    title: Backup & Restore
+    subtitle: Download a portable copy of your financial data.
+    export_title: Data Export
+    export_desc: All accounts, categories, transactions, budgets, goals, and plans
+      are exported with metadata.
+    download_json: Download JSON Backup
+    download_csv: Download CSV Backup

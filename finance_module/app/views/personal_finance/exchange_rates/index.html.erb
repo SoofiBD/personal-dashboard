@@ -1,1 +1,85 @@
-<header class="page-header"><div><p class="eyebrow">PARA BİRİMLERİ</p><h1>Döviz Kurları</h1><p class="page-subtitle">Manuel kurlar, hesap bakiyelerini <%= current_panel_user.currency %> cinsinden birleştirmek için kullanılır.</p></div></header><section class="panel exchange-rate-form"><%= render "form" %></section><section class="panel"><div class="panel-header"><div><h2>Tanımlı Kurlar</h2><p>1 kaynak para biriminin hedef para birimi karşılığı</p></div></div><% if @rates.any? %><div class="tag-management-list"><% @rates.each do |rate| %><div class="tag-management-row"><span><strong><%= rate.base_currency %></strong> → <strong><%= rate.quote_currency %></strong> · <%= number_with_precision rate.rate, precision: 6 %></span><div class="transaction-actions"><%= link_to edit_finance_exchange_rate_path(rate), class: "action-btn", title: "Düzenle" do %><%= finance_svg_icon("edit") %><% end %><%= button_to finance_exchange_rate_path(rate), method: :delete, class: "action-btn delete", title: "Sil", form: {style: "display: inline;"} do %><%= finance_svg_icon("trash") %><% end %></div></div><% end %></div><% else %><div class="empty-state"><p>Henüz kur girilmedi.</p></div><% end %></section>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="1" x2="12" y2="23"/>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      <%= t("exchange_rates.eyebrow", default: "PARA BİRİMLERİ & DÖNÜŞÜM") %>
+    </p>
+    <h1><%= t("exchange_rates.title", default: "Döviz Kurları") %></h1>
+    <p class="page-subtitle"><%= t("exchange_rates.subtitle", currency: current_panel_user.currency, default: "Manuel kurlar, hesap bakiyelerini #{current_panel_user.currency} cinsinden birleştirmek için kullanılır.") %></p>
+  </div>
+</header>
+
+<div class="exchange-rates-grid">
+  <!-- Kur Ekleme / Güncelleme Paneli -->
+  <section class="panel exchange-rate-panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("exchange_rates.form_title", default: "Kur Ekle / Güncelle") %></h2>
+        <p><%= t("exchange_rates.form_subtitle", default: "Para birimleri arasındaki çarpanı belirleyin") %></p>
+      </div>
+    </div>
+    <%= render "form" %>
+  </section>
+
+  <!-- Tanımlı Kurlar Paneli -->
+  <section class="panel exchange-rates-list-panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("exchange_rates.defined_rates", default: "Tanımlı Kurlar") %></h2>
+        <p><%= t("exchange_rates.defined_rates_subtitle", default: "1 kaynak para biriminin hedef para birimi karşılığı") %></p>
+      </div>
+      <% if @rates.any? %>
+        <span class="badge badge-info"><%= @rates.count %> <%= t("app.common.active", default: "Aktif") %></span>
+      <% end %>
+    </div>
+
+    <% if @rates.any? %>
+      <div class="currency-pairs-list">
+        <% @rates.each do |rate| %>
+          <article class="currency-pair-card">
+            <div class="currency-pair-header">
+              <div class="currency-pair-flags">
+                <span class="currency-badge base-badge"><%= rate.base_currency %></span>
+                <span class="currency-arrow">→</span>
+                <span class="currency-badge quote-badge"><%= rate.quote_currency %></span>
+              </div>
+              <div class="currency-pair-actions">
+                <%= link_to edit_finance_exchange_rate_path(rate), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
+                  <%= finance_svg_icon("edit") %>
+                <% end %>
+                <%= button_to finance_exchange_rate_path(rate), method: :delete, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: {style: "display: inline;"}, data: {turbo_confirm: t("app.common.confirm_delete", default: "Bu kuru silmek istediğinizden emin misiniz?")} do %>
+                  <%= finance_svg_icon("trash") %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="currency-rate-body">
+              <div class="currency-rate-value">
+                <strong><%= number_with_precision rate.rate, precision: 4 %></strong>
+                <small class="currency-rate-sub"><%= rate.quote_currency %></small>
+              </div>
+              <div class="currency-rate-calc">
+                <span><%= t("exchange_rates.rate_multiplier", base: rate.base_currency, rate: number_with_precision(rate.rate, precision: 4), quote: rate.quote_currency, default: "1 #{rate.base_currency} = #{number_with_precision(rate.rate, precision: 4)} #{rate.quote_currency}") %></span>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state currency-empty-state">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+            <path d="M12 6v12"/>
+          </svg>
+        </div>
+        <h3><%= t("exchange_rates.empty_title", default: "Henüz Tanımlı Kur Yok") %></h3>
+        <p><%= t("exchange_rates.empty_desc", default: "Yabancı para hesaplarınızı ana para biriminize dönüştürmek için sol taraftan kur ekleyin.") %></p>
+      </div>
+    <% end %>
+  </section>
+</div>
