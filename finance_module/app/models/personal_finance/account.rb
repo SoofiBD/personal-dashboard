@@ -14,5 +14,16 @@ module PersonalFinance
     def current_balance
       opening_balance + transactions.sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
     end
+
+    def balance_history(months: 6)
+      first_month = (Date.current.beginning_of_month - (months - 1).months)
+      running_balance = opening_balance + transactions.where("occurred_on < ?", first_month).sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
+      totals = transactions.where(occurred_on: first_month..Date.current).group("DATE_TRUNC('month', occurred_on)").sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
+      months.times.map do |offset|
+        month = first_month + offset.months
+        running_balance += totals[month.to_time.beginning_of_month] || 0
+        {month: month, balance: running_balance.to_f}
+      end
+    end
   end
 end
