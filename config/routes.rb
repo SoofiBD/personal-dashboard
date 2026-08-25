@@ -11,6 +11,9 @@ Rails.application.routes.draw do
     end
     resource :notification_settings, only: :update
     resource :theme_preference, only: :update
+    resource :data, only: :index do
+      get :export
+    end
     resources :subscriptions, except: :show
     resources :debts, except: :show do
       post :pay, on: :member
