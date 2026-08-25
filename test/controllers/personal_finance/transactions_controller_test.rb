@@ -1,4 +1,5 @@
 require "test_helper"
+require "csv"
 
 class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -68,5 +69,22 @@ class PersonalFinance::TransactionsControllerTest < ActionDispatch::IntegrationT
     assert_response :success
     assert_select ".transaction-category", text: /Weekly groceries buy/
     assert_select ".transaction-category", text: /Monthly payout salary/, count: 0
+  end
+
+  test "exports filtered transactions as an Excel-compatible CSV" do
+    from = (Date.current - 7.days).to_s
+    to = Date.current.to_s
+
+    get finance_transactions_path(format: :csv, category_id: [@category_food.id], from: from, to: to)
+
+    assert_response :success
+    assert_match "text/csv", response.content_type
+    assert_equal "\uFEFF", response.body[0]
+    assert_includes response.headers["Content-Disposition"], "transactions_#{Date.current.strftime("%Y-%m")}_#{Date.current.strftime("%Y-%m")}.csv"
+
+    rows = CSV.parse(response.body.delete_prefix("\uFEFF"))
+    assert_equal %w[date type amount category account note], rows.first
+    assert_equal 2, rows.size
+    assert_equal [(Date.current - 5.days).iso8601, "expense", "50.0", "Food", "Card", "Weekly groceries buy"], rows.second
   end
 end
