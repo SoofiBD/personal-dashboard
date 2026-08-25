@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :finance_budget_periods, class_name: "PersonalFinance::BudgetPeriod", dependent: :destroy
   has_many :finance_budget_templates, class_name: "PersonalFinance::BudgetTemplate", dependent: :destroy
   has_many :finance_notifications, class_name: "PersonalFinance::Notification", dependent: :destroy
+  has_many :finance_subscriptions, class_name: "PersonalFinance::Subscription", dependent: :destroy
   has_many :finance_savings_goals, class_name: "PersonalFinance::SavingsGoal", dependent: :destroy
   has_many :finance_purchase_plans, class_name: "PersonalFinance::PurchasePlan", dependent: :destroy
 
