@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
   resource :session, only: %i[new create destroy]
+  resource :mfa, controller: "mfa", only: %i[show destroy] do
+    post :verify
+  end
+  resource :profile, only: %i[show update]
+  resources :users, only: %i[index new create edit update]
 
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"

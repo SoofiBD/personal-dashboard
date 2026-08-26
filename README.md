@@ -65,10 +65,10 @@ personal-dashboard/
 The project is evolving into an all-in-one personal workspace and life operating system. The following modules and features are actively planned or currently in development:
 
 ### 🔐 Authentication & Access Control
-- [x] Password-protected owner login and expiring secure session.
-- [ ] Multi-factor authentication (MFA).
-- [ ] Role-based access control for multiple users.
-- [ ] User profile customizations and localized preferences.
+- [x] Password-protected login and expiring secure session.
+- [x] TOTP multi-factor authentication (MFA) with encrypted-at-rest secrets.
+- [x] Role-based access control for multiple users (owner, editor, viewer).
+- [x] User profile customizations and localized preferences.
 
 ### 📄 PDF Tools & Document Management
 - [ ] In-browser PDF viewer and annotator.
@@ -219,6 +219,8 @@ The following variables can be customized in `.env.local`:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `DASHBOARD_OWNER_NAME` | Display name of the dashboard owner | `Personal Dashboard` |
+| `DASHBOARD_OWNER_EMAIL` | Optional owner login identifier | None; legacy password-only owner login remains supported |
+| `DASHBOARD_MFA_ENCRYPTION_KEY` | Optional 32-character deployment key for encrypted MFA seeds | Derived from Rails secret key base |
 | `DASHBOARD_AUTH_PASSWORD` | Optional non-interactive input for the credential provisioning task; do not persist it | None; minimum 16 characters |
 | `DASHBOARD_CURRENCY` | Default currency code (e.g., `USD`, `EUR`, `TRY`) | `TRY` |
 | `DASHBOARD_TIME_ZONE` | Time zone used for scheduling and timestamps | `Europe/Istanbul` |

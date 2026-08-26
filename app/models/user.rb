@@ -1,9 +1,17 @@
 class User < ApplicationRecord
   has_secure_password validations: false
+  encrypts :mfa_secret
+
+  ROLES = %w[owner editor viewer].freeze
+  LOCALES = %w[tr en].freeze
 
   validates :name, presence: true, length: {maximum: 80}
   validates :currency, presence: true, length: {is: 3}
   validates :time_zone, presence: true
+  validates :role, inclusion: {in: ROLES}
+  validates :locale, inclusion: {in: LOCALES}
+  validates :email, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}, unless: :owner?
+  validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
   validate :password_security_requirements
 
   has_many :financial_accounts, class_name: "PersonalFinance::Account", dependent: :destroy
@@ -26,6 +34,7 @@ class User < ApplicationRecord
       user.name = ENV.fetch("DASHBOARD_OWNER_NAME", "Personal Dashboard")
       user.currency = ENV.fetch("DASHBOARD_CURRENCY", "TRY")
       user.time_zone = ENV.fetch("DASHBOARD_TIME_ZONE", "Europe/Istanbul")
+      user.email = ENV["DASHBOARD_OWNER_EMAIL"]
     end
   end
 
@@ -38,6 +47,40 @@ class User < ApplicationRecord
     self.password_confirmation = new_password
     self.authentication_version += 1
     save!
+  end
+
+  def owner?
+    role == "owner"
+  end
+
+  def editor?
+    role == "editor"
+  end
+
+  def can_manage_finances?
+    owner? || editor?
+  end
+
+  def login_identifier
+    email.presence || name
+  end
+
+  def mfa_pending_setup?
+    mfa_secret.present? && !mfa_enabled?
+  end
+
+  def prepare_mfa!
+    update!(mfa_secret: Totp.generate_secret, mfa_enabled: false, mfa_confirmed_at: nil)
+  end
+
+  def enable_mfa!(code)
+    return false unless Totp.valid?(mfa_secret, code)
+
+    update!(mfa_enabled: true, mfa_confirmed_at: Time.current)
+  end
+
+  def disable_mfa!
+    update!(mfa_secret: nil, mfa_enabled: false, mfa_confirmed_at: nil)
   end
 
   private
