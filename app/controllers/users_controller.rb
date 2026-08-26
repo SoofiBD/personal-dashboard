@@ -14,6 +14,7 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)
+    @user.role = role_param || "viewer"
     if @user.save
       redirect_to users_path, notice: "Kullanıcı oluşturuldu."
     else
@@ -22,10 +23,10 @@ class UsersController < ApplicationController
   end
 
   def update
-    if @user == current_user && user_params[:role].present? && user_params[:role] != "owner"
+    if @user == current_user && role_param.present? && role_param != "owner"
       @user.errors.add(:role, "sahip rolü kendi hesabınızdan kaldırılamaz")
       render :edit, status: :unprocessable_content
-    elsif @user.update(user_params)
+    elsif update_user
       redirect_to users_path, notice: "Kullanıcı güncellendi."
     else
       render :edit, status: :unprocessable_content
@@ -45,9 +46,19 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    permitted = params.require(:user).permit(:name, :email, :role, :currency, :time_zone, :locale, :password, :password_confirmation)
+    permitted = params.require(:user).permit(:name, :email, :currency, :time_zone, :locale, :password, :password_confirmation)
     permitted.delete(:password) if permitted[:password].blank?
     permitted.delete(:password_confirmation) if permitted[:password_confirmation].blank?
     permitted
+  end
+
+  def role_param
+    params.dig(:user, :role).presence
+  end
+
+  def update_user
+    @user.assign_attributes(user_params)
+    @user.role = role_param if role_param
+    @user.save
   end
 end

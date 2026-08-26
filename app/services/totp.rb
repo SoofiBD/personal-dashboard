@@ -4,13 +4,14 @@ class Totp
   ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".freeze
   STEP = 30
   DIGITS = 6
+  CODE_PATTERN = /\A\d{6}\z/
 
   def self.generate_secret(length: 32)
     Array.new(length) { ALPHABET[SecureRandom.random_number(ALPHABET.length)] }.join
   end
 
   def self.valid?(secret, code, at: Time.current)
-    return false unless secret.present? && code.to_s.match?(/\A\d{#{DIGITS}}\z/)
+    return false unless secret.present? && code.to_s.match?(CODE_PATTERN)
 
     (-1..1).any? { |offset| ActiveSupport::SecurityUtils.secure_compare(code_for(secret, at: at + offset * STEP), code.to_s) }
   end
