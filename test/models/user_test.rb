@@ -50,4 +50,25 @@ class UserTest < ActiveSupport::TestCase
     end
     assert user.authenticate("rotated-dashboard-password")
   end
+
+  test "roles separate finance write access" do
+    owner = User.new(name: "Owner", currency: "TRY", time_zone: "Europe/Istanbul", role: "owner")
+    editor = User.new(name: "Editor", email: "editor@example.test", currency: "TRY", time_zone: "Europe/Istanbul", role: "editor")
+    viewer = User.new(name: "Viewer", email: "viewer@example.test", currency: "TRY", time_zone: "Europe/Istanbul", role: "viewer")
+
+    assert owner.can_manage_finances?
+    assert editor.can_manage_finances?
+    assert_not viewer.can_manage_finances?
+  end
+
+  test "mfa secret requires a current TOTP code to enable" do
+    user = User.create!(name: "Owner", currency: "TRY", time_zone: "Europe/Istanbul")
+    user.prepare_mfa!
+
+    assert_not user.enable_mfa!("000000")
+    assert user.enable_mfa!(Totp.code_for(user.mfa_secret))
+    user.reload
+    assert Totp.valid?(user.mfa_secret, Totp.code_for(user.mfa_secret))
+    assert user.mfa_enabled?
+  end
 end

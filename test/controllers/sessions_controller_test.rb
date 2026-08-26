@@ -61,4 +61,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
   end
+
+  test "mfa-enabled user must complete a second step before accessing finance data" do
+    @owner.prepare_mfa!
+    @owner.enable_mfa!(Totp.code_for(@owner.mfa_secret))
+
+    post session_path, params: {password: PASSWORD}
+    assert_redirected_to mfa_path
+
+    get finance_root_path
+    assert_redirected_to new_session_path
+
+    post verify_mfa_path, params: {code: Totp.code_for(@owner.mfa_secret)}
+    assert_redirected_to finance_root_path
+  end
 end
