@@ -1,0 +1,14 @@
+<%= form_with model: @user do |form| %>
+  <% if @user.errors.any? %><div class="form-errors" role="alert" tabindex="-1"><%= @user.errors.full_messages.to_sentence %></div><% end %>
+  <div class="profile-form-grid">
+    <div class="form-group"><%= form.label :name, "Ad" %><%= form.text_field :name, required: true %></div>
+    <div class="form-group"><%= form.label :email, "E-posta" %><%= form.email_field :email, required: true, autocomplete: "email" %></div>
+    <div class="form-group"><%= form.label :role, "Rol" %><%= form.select :role, [["Sahip — tüm ayarlar", "owner"], ["Düzenleyici — finans verilerini yönetir", "editor"], ["Görüntüleyici — salt okunur", "viewer"]] %></div>
+    <div class="form-group"><%= form.label :currency, "Para birimi" %><%= form.text_field :currency, required: true, maxlength: 3 %></div>
+    <div class="form-group"><%= form.label :locale, "Dil" %><%= form.select :locale, [["Türkçe", "tr"], ["English", "en"]] %></div>
+    <div class="form-group"><%= form.label :time_zone, "Saat dilimi" %><%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.all, default: @user.time_zone %></div>
+    <div class="form-group"><%= form.label :password, @user.persisted? ? "Yeni parola (isteğe bağlı)" : "Geçici parola" %><%= form.password_field :password, autocomplete: "new-password", required: !@user.persisted? %></div>
+    <div class="form-group"><%= form.label :password_confirmation, "Parola tekrarı" %><%= form.password_field :password_confirmation, autocomplete: "new-password", required: !@user.persisted? %></div>
+  </div>
+  <div class="form-actions"><%= form.submit "Kaydet", class: "button button-primary" %><%= link_to "İptal", users_path, class: "button button-secondary" %></div>
+<% end %>

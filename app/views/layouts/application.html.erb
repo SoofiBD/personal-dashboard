@@ -78,6 +78,10 @@
             <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
             <nav class="sidebar-nav">
               <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
+              <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
+              <% if current_panel_user.owner? %>
+                <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
+              <% end %>
             </nav>
           </div>
         </div>
@@ -103,7 +107,7 @@
           <div class="workspace-pill">
             <div class="status-indicator-dot"></div>
             <div class="workspace-details">
-              <span class="workspace-title"><%= t("app.sidebar.workspace", default: "Çalışma Alanı") %></span>
+              <span class="workspace-title"><%= current_panel_user.name %></span>
               <span class="workspace-currency"><%= current_panel_user.currency %></span>
             </div>
           </div>

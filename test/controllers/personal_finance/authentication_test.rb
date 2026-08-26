@@ -31,4 +31,15 @@ class PersonalFinance::AuthenticationTest < ActionDispatch::IntegrationTest
     assert_equal "no-store", response.headers["Cache-Control"]
     assert_equal "no-cache", response.headers["Pragma"]
   end
+
+  test "viewer cannot mutate financial data" do
+    password = "viewer-dashboard-password"
+    viewer = User.create!(name: "Viewer", email: "viewer@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul", password: password, password_confirmation: password, onboarded_at: Time.current)
+    delete session_path
+    post session_path, params: {identifier: viewer.email, password: password}
+
+    post finance_accounts_path, params: {account: {name: "Read only", kind: "cash", opening_balance: "0", currency: "TRY"}}
+    assert_redirected_to finance_root_path
+    assert_equal "Bu kullanıcı finansal verilerde değişiklik yapamaz.", flash[:alert]
+  end
 end
