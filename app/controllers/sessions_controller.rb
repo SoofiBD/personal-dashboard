@@ -17,15 +17,21 @@ class SessionsController < ApplicationController
       return
     end
 
-    owner = User.dashboard_owner_record
+    user = login_user
 
-    if owner&.authenticate(params[:password].to_s)
+    if user&.authenticate(params[:password].to_s)
       LOGIN_ATTEMPT_CACHE.delete(login_attempt_cache_key)
       destination = safe_return_to
       reset_session
-      session[:user_id] = owner.id
-      session[:authentication_version] = owner.authentication_version
-      redirect_to destination, notice: "Giriş başarılı."
+      if user.mfa_enabled?
+        session[:pending_mfa_user_id] = user.id
+        session[:pending_mfa_authentication_version] = user.authentication_version
+        session[:pending_mfa_return_to] = destination
+        redirect_to mfa_path, notice: "İki adımlı doğrulama kodunuzu girin."
+      else
+        establish_authenticated_session(user)
+        redirect_to destination, notice: "Giriş başarılı."
+      end
     else
       record_login_attempt
       flash.now[:alert] = "Parola geçersiz veya dashboard erişimi henüz yapılandırılmamış."
@@ -40,8 +46,20 @@ class SessionsController < ApplicationController
 
   private
 
+  def establish_authenticated_session(user)
+    session[:user_id] = user.id
+    session[:authentication_version] = user.authentication_version
+  end
+
   def login_attempt_cache_key
     "dashboard-login:#{request.remote_ip}"
+  end
+
+  def login_user
+    identifier = params[:identifier].to_s.strip.downcase
+    return User.dashboard_owner_record if identifier.blank?
+
+    User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
   end
 
   def record_login_attempt
