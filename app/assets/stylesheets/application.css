@@ -4000,21 +4000,25 @@ select optgroup {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .auth-input-icon {
   position: absolute;
-  left: 1rem;
+  left: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
   width: 18px;
   height: 18px;
   color: var(--text-muted);
   pointer-events: none;
   transition: color 0.2s ease;
+  z-index: 2;
 }
 
 .auth-input {
   width: 100%;
-  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  padding: 0.85rem 1rem 0.85rem 3.25rem;
   background: rgba(11, 17, 32, 0.85);
   border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
@@ -4024,10 +4028,20 @@ select optgroup {
   letter-spacing: 0.05em;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  box-sizing: border-box;
 }
 
-.auth-input-plain { padding-left: 1rem; font-family: var(--font-sans); letter-spacing: normal; }
-.mfa-code-input { text-align: center; font-size: 1.4rem; letter-spacing: .35em; }
+.auth-input-plain {
+  padding: 0.85rem 1.1rem !important;
+  font-family: var(--font-sans);
+  letter-spacing: normal;
+}
+.mfa-code-input {
+  text-align: center;
+  font-size: 1.4rem;
+  letter-spacing: .35em;
+  padding: 0.85rem 1rem !important;
+}
 .mfa-secret { padding: 1rem; border: 1px solid var(--border-card); border-radius: var(--radius-md); background: rgba(11, 17, 32, .65); display: grid; gap: .45rem; text-align: center; color: var(--text-muted); }
 .mfa-secret code { color: var(--primary); font-size: 1rem; font-family: var(--font-mono); overflow-wrap: anywhere; }
 .mfa-secret small, .auth-field-group small { color: var(--text-muted); }

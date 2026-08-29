@@ -59,7 +59,8 @@ class SessionsController < ApplicationController
     identifier = params[:identifier].to_s.strip.downcase
     return User.dashboard_owner_record if identifier.blank?
 
-    User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
+    user = User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
+    user || (User.count == 1 ? User.dashboard_owner_record : nil)
   end
 
   def record_login_attempt
