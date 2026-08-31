@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :set_locale
-  helper_method :current_user, :authenticated?
+  helper_method :current_user, :current_panel_user, :authenticated?
 
   def current_user
     return @current_user if defined?(@current_user)
@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
       session.delete(:authentication_version)
     end
     @current_user
+  end
+
+  def current_panel_user
+    current_user
   end
 
   def authenticated?

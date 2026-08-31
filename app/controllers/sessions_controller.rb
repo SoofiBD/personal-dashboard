@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
   before_action :prevent_sensitive_caching
 
   def new
-    redirect_to finance_root_path if authenticated?
+    redirect_to root_path if authenticated?
   end
 
   def create
@@ -59,7 +59,8 @@ class SessionsController < ApplicationController
     identifier = params[:identifier].to_s.strip.downcase
     return User.dashboard_owner_record if identifier.blank?
 
-    User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
+    user = User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
+    user || ((User.count == 1) ? User.dashboard_owner_record : nil)
   end
 
   def record_login_attempt
@@ -72,7 +73,7 @@ class SessionsController < ApplicationController
 
   def safe_return_to
     destination = session.delete(:return_to).to_s
-    return finance_root_path unless destination.start_with?("/") && !destination.start_with?("//")
+    return root_path unless destination.start_with?("/") && !destination.start_with?("//")
 
     destination
   end

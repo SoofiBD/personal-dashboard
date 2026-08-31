@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   resource :profile, only: %i[show update]
   resources :users, only: %i[index new create edit update]
 
+  root to: "home#show"
+
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"
     resource :dashboard, only: :show
@@ -19,6 +21,13 @@ Rails.application.routes.draw do
     resource :theme_preference, only: :update
     resource :data, only: :show do
       get :export
+    end
+    resources :document_conversions, only: %i[index create show update destroy] do
+      get :source_pdf, on: :member
+      post :export_zip, on: :member
+      post :export_html, on: :member
+      post :reprocess, on: :member
+      resources :assets, only: :show, controller: :document_assets
     end
     resources :subscriptions, except: :show
     resources :debts, except: :show do
@@ -68,6 +77,4 @@ Rails.application.routes.draw do
   end
 
   match "locale/:locale", to: "locales#update", via: %i[get post], as: :change_locale
-
-  root to: redirect("/finance")
 end

@@ -66,6 +66,9 @@ en:
       section_transactions: TRANSACTIONS & DEBTS
       section_assets: ASSETS & BUDGET
       section_system: SYSTEM & DATA
+      section_modules: MODULES & NAVIGATION
+      switch_to_finance: Finance Dashboard
+      switch_to_markitdown: MarkItDown
       overview: Overview
       notifications: Notifications
       spending_report: Spending Report
@@ -84,6 +87,10 @@ en:
       savings_goals: Savings Goals
       purchase_plans: Purchase Plans
       data: Data Backup
+      documents: PDF Documents
+      profile: Profile & Security
+      users: Users
+      workspace_hub: Workspace Hub
       workspace: Workspace
       language: Language
       theme: Theme
@@ -813,3 +820,154 @@ en:
       are exported with metadata.
     download_json: Download JSON Backup
     download_csv: Download CSV Backup
+  home:
+    workspace_pill: Workspace
+    title: Content Hub
+    subtitle: Finance and document processing modules open independently. The same flow is preserved for upcoming sections.
+    modules:
+      finance:
+        title: Finance
+        description: Income-expense tracking, budgets, debts, goals, and cash flow analysis in a single panel.
+        badge: Core
+      markitdown:
+        title: MarkItDown
+        description: Convert and edit PDF and document contents into clean Markdown format.
+        badge: Docs
+    logout: Sign Out
+  document_conversions:
+    eyebrow: DOCUMENT TOOLS
+    title: PDF to Markdown
+    subtitle: Convert your PDFs into editable Markdown with the local conversion engine.
+    new_conversion: New conversion
+    file_limit_hint: PDF, up to 25 MB. Extracts text, tables, notes, and annotations.
+    pdf_file_label: PDF file
+    pdf_file_hint: Source PDF is securely stored for re-processing; dispatched only to the isolated worker.
+    custom_notes_label: Custom notes
+    custom_notes_placeholder: 'Optional: notes to add to the YAML frontmatter'
+    annotation_output: Annotation output
+    annotation_both: Both inline and in a separate section
+    annotation_section: In a separate section only
+    annotation_inline: Inline only
+    annotation_hint: Sticky notes are always preserved in a separate section when no anchor text is found.
+    convert_button: Convert to Markdown
+    history_title: Recent conversions
+    history_subtitle: Only conversion results belonging to your account are listed.
+    status_ready: Ready
+    status_failed: Failed
+    status_processing: Processing
+    open: Open
+    delete: Delete
+    delete_confirm: This conversion, source PDF, and extracted images will be permanently deleted. Continue?
+    empty_history: No converted documents yet.
+    result_eyebrow: CONVERSION RESULT
+    completed_at: Conversion completed on %{date}.
+    all_conversions: All conversions
+    delete_conversion: Delete conversion
+    workspace: Workspace
+    workspace_meta: '%{count} images · Markdown changes apply to ZIP export.'
+    open_source_pdf: Source PDF
+    reprocess_btn: Reprocess
+    reprocess_label: 'Reprocess:'
+    reprocess_annotation_label: Reprocess annotation mode
+    save_changes: Save
+    copy_markdown: Copy
+    download_zip: Download ZIP
+    download_html: Download HTML
+    editor_title: Markdown
+    editor_subtitle: Edit content before downloading.
+    editor_aria: Editable Markdown content
+    find_replace_aria: Find and replace in Markdown
+    find_label: Find
+    find_placeholder: Find text
+    find_next: Next
+    replace_label: Replace
+    replace_placeholder: Replace with
+    replace_btn: Replace
+    replace_all: Replace all
+    preview_title: Preview
+    preview_subtitle: Images are loaded from secure media routes.
+    source_pdf_title: Source PDF
+    source_pdf_subtitle: Compare output with source document. Browser preview can also open in a new tab.
+    open_new_tab: Open in new tab
+    source_viewer_aria: Source PDF preview
+    pdf_not_supported: Your browser does not support PDF preview.
+    download_or_open_pdf: Download or open PDF
+    summary_title: Processing summary
+    summary_subtitle: Deterministic extraction results of the latest conversion.
+    stat_pages: Pages
+    stat_images: Images
+    stat_tables: Tables
+    stat_annotations: Annotations
+    stat_headers: Stripped headers/footers
+    extracted_images_title: Extracted images
+    extracted_images_subtitle: Click on image to preview.
+    insert_to_markdown: Insert into Markdown
+    page_image: Page %{page}
+    page_image_alt: 'Page %{page} image: %{filename}'
+    options_summary: Conversion options
+    options_hint: Selections apply only to this conversion request.
+    opt_extract_images: Extract images
+    opt_strip_headers: Strip repeating headers and footers
+    opt_bind_captions: Bind image captions
+    opt_extract_annotations: Extract PDF annotations
+    opt_yaml_frontmatter: Add YAML frontmatter
+    opt_fix_hyphenation: Fix hyphenation and line breaks
+    opt_detect_tables: Convert tables to Markdown
+    opt_min_image_dimension: Minimum image dimension
+    processing_notice: PDF conversion is in progress. The page will refresh automatically when ready.
+  profile:
+    eyebrow: ACCOUNT & SECURITY
+    title: Profile Preferences
+    subtitle: Manage personal appearance, regional, and sign-in security settings.
+    personal_prefs: Personal preferences
+    personal_prefs_note: These preferences apply only to your account.
+    name: Display name
+    email: Email
+    currency: Currency
+    locale: Language
+    time_zone: Time zone
+    theme: Theme
+    save: Save Preferences
+    mfa_title: Two-factor authentication
+    mfa_desc: A code from your authenticator app is required in addition to your password.
+    mfa_enabled: Enabled
+    mfa_disabled: Disabled
+    disable_mfa: Disable 2FA
+    setup_mfa: Set Up 2FA
+    confirm_disable_mfa: Are you sure you want to disable two-factor authentication?
+  users_mgmt:
+    eyebrow: ACCESS MANAGEMENT
+    title: Users
+    subtitle: Manage user roles and personal workspaces.
+    add_user: Add User
+    add_subtitle: Grant minimum required permissions to the new user.
+    edit_subtitle: Update user roles, access, and regional preferences.
+    name: Name
+    email: Email
+    role: Role
+    role_owner: Owner
+    role_editor: Editor
+    role_viewer: Viewer
+    role_owner_desc: Owner — all settings
+    role_editor_desc: Editor — manages financial data
+    role_viewer_desc: Viewer — read-only
+    password_new: New password (optional)
+    password_temp: Temporary password
+    password_confirmation: Password confirmation
+  auth:
+    title: Sign In
+    subtitle: Enter your credentials to access your personal dashboard.
+    identifier_label: Email or username (Optional)
+    identifier_placeholder: Leave blank for owner login
+    password_label: Password
+    submit: Sign In
+    mfa_setup_title: Set Up Two-Factor Authentication
+    mfa_verify_title: Enter Security Code
+    mfa_setup_subtitle: Add the key below to your authenticator app, then verify the generated code.
+    mfa_verify_subtitle: Complete your sign-in with the 6-digit code from your authenticator app.
+    mfa_secret_aria: Authenticator app setup key
+    mfa_secret_label: Setup key
+    mfa_code_label: Six-digit verification code
+    mfa_code_help: Codes refresh every 30 seconds.
+    mfa_enable_btn: Enable 2FA
+    mfa_complete_btn: Complete Sign In

@@ -14,7 +14,7 @@
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "application" %>
     <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous" %>
@@ -24,67 +24,109 @@
 
   <body>
     <a class="skip-link" href="#main-content"><%= t("app.skip_link", default: "Ana içeriğe atla") %></a>
-    <div class="app-shell">
-      <aside class="sidebar" aria-label="<%= t('app.sidebar.nav_aria_label', default: 'Ana Navigasyon') %>">
-        <div class="brand-wrapper">
-          <%= link_to finance_root_path, class: "brand" do %>
-            <div class="brand-icon">
-              <%= finance_svg_icon("vault", class: "icon-brand") %>
+    <%
+      show_sidebar = !(@hide_sidebar || content_for?(:hide_sidebar))
+      is_markitdown = controller_name.in?(%w[document_conversions document_assets]) || @current_module == :markitdown
+    %>
+    <div class="app-shell <%= 'app-shell-no-sidebar' unless show_sidebar %>">
+      <% if show_sidebar %>
+        <aside class="sidebar" aria-label="<%= t('app.sidebar.nav_aria_label', default: 'Ana Navigasyon') %>">
+        <% if is_markitdown %>
+          <div class="brand-wrapper">
+            <%= link_to finance_document_conversions_path, class: "brand" do %>
+              <div class="brand-icon">
+                <%= finance_svg_icon("document", class: "icon-brand") %>
+              </div>
+              <div class="brand-text">
+                <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+                <span class="brand-subtitle">MarkItDown</span>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="sidebar-nav-groups">
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("document_conversions.eyebrow", default: "DOKÜMAN ARAÇLARI") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("document_conversions.title", default: "PDF’den Markdown’a"), finance_document_conversions_path, "document" %>
+              </nav>
             </div>
-            <div class="brand-text">
-              <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-              <span class="brand-subtitle"><%= t("app.module", default: "Finance") %></span>
+
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("app.sidebar.section_modules", default: "MODÜLLER & GEÇİŞ") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                <%= finance_navigation_item t("app.sidebar.switch_to_finance", default: "Finance Paneli"), finance_root_path, "vault" %>
+                <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
+                <% if current_panel_user.owner? %>
+                  <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
+                <% end %>
+              </nav>
             </div>
-          <% end %>
-        </div>
-
-        <div class="sidebar-nav-groups">
-          <div class="sidebar-section">
-            <p class="sidebar-label"><%= t("app.sidebar.section_overview", default: "ÖZET & ANALİZ") %></p>
-            <nav class="sidebar-nav">
-              <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
-              <%= finance_navigation_item t("app.sidebar.notifications", default: "Bildirimler"), finance_notifications_path, "chart", badge: current_panel_user.finance_notifications.unread.count %>
-              <%= finance_navigation_item t("app.sidebar.spending_report", default: "Harcama Analizi"), finance_spending_report_path, "chart" %>
-              <%= finance_navigation_item t("app.sidebar.cash_flow_forecast", default: "Nakit Akışı"), finance_cash_flow_forecast_path, "chart" %>
-            </nav>
+          </div>
+        <% else %>
+          <div class="brand-wrapper">
+            <%= link_to finance_root_path, class: "brand" do %>
+              <div class="brand-icon">
+                <%= finance_svg_icon("vault", class: "icon-brand") %>
+              </div>
+              <div class="brand-text">
+                <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+                <span class="brand-subtitle"><%= t("app.module", default: "Finance") %></span>
+              </div>
+            <% end %>
           </div>
 
-          <div class="sidebar-section">
-            <p class="sidebar-label"><%= t("app.sidebar.section_transactions", default: "İŞLEMLER & BORÇLAR") %></p>
-            <nav class="sidebar-nav">
-              <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
-              <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan"), finance_recurring_rules_path, "recurring" %>
-              <%= finance_navigation_item t("app.sidebar.subscriptions", default: "Abonelikler"), finance_subscriptions_path, "recurring" %>
-              <%= finance_navigation_item t("app.sidebar.debts", default: "Borç & Taksit"), finance_debts_path, "budget" %>
-            </nav>
-          </div>
+          <div class="sidebar-nav-groups">
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("app.sidebar.section_overview", default: "ÖZET & ANALİZ") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
+                <%= finance_navigation_item t("app.sidebar.notifications", default: "Bildirimler"), finance_notifications_path, "chart", badge: current_panel_user.finance_notifications.unread.count %>
+                <%= finance_navigation_item t("app.sidebar.spending_report", default: "Harcama Analizi"), finance_spending_report_path, "chart" %>
+                <%= finance_navigation_item t("app.sidebar.cash_flow_forecast", default: "Nakit Akışı"), finance_cash_flow_forecast_path, "chart" %>
+              </nav>
+            </div>
 
-          <div class="sidebar-section">
-            <p class="sidebar-label"><%= t("app.sidebar.section_assets", default: "VARLIK & BÜTÇE") %></p>
-            <nav class="sidebar-nav">
-              <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
-              <%= finance_navigation_item t("app.sidebar.exchange_rates", default: "Döviz Kurları"), finance_exchange_rates_path, "chart" %>
-              <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
-              <%= finance_navigation_item t("app.sidebar.tags", default: "Etiketler"), finance_tags_path, "tags" %>
-              <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
-              <%= finance_navigation_item t("app.sidebar.budget_templates", default: "Bütçe Şablonları"), finance_budget_templates_path, "budget" %>
-              <%= finance_navigation_item t("app.sidebar.yearly_budget", default: "Yıllık Plan"), finance_year_budget_path(Date.current.year), "chart" %>
-              <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
-              <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma"), finance_purchase_plans_path, "purchase_plans" %>
-            </nav>
-          </div>
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("app.sidebar.section_transactions", default: "İŞLEMLER & BORÇLAR") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
+                <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan"), finance_recurring_rules_path, "recurring" %>
+                <%= finance_navigation_item t("app.sidebar.subscriptions", default: "Abonelikler"), finance_subscriptions_path, "recurring" %>
+                <%= finance_navigation_item t("app.sidebar.debts", default: "Borç & Taksit"), finance_debts_path, "budget" %>
+              </nav>
+            </div>
 
-          <div class="sidebar-section">
-            <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
-            <nav class="sidebar-nav">
-              <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
-              <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
-              <% if current_panel_user.owner? %>
-                <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
-              <% end %>
-            </nav>
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("app.sidebar.section_assets", default: "VARLIK & BÜTÇE") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
+                <%= finance_navigation_item t("app.sidebar.exchange_rates", default: "Döviz Kurları"), finance_exchange_rates_path, "chart" %>
+                <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
+                <%= finance_navigation_item t("app.sidebar.tags", default: "Etiketler"), finance_tags_path, "tags" %>
+                <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
+                <%= finance_navigation_item t("app.sidebar.budget_templates", default: "Bütçe Şablonları"), finance_budget_templates_path, "budget" %>
+                <%= finance_navigation_item t("app.sidebar.yearly_budget", default: "Yıllık Plan"), finance_year_budget_path(Date.current.year), "chart" %>
+                <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
+                <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma"), finance_purchase_plans_path, "purchase_plans" %>
+              </nav>
+            </div>
+
+            <div class="sidebar-section">
+              <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
+              <nav class="sidebar-nav">
+                <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                <%= finance_navigation_item t("app.sidebar.documents", default: "PDF Dokümanları (MarkItDown)"), finance_document_conversions_path, "document" %>
+                <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
+                <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
+                <% if current_panel_user.owner? %>
+                  <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
+                <% end %>
+              </nav>
+            </div>
           </div>
-        </div>
+        <% end %>
 
         <div class="sidebar-footer">
           <div class="sidebar-footer-row">
@@ -122,8 +164,9 @@
           <% end %>
         </div>
       </aside>
+      <% end %>
 
-      <div class="page-frame">
+      <div class="page-frame <%= 'page-frame-full' unless show_sidebar %>">
         <% if notice.present? || alert.present? %>
           <div class="flash-stack" aria-live="polite">
             <% if notice.present? %>
@@ -150,6 +193,6 @@
         </main>
       </div>
     </div>
-    <%= render "personal_finance/shared/quick_add_sheet" %>
+    <%= render "personal_finance/shared/quick_add_sheet" if show_sidebar && !is_markitdown %>
   </body>
 </html>

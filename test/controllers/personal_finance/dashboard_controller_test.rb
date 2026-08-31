@@ -13,6 +13,15 @@ class PersonalFinance::DashboardControllerTest < PersonalFinance::IntegrationTes
     assert_equal 1, User.count
   end
 
+  test "root landing page shows available modules" do
+    get root_path
+
+    assert_response :success
+    assert_select ".module-launcher-card", count: 2
+    assert_select ".module-launcher-card", text: /Finance/i
+    assert_select ".module-launcher-card", text: /MarkItDown/i
+  end
+
   test "dashboard renders interactive cash flow chart and category bars with data" do
     user = User.dashboard_owner
     account = PersonalFinance::Account.create!(user: user, name: "Bank", kind: "bank", opening_balance: 0)
