@@ -865,11 +865,12 @@ en:
     delete_conversion: Delete conversion
     workspace: Workspace
     workspace_meta: '%{count} images · Markdown changes apply to ZIP export.'
-    open_source_pdf: Open source PDF
+    open_source_pdf: Source PDF
     reprocess_btn: Reprocess
+    reprocess_label: 'Reprocess:'
     reprocess_annotation_label: Reprocess annotation mode
-    save_changes: Save changes
-    copy_markdown: Copy Markdown
+    save_changes: Save
+    copy_markdown: Copy
     download_zip: Download ZIP
     download_html: Download HTML
     editor_title: Markdown

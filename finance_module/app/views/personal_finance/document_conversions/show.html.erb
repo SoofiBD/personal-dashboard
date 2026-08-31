@@ -14,31 +14,60 @@
   <% asset_map = @document_conversion.assets.index_with { |asset| finance_document_conversion_asset_path(@document_conversion, asset) } %>
   <section class="document-workspace" data-document-workspace data-document-assets="<%= json_escape(asset_map.to_json) %>">
     <div class="document-workspace-toolbar">
-      <div><strong><%= t("document_conversions.workspace", default: "Çalışma alanı") %></strong><span><%= t("document_conversions.workspace_meta", count: @document_conversion.assets.count, default: "#{@document_conversion.assets.count} görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.") %></span></div>
+      <div class="workspace-meta-group">
+        <strong><%= t("document_conversions.workspace", default: "Çalışma alanı") %></strong>
+        <span><%= t("document_conversions.workspace_meta", count: @document_conversion.assets.count, default: "#{@document_conversion.assets.count} görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.") %></span>
+      </div>
       <div class="document-workspace-actions">
         <% if @document_conversion.source_pdf_available? %>
-          <%= link_to t("document_conversions.open_source_pdf", default: "Kaynak PDF’yi aç"), source_pdf_finance_document_conversion_path(@document_conversion), class: "button button-secondary button-compact", target: "_blank", rel: "noopener" %>
-        <% end %>
-        <% if @document_conversion.source_pdf_available? %>
-          <%= form_with url: reprocess_finance_document_conversion_path(@document_conversion), method: :post, class: "document-reprocess-form" do |form| %>
-            <%= form.label :annotation_mode, t("document_conversions.annotation_output", default: "Anotasyon modu"), class: "visually-hidden" %>
-            <%= form.select :annotation_mode, [[t("document_conversions.annotation_both", default: "Metin içi + bölüm"), "both"], [t("document_conversions.annotation_section", default: "Yalnızca bölüm"), "section"], [t("document_conversions.annotation_inline", default: "Yalnızca metin içi"), "inline"]], {}, aria: {label: t("document_conversions.reprocess_annotation_label", default: "Yeniden dönüştürme anotasyon modu")} %>
-            <%= render "conversion_options", compact: true, conversion_options: @document_conversion.conversion_options %>
-            <%= form.submit t("document_conversions.reprocess_btn", default: "Yeniden dönüştür"), class: "button button-secondary button-compact" %>
+          <%= link_to source_pdf_finance_document_conversion_path(@document_conversion), class: "button button-secondary button-compact", target: "_blank", rel: "noopener", title: t("document_conversions.open_source_pdf", default: "Kaynak PDF") do %>
+            <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span><%= t("document_conversions.open_source_pdf", default: "Kaynak PDF") %></span>
           <% end %>
         <% end %>
-        <button class="button button-secondary button-compact" type="button" data-save-markdown data-save-url="<%= finance_document_conversion_path(@document_conversion) %>"><%= t("document_conversions.save_changes", default: "Değişiklikleri kaydet") %></button>
-        <button class="button button-secondary button-compact" type="button" data-copy-markdown><%= t("document_conversions.copy_markdown", default: "Markdown’ı kopyala") %></button>
-        <%= form_with url: export_zip_finance_document_conversion_path(@document_conversion), method: :post, data: {export_zip_form: true} do |form| %>
-          <%= form.hidden_field :markdown_content, value: @document_conversion.markdown_content, data: {zip_markdown: true} %>
-          <%= form.submit t("document_conversions.download_zip", default: "ZIP indir"), class: "button button-primary button-compact" %>
-        <% end %>
-        <%= form_with url: export_html_finance_document_conversion_path(@document_conversion), method: :post, data: {export_html_form: true} do |form| %>
+        <button class="button button-secondary button-compact" type="button" data-save-markdown data-save-url="<%= finance_document_conversion_path(@document_conversion) %>" title="<%= t("document_conversions.save_changes", default: "Kaydet") %>">
+          <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span><%= t("document_conversions.save_changes", default: "Kaydet") %></span>
+        </button>
+        <button class="button button-secondary button-compact" type="button" data-copy-markdown title="<%= t("document_conversions.copy_markdown", default: "Kopyala") %>">
+          <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span><%= t("document_conversions.copy_markdown", default: "Kopyala") %></span>
+        </button>
+        <%= form_with url: export_html_finance_document_conversion_path(@document_conversion), method: :post, data: {export_html_form: true}, class: "export-action-form" do |form| %>
           <%= form.hidden_field :markdown_content, value: @document_conversion.markdown_content, data: {html_markdown: true} %>
-          <%= form.submit t("document_conversions.download_html", default: "HTML indir"), class: "button button-secondary button-compact" %>
+          <button type="submit" class="button button-secondary button-compact" title="<%= t("document_conversions.download_html", default: "HTML İndir") %>">
+            <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span><%= t("document_conversions.download_html", default: "HTML İndir") %></span>
+          </button>
+        <% end %>
+        <%= form_with url: export_zip_finance_document_conversion_path(@document_conversion), method: :post, data: {export_zip_form: true}, class: "export-action-form" do |form| %>
+          <%= form.hidden_field :markdown_content, value: @document_conversion.markdown_content, data: {zip_markdown: true} %>
+          <button type="submit" class="button button-primary button-compact" title="<%= t("document_conversions.download_zip", default: "ZIP İndir") %>">
+            <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span><%= t("document_conversions.download_zip", default: "ZIP İndir") %></span>
+          </button>
         <% end %>
       </div>
     </div>
+
+    <% if @document_conversion.source_pdf_available? %>
+      <div class="document-reprocess-bar">
+        <%= form_with url: reprocess_finance_document_conversion_path(@document_conversion), method: :post, class: "document-reprocess-form" do |form| %>
+          <div class="reprocess-header-row">
+            <div class="reprocess-controls-inline">
+              <span class="reprocess-label"><%= t("document_conversions.reprocess_label", default: "Yeniden İşle:") %></span>
+              <%= form.label :annotation_mode, t("document_conversions.annotation_output", default: "Anotasyon modu"), class: "visually-hidden" %>
+              <%= form.select :annotation_mode, [[t("document_conversions.annotation_both", default: "Hem metin içinde hem ayrı bölümde"), "both"], [t("document_conversions.annotation_section", default: "Yalnızca ayrı bölümde"), "section"], [t("document_conversions.annotation_inline", default: "Yalnızca metin içinde"), "inline"]], {}, aria: {label: t("document_conversions.reprocess_annotation_label", default: "Yeniden dönüştürme anotasyon modu")}, class: "reprocess-annotation-select" %>
+            </div>
+            <%= form.submit t("document_conversions.reprocess_btn", default: "Yeniden dönüştür"), class: "button button-secondary button-compact reprocess-submit-btn" %>
+          </div>
+          <div class="reprocess-options-wrapper">
+            <%= render "conversion_options", compact: true, conversion_options: @document_conversion.conversion_options %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <p class="document-workspace-feedback" data-workspace-feedback role="status" aria-atomic="true"></p>
     <div class="document-workspace-grid">
       <section class="panel markdown-editor-panel" aria-labelledby="markdown-editor-title">
