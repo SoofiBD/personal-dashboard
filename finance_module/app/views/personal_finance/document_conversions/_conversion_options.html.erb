@@ -1,0 +1,27 @@
+<% defaults = {"extract_images_enabled" => true, "min_image_dimension" => 100, "strip_headers_footers" => true, "bind_captions_enabled" => true, "extract_annotations_enabled" => true, "include_yaml_frontmatter" => true, "fix_hyphenation_enabled" => true, "detect_tables" => true} %>
+<% options = defaults.merge(local_assigns.fetch(:conversion_options, {})) %>
+<details class="conversion-options" <%= "open" unless local_assigns[:compact] %>>
+  <summary><%= t("document_conversions.options_summary", default: "Dönüştürme ayarları") %></summary>
+  <p class="field-hint"><%= t("document_conversions.options_hint", default: "Seçimler yalnızca bu dönüşüm isteğine uygulanır.") %></p>
+  <div class="conversion-options-grid">
+    <% {
+      "extract_images_enabled" => t("document_conversions.opt_extract_images", default: "Görselleri çıkar"),
+      "strip_headers_footers" => t("document_conversions.opt_strip_headers", default: "Tekrarlanan başlık ve footer’ları temizle"),
+      "bind_captions_enabled" => t("document_conversions.opt_bind_captions", default: "Görsel başlıklarını bağla"),
+      "extract_annotations_enabled" => t("document_conversions.opt_extract_annotations", default: "PDF anotasyonlarını çıkar"),
+      "include_yaml_frontmatter" => t("document_conversions.opt_yaml_frontmatter", default: "YAML ön bilgisi ekle"),
+      "fix_hyphenation_enabled" => t("document_conversions.opt_fix_hyphenation", default: "Satır sonu ve tireleri düzelt"),
+      "detect_tables" => t("document_conversions.opt_detect_tables", default: "Tabloları Markdown’a çevir")
+    }.each do |key, label| %>
+      <label class="conversion-option">
+        <%= hidden_field_tag "conversion_options[#{key}]", "0" %>
+        <%= check_box_tag "conversion_options[#{key}]", "1", options[key] %>
+        <span><%= label %></span>
+      </label>
+    <% end %>
+    <div class="conversion-option conversion-option--select">
+      <%= label_tag "conversion_options_min_image_dimension", t("document_conversions.opt_min_image_dimension", default: "Minimum görsel boyutu") %>
+      <%= select_tag "conversion_options[min_image_dimension]", options_for_select([["50 px", 50], ["100 px", 100], ["200 px", 200], ["300 px", 300], ["500 px", 500]], options["min_image_dimension"]), id: "conversion_options_min_image_dimension" %>
+    </div>
+  </div>
+</details>

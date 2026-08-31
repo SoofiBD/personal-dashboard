@@ -22,6 +22,7 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
   - [Option A: Docker Compose (Recommended)](#option-a-docker-compose-recommended)
   - [Option B: Local Machine Setup](#option-b-local-machine-setup)
 - [Running Tests](#-running-tests)
+- [PDF to Markdown](#-pdf-to-markdown)
 - [Environment Configuration](#-environment-configuration)
 - [Modular Architecture](#-modular-architecture)
 - [Contributing & Development](#-contributing--development)
@@ -58,6 +59,12 @@ personal-dashboard/
 - **Accessible interaction states:** Keyboard-friendly controls, focus treatment, reduced-motion support, and semantic labels.
 - **Localized UI:** Turkish and English copy share the same component and layout system.
 
+### 📄 PDF to Markdown Workspace
+- **Isolated converter:** A dedicated FastAPI worker uses Microsoft MarkItDown and PyMuPDF; it is only reachable from the Rails service network.
+- **Deterministic cleanup:** Repeated header/footer removal, line-wrap and hyphen repair, heading synthesis, image extraction, captions, annotations, and validated GFM table extraction.
+- **Editable output:** Live Markdown preview, line numbers, find/replace, copy, persistent edits, and image insertion from the extracted asset gallery.
+- **Portable export:** The ZIP contains the current Markdown and an `images/` directory with matching relative links; a standalone HTML export embeds extracted images and sanitizes rendered content.
+
 ---
 
 ## 🔮 Project Status & Roadmap
@@ -71,7 +78,7 @@ The project is evolving into an all-in-one personal workspace and life operating
 - [x] User profile customizations and localized preferences.
 
 ### 📄 PDF Tools & Document Management
-- [ ] In-browser PDF viewer and annotator.
+- [x] In-browser PDF viewer for stored source documents (annotation tools remain planned).
 - [ ] PDF editing, splitting, merging, and page re-ordering.
 - [ ] Receipt and invoice parsing from uploaded PDFs.
 
@@ -208,6 +215,21 @@ docker compose exec -T \
 ### Local Environment:
 ```bash
 RAILS_ENV=test bin/rails test
+```
+
+## 📄 PDF to Markdown
+
+Open **PDF Dokümanları** from the Finance navigation to upload a PDF (maximum 25 MB and 250 pages). The source PDF is retained in the owner-scoped conversion record so the same document can be reprocessed with different settings.
+
+The upload and reprocess forms support image extraction (50–500 px threshold), header/footer removal, caption binding, annotation extraction mode, YAML frontmatter, line-wrap repair, and table detection. Conversion runs through Active Job so the web request returns immediately; the development setup uses Rails’ async adapter. Configure a durable adapter such as Solid Queue before deploying where process restarts must not lose queued work. The worker is intentionally not published on a host port.
+
+To review old conversion records without deleting anything, run `docker compose run --rm web bin/rails document_conversions:purge[90]`. The task is dry-run by default; add `CONFIRM=yes` only after reviewing the count to permanently remove those records, their source PDFs, and extracted assets.
+
+Run the worker’s deterministic tests with:
+
+```bash
+docker compose build pdf-worker
+docker run --rm personal-dashboard-pdf-worker python -m unittest discover -s tests -v
 ```
 
 ---

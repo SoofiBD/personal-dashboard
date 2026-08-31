@@ -2,28 +2,28 @@
   <div class="auth-card-header">
     <div class="auth-brand-badge">
       <div class="brand-icon auth-icon-pulse"><%= finance_svg_icon("vault", class: "icon-brand") %></div>
-      <div class="brand-text"><span class="brand-title">Personal</span><span class="brand-subtitle">Financial Hub</span></div>
+      <div class="brand-text"><span class="brand-title"><%= t("app.name", default: "Personal") %></span><span class="brand-subtitle"><%= t("app.module", default: "Financial Hub") %></span></div>
     </div>
     <div class="auth-title-block">
-      <h1 id="mfa-title"><%= authenticated? ? "İki Adımlı Doğrulamayı Kur" : "Güvenlik Kodunu Girin" %></h1>
-      <p><%= authenticated? ? "Doğrulama uygulamanıza aşağıdaki anahtarı ekleyin, ardından üretilen kodu onaylayın." : "Doğrulama uygulamanızdaki altı haneli kodla girişinizi tamamlayın." %></p>
+      <h1 id="mfa-title"><%= authenticated? ? t("auth.mfa_setup_title", default: "İki Adımlı Doğrulamayı Kur") : t("auth.mfa_verify_title", default: "Güvenlik Kodunu Girin") %></h1>
+      <p><%= authenticated? ? t("auth.mfa_setup_subtitle", default: "Doğrulama uygulamanıza aşağıdaki anahtarı ekleyin, ardından üretilen kodu onaylayın.") : t("auth.mfa_verify_subtitle", default: "Doğrulama uygulamanızdaki altı haneli kodla girişinizi tamamlayın.") %></p>
     </div>
   </div>
 
   <% if authenticated? %>
-    <div class="mfa-secret" aria-label="Doğrulama uygulaması kurulum anahtarı">
-      <span>Kurulum anahtarı</span>
+    <div class="mfa-secret" aria-label="<%= t("auth.mfa_secret_aria", default: "Doğrulama uygulaması kurulum anahtarı") %>">
+      <span><%= t("auth.mfa_secret_label", default: "Kurulum anahtarı") %></span>
       <code><%= @setup_user.mfa_secret %></code>
-      <small>Hesap: <%= @setup_user.name %> · Personal Dashboard</small>
+      <small><%= t("app.common.account", default: "Hesap") %>: <%= @setup_user.name %> · Personal Dashboard</small>
     </div>
   <% end %>
 
   <%= form_with url: verify_mfa_path, method: :post, class: "auth-form" do |form| %>
     <div class="form-group auth-field-group">
-      <%= form.label :code, "Altı haneli doğrulama kodu" %>
+      <%= form.label :code, t("auth.mfa_code_label", default: "Altı haneli doğrulama kodu") %>
       <%= form.text_field :code, required: true, autofocus: true, inputmode: "numeric", pattern: "[0-9]{6}", maxlength: 6, autocomplete: "one-time-code", class: "auth-input mfa-code-input", "aria-describedby": "mfa-code-help" %>
-      <small id="mfa-code-help">Kodlar 30 saniyede bir yenilenir.</small>
+      <small id="mfa-code-help"><%= t("auth.mfa_code_help", default: "Kodlar 30 saniyede bir yenilenir.") %></small>
     </div>
-    <div class="auth-actions"><%= form.submit authenticated? ? "MFA’yı Etkinleştir" : "Girişi Tamamla", class: "button button-primary auth-submit-btn" %></div>
+    <div class="auth-actions"><%= form.submit authenticated? ? t("auth.mfa_enable_btn", default: "MFA’yı Etkinleştir") : t("auth.mfa_complete_btn", default: "Girişi Tamamla"), class: "button button-primary auth-submit-btn" %></div>
   <% end %>
 </section>

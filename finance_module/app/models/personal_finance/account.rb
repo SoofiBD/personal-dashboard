@@ -11,7 +11,9 @@ module PersonalFinance
     validates :name, presence: true, length: {maximum: 80}
     validates :opening_balance, numericality: true
     validates :currency, presence: true, length: {is: 3}
-    before_validation { self.currency = currency.to_s.upcase }
+    before_validation do
+      self.currency = (currency.presence || user&.currency || "TRY").to_s.upcase
+    end
 
     def current_balance
       opening_balance + transactions.sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")

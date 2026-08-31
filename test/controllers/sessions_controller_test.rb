@@ -11,7 +11,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "valid password creates an authenticated session" do
     post session_path, params: {password: PASSWORD}
 
-    assert_redirected_to finance_root_path
+    assert_redirected_to root_path
     follow_redirect!
     assert_response :success
   end
@@ -27,7 +27,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get finance_transactions_path(search: "x" * 3000)
     post session_path, params: {password: PASSWORD}
 
-    assert_redirected_to finance_root_path
+    assert_redirected_to root_path
   end
 
   test "invalid password does not create an authenticated session" do
@@ -55,8 +55,9 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "deleted session user is rejected" do
-    post session_path, params: {password: PASSWORD}
-    @owner.destroy!
+    orphaned_user = User.create!(name: "Temporary User", email: "temporary@example.test", currency: "TRY", time_zone: "Europe/Istanbul", role: "viewer", password: PASSWORD, password_confirmation: PASSWORD, onboarded_at: Time.current)
+    post session_path, params: {identifier: orphaned_user.email, password: PASSWORD}
+    orphaned_user.destroy!
     get finance_root_path
 
     assert_redirected_to new_session_path
@@ -73,6 +74,6 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
 
     post verify_mfa_path, params: {code: Totp.code_for(@owner.mfa_secret)}
-    assert_redirected_to finance_root_path
+    assert_redirected_to root_path
   end
 end

@@ -6,91 +6,22 @@
   const animateDashboard = () => {
     if (motionQuery.matches || typeof window.gsap === "undefined") return;
 
-    const timeline = window.gsap.timeline({ defaults: { ease: "power2.out", clearProps: "transform,opacity" } });
+    const timeline = window.gsap.timeline({ defaults: { ease: "power2.out" } });
+    const launcher = document.querySelector(".module-launcher");
     const sidebar = document.querySelector(".sidebar");
     const header = document.querySelector(".page-header");
     const cards = document.querySelectorAll(".metric-card, .kinetic-card");
     const panels = document.querySelectorAll(".panel");
-    const items = document.querySelectorAll(".finance-list article, .card-item, .subscription-row, .notification-preview, .debt-card");
     const flashes = document.querySelectorAll(".flash");
 
-    if (sidebar) timeline.fromTo(sidebar, { x: -16, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.32 });
-    if (header) timeline.fromTo(header, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.35 }, "-=0.15");
-    if (cards.length) timeline.fromTo(cards, { y: 16, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.38, stagger: 0.045 }, "-=0.18");
-    if (panels.length) timeline.fromTo(panels, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.36, stagger: 0.04 }, "-=0.22");
-    if (items.length) timeline.fromTo(items, { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.28, stagger: 0.02 }, "-=0.24");
-    if (flashes.length) timeline.fromTo(flashes, { y: -10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.25 }, 0);
-  };
-
-  const initKineticTiltCards = () => {
-    if (motionQuery.matches || typeof window.gsap === "undefined") return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-
-    const cards = document.querySelectorAll(".metric-card, .panel, .card-item, [data-kinetic-card]");
-    cards.forEach((card) => {
-      if (card.dataset.kineticBound) return;
-      card.dataset.kineticBound = "true";
-
-      if (!card.querySelector(".card-sheen")) {
-        const sheen = document.createElement("div");
-        sheen.className = "card-sheen";
-        card.appendChild(sheen);
-      }
-
-      const rotXTo = window.gsap.quickTo(card, "rotationX", { duration: 0.35, ease: "power2.out" });
-      const rotYTo = window.gsap.quickTo(card, "rotationY", { duration: 0.35, ease: "power2.out" });
-
-      const onMouseMove = (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        const rotateX = -((y - centerY) / centerY) * 7.5;
-        const rotateY = ((x - centerX) / centerX) * 7.5;
-
-        card.style.setProperty("--mouse-x", `${(x / rect.width) * 100}%`);
-        card.style.setProperty("--mouse-y", `${(y / rect.height) * 100}%`);
-
-        rotXTo(rotateX);
-        rotYTo(rotateY);
-      };
-
-      const onMouseLeave = () => {
-        rotXTo(0);
-        rotYTo(0);
-      };
-
-      card.addEventListener("mousemove", onMouseMove);
-      card.addEventListener("mouseleave", onMouseLeave);
-    });
-  };
-
-  const initMagneticButtons = () => {
-    if (motionQuery.matches || typeof window.gsap === "undefined") return;
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-
-    const buttons = document.querySelectorAll(".button-primary, .button-accent, [data-quick-add-open], .btn-magnetic");
-    buttons.forEach((btn) => {
-      if (btn.dataset.magneticBound) return;
-      btn.dataset.magneticBound = "true";
-
-      const xTo = window.gsap.quickTo(btn, "x", { duration: 0.3, ease: "power2.out" });
-      const yTo = window.gsap.quickTo(btn, "y", { duration: 0.3, ease: "power2.out" });
-
-      btn.addEventListener("mousemove", (e) => {
-        const rect = btn.getBoundingClientRect();
-        const x = (e.clientX - rect.left - rect.width / 2) * 0.28;
-        const y = (e.clientY - rect.top - rect.height / 2) * 0.28;
-        xTo(x);
-        yTo(y);
-      });
-
-      btn.addEventListener("mouseleave", () => {
-        window.gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)", clearProps: "transform" });
-      });
-    });
+    if (launcher) {
+      timeline.fromTo(launcher, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.42 });
+    }
+    if (sidebar) timeline.fromTo(sidebar, { x: -12, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.28 }, "-=0.18");
+    if (header) timeline.fromTo(header, { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.28 }, "-=0.14");
+    if (cards.length) timeline.fromTo(cards, { y: 12, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.28, stagger: 0.03 }, "-=0.12");
+    if (panels.length) timeline.fromTo(panels, { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.26, stagger: 0.025 }, "-=0.14");
+    if (flashes.length) timeline.fromTo(flashes, { y: -8, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.2 }, 0);
   };
 
   const initLiveCounters = () => {
@@ -1033,6 +964,162 @@
     updateStep(1);
   };
 
+  const initDocumentWorkspace = () => {
+    document.querySelectorAll("[data-document-workspace]").forEach((workspace) => {
+      if (workspace.dataset.documentWorkspaceBound) return;
+      workspace.dataset.documentWorkspaceBound = "true";
+
+      const editor = workspace.querySelector("[data-markdown-editor]");
+      const preview = workspace.querySelector("[data-markdown-preview]");
+      const feedback = workspace.querySelector("[data-workspace-feedback]");
+      const copyButton = workspace.querySelector("[data-copy-markdown]");
+      const saveButton = workspace.querySelector("[data-save-markdown]");
+      const zipMarkdown = workspace.querySelector("[data-zip-markdown]");
+      const lineNumbers = workspace.querySelector("[data-markdown-line-numbers]");
+      const findInput = workspace.querySelector("[data-markdown-find]");
+      const replaceInput = workspace.querySelector("[data-markdown-replace]");
+      const findFeedback = workspace.querySelector("[data-find-feedback]");
+      let assets = {};
+
+      try {
+        assets = JSON.parse(workspace.dataset.documentAssets || "{}");
+      } catch (_error) {
+        assets = {};
+      }
+
+      const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"}[character]));
+      const render = () => {
+        const lines = editor.value.split("\n");
+        const html = lines.map((line) => {
+          const image = line.match(/^!\[([^\]]*)\]\(images\/([a-zA-Z0-9._-]+)\)$/);
+          if (image) {
+            const source = assets[image[2]];
+            return source ? `<figure><img src="${escapeHtml(source)}" alt="${escapeHtml(image[1])}" loading="lazy"><figcaption>${escapeHtml(image[1])}</figcaption></figure>` : `<p>${escapeHtml(line)}</p>`;
+          }
+          const heading = line.match(/^(#{1,3})\s+(.+)$/);
+          if (heading) return `<h${heading[1].length}>${escapeHtml(heading[2])}</h${heading[1].length}>`;
+          if (line.startsWith("- ")) return `<p class="markdown-preview-list-item">${escapeHtml(line.slice(2))}</p>`;
+          return line.trim() ? `<p>${escapeHtml(line)}</p>` : "";
+        }).join("");
+        preview.innerHTML = html || "<p>Önizlenecek içerik yok.</p>";
+        zipMarkdown.value = editor.value;
+        if (lineNumbers) lineNumbers.textContent = editor.value.split("\n").map((_, index) => index + 1).join("\n");
+      };
+
+      editor.addEventListener("input", render);
+      editor.addEventListener("scroll", () => {
+        if (lineNumbers) lineNumbers.scrollTop = editor.scrollTop;
+      });
+      const findNext = () => {
+        const query = findInput?.value || "";
+        if (!query) {
+          findFeedback.textContent = "Aranacak metni yazın.";
+          findInput?.focus();
+          return false;
+        }
+        const index = editor.value.indexOf(query, editor.selectionEnd);
+        const matchAt = index === -1 ? editor.value.indexOf(query) : index;
+        if (matchAt === -1) {
+          findFeedback.textContent = "Eşleşme bulunamadı.";
+          return false;
+        }
+        editor.focus();
+        editor.setSelectionRange(matchAt, matchAt + query.length);
+        findFeedback.textContent = index === -1 ? "Başa dönüldü." : "Eşleşme seçildi.";
+        return true;
+      };
+      workspace.querySelector("[data-find-next]")?.addEventListener("click", findNext);
+      workspace.querySelector("[data-replace-next]")?.addEventListener("click", () => {
+        const query = findInput?.value || "";
+        const selectedText = editor.value.slice(editor.selectionStart, editor.selectionEnd);
+        if (selectedText !== query && !findNext()) return;
+        editor.setRangeText(replaceInput?.value || "", editor.selectionStart, editor.selectionEnd, "select");
+        render();
+        findFeedback.textContent = "Bir eşleşme değiştirildi.";
+      });
+      workspace.querySelector("[data-replace-all]")?.addEventListener("click", () => {
+        const query = findInput?.value || "";
+        if (!query) return findNext();
+        const matches = editor.value.split(query).length - 1;
+        if (!matches) {
+          findFeedback.textContent = "Eşleşme bulunamadı.";
+          return;
+        }
+        editor.value = editor.value.split(query).join(replaceInput?.value || "");
+        render();
+        findFeedback.textContent = `${matches} eşleşme değiştirildi.`;
+      });
+      workspace.addEventListener("keydown", (event) => {
+        if (!(event.metaKey || event.ctrlKey)) return;
+        if (event.key.toLowerCase() === "f") {
+          event.preventDefault();
+          findInput?.focus();
+        } else if (event.key.toLowerCase() === "g") {
+          event.preventDefault();
+          findNext();
+        }
+      });
+      workspace.querySelectorAll("[data-insert-image]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const markdown = `![${button.dataset.imageAlt}](images/${button.dataset.imageFilename})`;
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const prefix = editor.value.slice(0, start);
+          const suffix = editor.value.slice(end);
+          const leadingBreak = prefix && !prefix.endsWith("\n") ? "\n\n" : "";
+          const trailingBreak = suffix && !suffix.startsWith("\n") ? "\n\n" : "";
+          editor.value = `${prefix}${leadingBreak}${markdown}${trailingBreak}${suffix}`;
+          const cursor = (prefix + leadingBreak + markdown).length;
+          editor.focus();
+          editor.setSelectionRange(cursor, cursor);
+          render();
+          feedback.textContent = "Görsel Markdown’a eklendi. Değişikliği kalıcı yapmak için kaydedin.";
+        });
+      });
+      copyButton?.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(editor.value);
+          feedback.textContent = "Markdown panoya kopyalandı.";
+        } catch (_error) {
+          feedback.textContent = "Kopyalama başarısız oldu; Markdown alanından elle kopyalayabilirsiniz.";
+        }
+      });
+      saveButton?.addEventListener("click", async () => {
+        const originalLabel = saveButton.textContent;
+        saveButton.disabled = true;
+        saveButton.textContent = "Kaydediliyor…";
+        feedback.textContent = "Markdown değişiklikleri kaydediliyor.";
+        try {
+          const response = await fetch(saveButton.dataset.saveUrl, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+            },
+            body: JSON.stringify({document_conversion: {markdown_content: editor.value}})
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Kaydetme başarısız oldu.");
+          feedback.textContent = "Markdown değişiklikleri kaydedildi.";
+        } catch (error) {
+          feedback.textContent = error.message || "Kaydetme başarısız oldu; tekrar deneyin.";
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = originalLabel;
+        }
+      });
+      render();
+    });
+  };
+
+  const initDocumentConversionPolling = () => {
+    const processing = document.querySelector("[data-document-conversion-processing]");
+    if (!processing || processing.dataset.pollingBound) return;
+    processing.dataset.pollingBound = "true";
+    window.setTimeout(() => window.location.reload(), 5000);
+  };
+
   const init = () => {
     document.querySelectorAll("[data-auto-submit]").forEach((element) => {
       if (element.dataset.autoSubmitBound) return;
@@ -1040,11 +1127,8 @@
       element.addEventListener("change", () => element.form?.requestSubmit());
     });
     animateDashboard();
-    initKineticTiltCards();
-    initMagneticButtons();
     initLiveCounters();
     initHealthScoreGauge();
-    initProgressBarAnimations();
     initBudgetSelector();
     initBudgetCalculator();
     initTransactionFilters();
@@ -1055,6 +1139,8 @@
     initSpendingReport();
     initCashFlowForecast();
     initOnboardingWizard();
+    initDocumentWorkspace();
+    initDocumentConversionPolling();
     registerServiceWorker();
   };
 
