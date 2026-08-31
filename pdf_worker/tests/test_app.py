@@ -132,6 +132,25 @@ class PdfWorkerTest(unittest.TestCase):
         self.assertIn("data:image/png;base64,", body)
         self.assertNotIn("<script>", body)
 
+    def test_extracts_vector_charts_and_diagrams(self):
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        shape = page.new_shape()
+        shape.draw_line(fitz.Point(100, 300), fitz.Point(400, 300))
+        shape.draw_line(fitz.Point(100, 300), fitz.Point(100, 150))
+        shape.draw_rect(fitz.Rect(130, 200, 170, 300))
+        shape.draw_rect(fitz.Rect(200, 170, 240, 300))
+        shape.draw_rect(fitz.Rect(270, 230, 310, 300))
+        shape.finish(color=(0.2, 0.4, 0.8), fill=(0.4, 0.7, 1.0))
+        shape.commit()
+        page.insert_text(fitz.Point(100, 330), "Grafik 1: Gelir Analizi", fontsize=10)
+
+        result = convert_pdf(document)
+
+        self.assertGreaterEqual(result["stats"]["images_extracted"], 1)
+        self.assertTrue(any("chart_p1_" in img["filename"] for img in result["images"]))
+        self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
+
     def test_rejects_pdf_over_the_page_limit(self):
         document = fitz.open()
         for _page_number in range(251):
@@ -141,3 +160,4 @@ class PdfWorkerTest(unittest.TestCase):
             convert_pdf(document)
 
         self.assertEqual(422, raised.exception.status_code)
+

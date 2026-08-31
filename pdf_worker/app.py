@@ -303,8 +303,11 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
     extracted_bytes = 0
     allowed_types = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp"}
     for page_number, page in enumerate(document, start=1):
+        page_raster_rects = []
+        # 1. Extract embedded raster images
         for image_index, image_info in enumerate(page.get_images(full=True), start=1):
-            image = document.extract_image(image_info[0])
+            xref = image_info[0]
+            image = document.extract_image(xref)
             width, height = image["width"], image["height"]
             extension = image.get("ext", "png").lower()
             content_type = allowed_types.get(extension)
@@ -313,17 +316,162 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
             image_data = image["image"]
             if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(image_data) > MAX_EXTRACTED_IMAGE_BYTES:
                 return images
+
+            for r in page.get_image_rects(xref):
+                page_raster_rects.append(fitz.Rect(r))
+
             images.append({
                 "filename": f"img_p{page_number}_{image_index}.{extension}",
                 "page": page_number,
                 "width": width,
                 "height": height,
                 "content_type": content_type,
-                "caption": find_caption(page, image_info[0]),
+                "caption": find_caption(page, xref),
                 "data_base64": base64.b64encode(image_data).decode("ascii"),
             })
             extracted_bytes += len(image_data)
+
+        # 2. Extract vector graphics, charts, plots and diagrams
+        charts = extract_vector_charts(page, page_number, page_raster_rects, min_image_dimension)
+        for chart in charts:
+            chart_data = chart["data"]
+            if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(chart_data) > MAX_EXTRACTED_IMAGE_BYTES:
+                return images
+            images.append({
+                "filename": chart["filename"],
+                "page": page_number,
+                "width": chart["width"],
+                "height": chart["height"],
+                "content_type": "image/png",
+                "caption": chart["caption"],
+                "data_base64": base64.b64encode(chart_data).decode("ascii"),
+            })
+            extracted_bytes += len(chart_data)
+
     return images
+
+
+def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION):
+    drawings = page.get_drawings()
+    if not drawings:
+        return []
+
+    page_rect = page.rect
+    table_rects = []
+    try:
+        for table in page.find_tables().tables:
+            table_rects.append(fitz.Rect(table.bbox))
+    except Exception:
+        pass
+
+    candidate_rects = []
+    for d in drawings:
+        r = fitz.Rect(d["rect"])
+        # Ignore full-page background boxes
+        if r.width >= page_rect.width * 0.92 and r.height >= page_rect.height * 0.92:
+            continue
+        # Ignore thin header/footer line separators
+        if (r.height <= 2.5 and r.width >= page_rect.width * 0.4) or (r.width <= 2.5 and r.height >= page_rect.height * 0.4):
+            continue
+        # Ignore drawings strictly inside table borders
+        if any(r in t_rect for t_rect in table_rects):
+            continue
+        candidate_rects.append(r)
+
+    if not candidate_rects:
+        return []
+
+    # Cluster nearby drawing rectangles (threshold 25pt)
+    clusters = []
+    for r in candidate_rects:
+        merged = False
+        margin = 25
+        for i, cluster in enumerate(clusters):
+            expanded_cluster = fitz.Rect(cluster.x0 - margin, cluster.y0 - margin, cluster.x1 + margin, cluster.y1 + margin)
+            if expanded_cluster.intersects(r):
+                clusters[i] = cluster | r
+                merged = True
+                break
+        if not merged:
+            clusters.append(fitz.Rect(r))
+
+    merged_clusters = []
+    while clusters:
+        current = clusters.pop(0)
+        merged = False
+        margin = 20
+        for i, other in enumerate(merged_clusters):
+            expanded = fitz.Rect(other.x0 - margin, other.y0 - margin, other.x1 + margin, other.y1 + margin)
+            if expanded.intersects(current):
+                merged_clusters[i] = other | current
+                merged = True
+                break
+        if not merged:
+            merged_clusters.append(current)
+
+    charts = []
+    chart_index = 1
+    for cluster_rect in merged_clusters:
+        min_pt = max(45, min_image_dimension * 72 / 150)
+        if cluster_rect.width < min_pt or cluster_rect.height < min_pt:
+            continue
+        if cluster_rect.width * cluster_rect.height < 3000:
+            continue
+
+        # Skip if covered by raster image
+        if any(
+            (cluster_rect.intersect(r_rect).get_area() / max(1, cluster_rect.get_area())) > 0.5
+            for r_rect in raster_rects
+        ):
+            continue
+
+        # Skip if predominantly a table
+        if any(
+            (cluster_rect.intersect(t_rect).get_area() / max(1, cluster_rect.get_area())) > 0.6
+            for t_rect in table_rects
+        ):
+            continue
+
+        # Check drawing density
+        drawings_in_cluster = [d for d in drawings if fitz.Rect(d["rect"]).intersects(cluster_rect)]
+        if len(drawings_in_cluster) < 2 and not any(d.get("fill") for d in drawings_in_cluster):
+            continue
+
+        # Expand to include axis labels or text blocks located inside/adjacent
+        clip_rect = fitz.Rect(cluster_rect)
+        for block in page.get_text("blocks", sort=True):
+            bx0, by0, bx1, by1, btext, *_ = block
+            b_rect = fitz.Rect(bx0, by0, bx1, by1)
+            if b_rect.intersects(cluster_rect) or (
+                abs(b_rect.y0 - cluster_rect.y1) <= 12 and (b_rect.x0 >= cluster_rect.x0 - 20 and b_rect.x1 <= cluster_rect.x1 + 20)
+            ):
+                if len(btext.strip()) <= 80:
+                    clip_rect |= b_rect
+
+        padded_rect = fitz.Rect(
+            max(0, clip_rect.x0 - 4),
+            max(0, clip_rect.y0 - 4),
+            min(page_rect.width, clip_rect.x1 + 4),
+            min(page_rect.height, clip_rect.y1 + 4)
+        )
+
+        pix = page.get_pixmap(clip=padded_rect, dpi=150)
+        if pix.width < min_image_dimension or pix.height < min_image_dimension:
+            continue
+
+        caption = find_caption(page, padded_rect)
+        chart_bytes = pix.tobytes("png")
+
+        charts.append({
+            "filename": f"chart_p{page_number}_{chart_index}.png",
+            "width": pix.width,
+            "height": pix.height,
+            "caption": caption,
+            "data": chart_bytes,
+        })
+        chart_index += 1
+
+    return charts
 
 
 def extract_tables(document):
@@ -359,9 +507,15 @@ def is_valid_table(rows):
     return sum(len(cell) > 120 for cell in non_empty_cells) / len(non_empty_cells) <= 0.3
 
 
-def find_caption(page, xref):
-    caption_pattern = re.compile(r"^(figure|fig\.|şekil|resim|görsel|table|tablo|chart|grafik)\s*\d+[:.\s-].*", re.IGNORECASE)
-    image_rects = page.get_image_rects(xref)
+def find_caption(page, target):
+    caption_pattern = re.compile(r"^(figure|fig\.|şekil|resim|görsel|table|tablo|chart|grafik|diagram|çizelge)\s*\d*[:.\s-].*", re.IGNORECASE)
+    if isinstance(target, fitz.Rect):
+        image_rects = [target]
+    elif isinstance(target, int):
+        image_rects = page.get_image_rects(target)
+    else:
+        image_rects = [fitz.Rect(target)]
+
     candidates = []
     for block in page.get_text("blocks", sort=True):
         _x0, y0, _x1, y1, text, *_rest = block

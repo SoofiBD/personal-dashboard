@@ -48,7 +48,7 @@ class MfaController < ApplicationController
       return
     end
 
-    destination = session.delete(:pending_mfa_return_to) || finance_root_path
+    destination = session.delete(:pending_mfa_return_to) || root_path
     reset_session
     session[:user_id] = user.id
     session[:authentication_version] = user.authentication_version

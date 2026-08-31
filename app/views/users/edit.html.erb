@@ -1,1 +1,1 @@
-<header class="page-header"><div><p class="eyebrow">ERİŞİM YÖNETİMİ</p><h1><%= @user.name %></h1><p class="page-subtitle">Rol, erişim ve yerel tercihlerini güncelleyin.</p></div></header><section class="panel"><%= render "form" %></section>
+<header class="page-header"><div><p class="eyebrow"><%= t("users_mgmt.eyebrow", default: "ERİŞİM YÖNETİMİ") %></p><h1><%= @user.name %></h1><p class="page-subtitle"><%= t("users_mgmt.edit_subtitle", default: "Rol, erişim ve yerel tercihlerini güncelleyin.") %></p></div></header><section class="panel"><%= render "form" %></section>

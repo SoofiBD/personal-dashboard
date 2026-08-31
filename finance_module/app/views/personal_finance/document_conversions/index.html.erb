@@ -1,62 +1,62 @@
 <header class="page-header">
   <div>
-    <p class="eyebrow"><%= finance_svg_icon("document", class: "icon-xs", "aria-hidden": true) %> DOKÜMAN ARAÇLARI</p>
-    <h1>PDF’den Markdown’a</h1>
-    <p class="page-subtitle">PDF’lerinizi yerel dönüştürme motoruyla düzenlenebilir Markdown’a çevirin.</p>
+    <p class="eyebrow"><%= finance_svg_icon("document", class: "icon-xs", "aria-hidden": true) %> <%= t("document_conversions.eyebrow", default: "DOKÜMAN ARAÇLARI") %></p>
+    <h1><%= t("document_conversions.title", default: "PDF’den Markdown’a") %></h1>
+    <p class="page-subtitle"><%= t("document_conversions.subtitle", default: "PDF’lerinizi yerel dönüştürme motoruyla düzenlenebilir Markdown’a çevirin.") %></p>
   </div>
 </header>
 
 <section class="panel document-upload-panel" aria-labelledby="document-upload-title">
   <div class="panel-header">
     <div>
-      <h2 id="document-upload-title">Yeni dönüşüm</h2>
-      <p>PDF, en fazla 25 MB. İlk sürüm metin, temel tablolar, notlar ve PDF anotasyonlarını işler.</p>
+      <h2 id="document-upload-title"><%= t("document_conversions.new_conversion", default: "Yeni dönüşüm") %></h2>
+      <p><%= t("document_conversions.file_limit_hint", default: "PDF, en fazla 25 MB. İlk sürüm metin, temel tablolar, notlar ve PDF anotasyonlarını işler.") %></p>
     </div>
   </div>
 
   <%= form_with model: @document_conversion, url: finance_document_conversions_path, multipart: true, class: "document-upload-form" do |form| %>
     <%= render "personal_finance/shared/errors", record: @document_conversion %>
     <div class="form-group">
-      <%= label_tag :pdf_file, "PDF dosyası" %>
+      <%= label_tag :pdf_file, t("document_conversions.pdf_file_label", default: "PDF dosyası") %>
       <%= file_field_tag :pdf_file, accept: "application/pdf,.pdf", required: true, aria: {describedby: "pdf-file-hint"} %>
-      <p class="field-hint" id="pdf-file-hint">Kaynak PDF, yeniden dönüştürme için hesabınıza ait dönüşüm kaydında saklanır; dosya yalnızca izole worker’a iletilir.</p>
+      <p class="field-hint" id="pdf-file-hint"><%= t("document_conversions.pdf_file_hint", default: "Kaynak PDF, yeniden dönüştürme için hesabınıza ait dönüşüm kaydında saklanır; dosya yalnızca izole worker’a iletilir.") %></p>
     </div>
     <div class="form-group">
-      <%= form.label :custom_notes, "Ek notlar" %>
-      <%= form.text_area :custom_notes, rows: 4, maxlength: 10_000, placeholder: "İsteğe bağlı: çıktıdaki YAML ön bilgisine eklenecek notlar" %>
+      <%= form.label :custom_notes, t("document_conversions.custom_notes_label", default: "Ek notlar") %>
+      <%= form.text_area :custom_notes, rows: 4, maxlength: 10_000, placeholder: t("document_conversions.custom_notes_placeholder", default: "İsteğe bağlı: çıktıdaki YAML ön bilgisine eklenecek notlar") %>
     </div>
     <fieldset class="form-group annotation-mode-group" aria-describedby="annotation-mode-hint">
-      <legend>Anotasyon çıktısı</legend>
+      <legend><%= t("document_conversions.annotation_output", default: "Anotasyon çıktısı") %></legend>
       <div class="annotation-mode-options">
-        <label><%= radio_button_tag :annotation_mode, "both", true %> Hem metin içinde hem ayrı bölümde</label>
-        <label><%= radio_button_tag :annotation_mode, "section" %> Yalnızca ayrı bölümde</label>
-        <label><%= radio_button_tag :annotation_mode, "inline" %> Yalnızca metin içinde</label>
+        <label><%= radio_button_tag :annotation_mode, "both", true %> <%= t("document_conversions.annotation_both", default: "Hem metin içinde hem ayrı bölümde") %></label>
+        <label><%= radio_button_tag :annotation_mode, "section" %> <%= t("document_conversions.annotation_section", default: "Yalnızca ayrı bölümde") %></label>
+        <label><%= radio_button_tag :annotation_mode, "inline" %> <%= t("document_conversions.annotation_inline", default: "Yalnızca metin içinde") %></label>
       </div>
-      <p class="field-hint" id="annotation-mode-hint">Yapışkan notlar, bağlanacak metin bulunmadığında her zaman ayrı bölümde korunur.</p>
+      <p class="field-hint" id="annotation-mode-hint"><%= t("document_conversions.annotation_hint", default: "Yapışkan notlar, bağlanacak metin bulunmadığında her zaman ayrı bölümde korunur.") %></p>
     </fieldset>
     <%= render "conversion_options" %>
     <div class="form-actions">
-      <%= form.submit "Markdown’a dönüştür", class: "button button-primary" %>
+      <%= form.submit t("document_conversions.convert_button", default: "Markdown’a dönüştür"), class: "button button-primary" %>
     </div>
   <% end %>
 </section>
 
 <section class="panel document-history-panel" aria-labelledby="document-history-title">
-  <div class="panel-header"><div><h2 id="document-history-title">Son dönüşümler</h2><p>Yalnızca hesabınıza ait dönüşüm sonuçları listelenir.</p></div></div>
+  <div class="panel-header"><div><h2 id="document-history-title"><%= t("document_conversions.history_title", default: "Son dönüşümler") %></h2><p><%= t("document_conversions.history_subtitle", default: "Yalnızca hesabınıza ait dönüşüm sonuçları listelenir.") %></p></div></div>
   <% if @document_conversions.any? %>
     <div class="document-history-list">
       <% @document_conversions.each do |conversion| %>
         <article class="document-history-row">
           <div class="document-history-main"><strong><%= conversion.source_filename %></strong><span><%= l(conversion.created_at, format: :short) %></span></div>
           <div class="document-history-actions">
-            <span class="document-status document-status--<%= conversion.status %>"><%= conversion.status == "completed" ? "Hazır" : conversion.status == "failed" ? "Başarısız" : "İşleniyor" %></span>
-            <%= link_to "Aç", finance_document_conversion_path(conversion), class: "button button-secondary button-compact" if conversion.completed? %>
-            <%= button_to "Sil", finance_document_conversion_path(conversion), method: :delete, class: "button button-danger button-compact", form: {data: {turbo_confirm: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?"}} %>
+            <span class="document-status document-status--<%= conversion.status %>"><%= conversion.status == "completed" ? t("document_conversions.status_ready", default: "Hazır") : conversion.status == "failed" ? t("document_conversions.status_failed", default: "Başarısız") : t("document_conversions.status_processing", default: "İşleniyor") %></span>
+            <%= link_to t("document_conversions.open", default: "Aç"), finance_document_conversion_path(conversion), class: "button button-secondary button-compact" if conversion.completed? %>
+            <%= button_to t("document_conversions.delete", default: "Sil"), finance_document_conversion_path(conversion), method: :delete, class: "button button-danger button-compact", form: {data: {turbo_confirm: t("document_conversions.delete_confirm", default: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?")}} %>
           </div>
         </article>
       <% end %>
     </div>
   <% else %>
-    <div class="empty-state"><p>Henüz dönüştürülmüş bir doküman yok.</p></div>
+    <div class="empty-state"><p><%= t("document_conversions.empty_history", default: "Henüz dönüştürülmüş bir doküman yok.") %></p></div>
   <% end %>
 </section>

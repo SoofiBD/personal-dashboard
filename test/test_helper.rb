@@ -26,6 +26,6 @@ class PersonalFinance::IntegrationTest < ActionDispatch::IntegrationTest
     owner = User.dashboard_owner
     owner.update!(password: TEST_PASSWORD, password_confirmation: TEST_PASSWORD)
     post session_path, params: {password: TEST_PASSWORD}
-    assert_redirected_to finance_root_path
+    assert_redirected_to root_path
   end
 end

@@ -66,6 +66,9 @@ tr:
       section_transactions: İŞLEMLER & BORÇLAR
       section_assets: VARLIK & BÜTÇE
       section_system: SİSTEM & VERİ
+      section_modules: MODÜLLER & GEÇİŞ
+      switch_to_finance: Finance Paneli
+      switch_to_markitdown: MarkItDown
       overview: Genel Bakış
       notifications: Bildirimler
       spending_report: Harcama Analizi
@@ -84,6 +87,10 @@ tr:
       savings_goals: Tasarruf Hedefleri
       purchase_plans: Satın Alma
       data: Veri Yedekleme
+      documents: PDF Dokümanları
+      profile: Profil & Güvenlik
+      users: Kullanıcılar
+      workspace_hub: Modül Seçimi
       workspace: Çalışma Alanı
       language: Dil
       theme: Tema
@@ -818,3 +825,153 @@ tr:
       sürüm ve kayıt sayısı metadatasıyla indirilir.
     download_json: JSON Yedeğini İndir
     download_csv: CSV Yedeğini İndir
+  home:
+    workspace_pill: Workspace
+    title: İçerik Merkeziniz
+    subtitle: Finans ve belge işleme modülleri ayrı ayrı açılır. Gelişen bölüm eklemeleri için aynı akış korunur.
+    modules:
+      finance:
+        title: Finance
+        description: Gelir-gider takibi, bütçeler, borçlar, hedefler ve akış analizi tek panelde.
+        badge: Core
+      markitdown:
+        title: MarkItDown
+        description: PDF ve belge içeriklerini temiz Markdown çıktısına dönüştürüp düzenleyin.
+        badge: Docs
+    logout: Oturumu Kapat
+  document_conversions:
+    eyebrow: DOKÜMAN ARAÇLARI
+    title: PDF’den Markdown’a
+    subtitle: PDF’lerinizi yerel dönüştürme motoruyla düzenlenebilir Markdown’a çevirin.
+    new_conversion: Yeni dönüşüm
+    file_limit_hint: PDF, en fazla 25 MB. İlk sürüm metin, temel tablolar, notlar ve PDF anotasyonlarını işler.
+    pdf_file_label: PDF dosyası
+    pdf_file_hint: Kaynak PDF, yeniden dönüştürme için hesabınıza ait dönüşüm kaydında saklanır; dosya yalnızca izole worker’a iletilir.
+    custom_notes_label: Ek notlar
+    custom_notes_placeholder: 'İsteğe bağlı: çıktıdaki YAML ön bilgisine eklenecek notlar'
+    annotation_output: Anotasyon çıktısı
+    annotation_both: Hem metin içinde hem ayrı bölümde
+    annotation_section: Yalnızca ayrı bölümde
+    annotation_inline: Yalnızca metin içinde
+    annotation_hint: Yapışkan notlar, bağlanacak metin bulunmadığında her zaman ayrı bölümde korunur.
+    convert_button: Markdown’a dönüştür
+    history_title: Son dönüşümler
+    history_subtitle: Yalnızca hesabınıza ait dönüşüm sonuçları listelenir.
+    status_ready: Hazır
+    status_failed: Başarısız
+    status_processing: İşleniyor
+    open: Aç
+    delete: Sil
+    delete_confirm: Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?
+    empty_history: Henüz dönüştürülmüş bir doküman yok.
+    result_eyebrow: DÖNÜŞÜM SONUCU
+    completed_at: Dönüşüm %{date} tarihinde tamamlandı.
+    all_conversions: Tüm dönüşümler
+    delete_conversion: Dönüşümü sil
+    workspace: Çalışma alanı
+    workspace_meta: '%{count} görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.'
+    open_source_pdf: Kaynak PDF’yi aç
+    reprocess_btn: Yeniden dönüştür
+    reprocess_annotation_label: Yeniden dönüştürme anotasyon modu
+    save_changes: Değişiklikleri kaydet
+    copy_markdown: Markdown’ı kopyala
+    download_zip: ZIP indir
+    download_html: HTML indir
+    editor_title: Markdown
+    editor_subtitle: İndirmeden önce içeriği düzenleyin.
+    editor_aria: Düzenlenebilir Markdown içeriği
+    find_replace_aria: Markdown içinde bul ve değiştir
+    find_label: Bul
+    find_placeholder: Metin bul
+    find_next: Sonraki
+    replace_label: Değiştir
+    replace_placeholder: Şununla değiştir
+    replace_btn: Değiştir
+    replace_all: Tümünü değiştir
+    preview_title: Önizleme
+    preview_subtitle: Görseller güvenli medya rotasından yüklenir.
+    source_pdf_title: Kaynak PDF
+    source_pdf_subtitle: Çıktıyı kaynak belgeyle karşılaştırın. Tarayıcı önizlemesi yeni sekmede de açılabilir.
+    open_new_tab: Yeni sekmede aç
+    source_viewer_aria: Kaynak PDF önizlemesi
+    pdf_not_supported: Tarayıcınız PDF önizlemesini desteklemiyor.
+    download_or_open_pdf: PDF’yi indir veya aç
+    summary_title: İşleme özeti
+    summary_subtitle: Son dönüşümün deterministik çıkarım sonuçları.
+    stat_pages: Sayfa
+    stat_images: Görsel
+    stat_tables: Tablo
+    stat_annotations: Anotasyon
+    stat_headers: Kaldırılan başlık/footer
+    extracted_images_title: Çıkarılan görseller
+    extracted_images_subtitle: Önizlemek için görsele tıklayın.
+    insert_to_markdown: Markdown’a ekle
+    page_image: Sayfa %{page}
+    page_image_alt: 'Sayfa %{page} görseli: %{filename}'
+    options_summary: Dönüştürme ayarları
+    options_hint: Seçimler yalnızca bu dönüşüm isteğine uygulanır.
+    opt_extract_images: Görselleri çıkar
+    opt_strip_headers: Tekrarlanan başlık ve footer’ları temizle
+    opt_bind_captions: Görsel başlıklarını bağla
+    opt_extract_annotations: PDF anotasyonlarını çıkar
+    opt_yaml_frontmatter: YAML ön bilgisi ekle
+    opt_fix_hyphenation: Satır sonu ve tireleri düzelt
+    opt_detect_tables: Tabloları Markdown’a çevir
+    opt_min_image_dimension: Minimum görsel boyutu
+    processing_notice: PDF dönüşümü işleniyor. Sonuç hazır olduğunda sayfa otomatik yenilenecek.
+  profile:
+    eyebrow: HESAP & GÜVENLİK
+    title: Profil Tercihleri
+    subtitle: Kişisel görünüm, bölge ve giriş güvenliği ayarlarınızı yönetin.
+    personal_prefs: Kişisel tercihler
+    personal_prefs_note: Bu tercihler yalnızca hesabınıza uygulanır.
+    name: Görünen ad
+    email: E-posta
+    currency: Para birimi
+    locale: Dil
+    time_zone: Saat dilimi
+    theme: Tema
+    save: Tercihleri Kaydet
+    mfa_title: İki adımlı doğrulama
+    mfa_desc: Parolanıza ek olarak doğrulama uygulaması kodu istenir.
+    mfa_enabled: Etkin
+    mfa_disabled: Kapalı
+    disable_mfa: MFA’yı Kapat
+    setup_mfa: MFA’yı Kur
+    confirm_disable_mfa: İki adımlı doğrulamayı kapatmak istediğinizden emin misiniz?
+  users_mgmt:
+    eyebrow: ERİŞİM YÖNETİMİ
+    title: Kullanıcılar
+    subtitle: Kullanıcı rollerini ve kişisel çalışma alanlarını yönetin.
+    add_user: Kullanıcı Ekle
+    add_subtitle: Yeni kullanıcıya gereken en düşük yetkiyi verin.
+    edit_subtitle: Rol, erişim ve yerel tercihlerini güncelleyin.
+    name: Ad
+    email: E-posta
+    role: Rol
+    role_owner: Sahip
+    role_editor: Düzenleyici
+    role_viewer: Görüntüleyici
+    role_owner_desc: Sahip — tüm ayarlar
+    role_editor_desc: Düzenleyici — finans verilerini yönetir
+    role_viewer_desc: Görüntüleyici — salt okunur
+    password_new: Yeni parola (isteğe bağlı)
+    password_temp: Geçici parola
+    password_confirmation: Parola tekrarı
+  auth:
+    title: Yönetici Girişi
+    subtitle: Finansal egemenlik panelinize erişmek için parolanızı girin.
+    identifier_label: E-posta veya kullanıcı adı (İsteğe bağlı)
+    identifier_placeholder: Yönetici girişi için boş bırakabilirsiniz
+    password_label: Yönetici Parolası
+    submit: Kasaya Giriş Yap
+    mfa_setup_title: İki Adımlı Doğrulamayı Kur
+    mfa_verify_title: Güvenlik Kodunu Girin
+    mfa_setup_subtitle: Doğrulama uygulamanıza aşağıdaki anahtarı ekleyin, ardından üretilen kodu onaylayın.
+    mfa_verify_subtitle: Doğrulama uygulamanızdaki altı haneli kodla girişinizi tamamlayın.
+    mfa_secret_aria: Doğrulama uygulaması kurulum anahtarı
+    mfa_secret_label: Kurulum anahtarı
+    mfa_code_label: Altı haneli doğrulama kodu
+    mfa_code_help: Kodlar 30 saniyede bir yenilenir.
+    mfa_enable_btn: MFA’yı Etkinleştir
+    mfa_complete_btn: Girişi Tamamla
