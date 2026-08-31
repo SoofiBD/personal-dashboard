@@ -18,7 +18,10 @@ class PersonalFinance::PdfDocumentConversionJobTest < ActiveJob::TestCase
     client = Class.new do
       attr_reader :arguments
       define_method(:initialize) { |conversion_result| @conversion_result = conversion_result }
-      define_method(:convert) { |**arguments| @arguments = arguments; @conversion_result }
+      define_method(:convert) { |**arguments|
+        @arguments = arguments
+        @conversion_result
+      }
     end.new(result)
 
     PdfConversionClient.singleton_class.define_method(:new) { client }

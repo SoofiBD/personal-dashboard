@@ -60,7 +60,7 @@ class SessionsController < ApplicationController
     return User.dashboard_owner_record if identifier.blank?
 
     user = User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
-    user || (User.count == 1 ? User.dashboard_owner_record : nil)
+    user || ((User.count == 1) ? User.dashboard_owner_record : nil)
   end
 
   def record_login_attempt
