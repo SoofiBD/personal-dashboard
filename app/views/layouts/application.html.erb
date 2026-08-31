@@ -78,6 +78,7 @@
             <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
             <nav class="sidebar-nav">
               <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
+              <%= finance_navigation_item t("app.sidebar.documents", default: "PDF Dokümanları"), finance_document_conversions_path, "document" %>
               <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
               <% if current_panel_user.owner? %>
                 <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>

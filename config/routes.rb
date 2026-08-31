@@ -20,6 +20,13 @@ Rails.application.routes.draw do
     resource :data, only: :show do
       get :export
     end
+    resources :document_conversions, only: %i[index create show update destroy] do
+      get :source_pdf, on: :member
+      post :export_zip, on: :member
+      post :export_html, on: :member
+      post :reprocess, on: :member
+      resources :assets, only: :show, controller: :document_assets
+    end
     resources :subscriptions, except: :show
     resources :debts, except: :show do
       post :pay, on: :member

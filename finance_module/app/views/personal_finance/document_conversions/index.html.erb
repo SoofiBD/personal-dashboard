@@ -1,0 +1,62 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= finance_svg_icon("document", class: "icon-xs", "aria-hidden": true) %> DOKÜMAN ARAÇLARI</p>
+    <h1>PDF’den Markdown’a</h1>
+    <p class="page-subtitle">PDF’lerinizi yerel dönüştürme motoruyla düzenlenebilir Markdown’a çevirin.</p>
+  </div>
+</header>
+
+<section class="panel document-upload-panel" aria-labelledby="document-upload-title">
+  <div class="panel-header">
+    <div>
+      <h2 id="document-upload-title">Yeni dönüşüm</h2>
+      <p>PDF, en fazla 25 MB. İlk sürüm metin, temel tablolar, notlar ve PDF anotasyonlarını işler.</p>
+    </div>
+  </div>
+
+  <%= form_with model: @document_conversion, url: finance_document_conversions_path, multipart: true, class: "document-upload-form" do |form| %>
+    <%= render "personal_finance/shared/errors", record: @document_conversion %>
+    <div class="form-group">
+      <%= label_tag :pdf_file, "PDF dosyası" %>
+      <%= file_field_tag :pdf_file, accept: "application/pdf,.pdf", required: true, aria: {describedby: "pdf-file-hint"} %>
+      <p class="field-hint" id="pdf-file-hint">Kaynak PDF, yeniden dönüştürme için hesabınıza ait dönüşüm kaydında saklanır; dosya yalnızca izole worker’a iletilir.</p>
+    </div>
+    <div class="form-group">
+      <%= form.label :custom_notes, "Ek notlar" %>
+      <%= form.text_area :custom_notes, rows: 4, maxlength: 10_000, placeholder: "İsteğe bağlı: çıktıdaki YAML ön bilgisine eklenecek notlar" %>
+    </div>
+    <fieldset class="form-group annotation-mode-group" aria-describedby="annotation-mode-hint">
+      <legend>Anotasyon çıktısı</legend>
+      <div class="annotation-mode-options">
+        <label><%= radio_button_tag :annotation_mode, "both", true %> Hem metin içinde hem ayrı bölümde</label>
+        <label><%= radio_button_tag :annotation_mode, "section" %> Yalnızca ayrı bölümde</label>
+        <label><%= radio_button_tag :annotation_mode, "inline" %> Yalnızca metin içinde</label>
+      </div>
+      <p class="field-hint" id="annotation-mode-hint">Yapışkan notlar, bağlanacak metin bulunmadığında her zaman ayrı bölümde korunur.</p>
+    </fieldset>
+    <%= render "conversion_options" %>
+    <div class="form-actions">
+      <%= form.submit "Markdown’a dönüştür", class: "button button-primary" %>
+    </div>
+  <% end %>
+</section>
+
+<section class="panel document-history-panel" aria-labelledby="document-history-title">
+  <div class="panel-header"><div><h2 id="document-history-title">Son dönüşümler</h2><p>Yalnızca hesabınıza ait dönüşüm sonuçları listelenir.</p></div></div>
+  <% if @document_conversions.any? %>
+    <div class="document-history-list">
+      <% @document_conversions.each do |conversion| %>
+        <article class="document-history-row">
+          <div class="document-history-main"><strong><%= conversion.source_filename %></strong><span><%= l(conversion.created_at, format: :short) %></span></div>
+          <div class="document-history-actions">
+            <span class="document-status document-status--<%= conversion.status %>"><%= conversion.status == "completed" ? "Hazır" : conversion.status == "failed" ? "Başarısız" : "İşleniyor" %></span>
+            <%= link_to "Aç", finance_document_conversion_path(conversion), class: "button button-secondary button-compact" if conversion.completed? %>
+            <%= button_to "Sil", finance_document_conversion_path(conversion), method: :delete, class: "button button-danger button-compact", form: {data: {turbo_confirm: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?"}} %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state"><p>Henüz dönüştürülmüş bir doküman yok.</p></div>
+  <% end %>
+</section>

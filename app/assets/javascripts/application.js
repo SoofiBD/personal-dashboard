@@ -1033,6 +1033,162 @@
     updateStep(1);
   };
 
+  const initDocumentWorkspace = () => {
+    document.querySelectorAll("[data-document-workspace]").forEach((workspace) => {
+      if (workspace.dataset.documentWorkspaceBound) return;
+      workspace.dataset.documentWorkspaceBound = "true";
+
+      const editor = workspace.querySelector("[data-markdown-editor]");
+      const preview = workspace.querySelector("[data-markdown-preview]");
+      const feedback = workspace.querySelector("[data-workspace-feedback]");
+      const copyButton = workspace.querySelector("[data-copy-markdown]");
+      const saveButton = workspace.querySelector("[data-save-markdown]");
+      const zipMarkdown = workspace.querySelector("[data-zip-markdown]");
+      const lineNumbers = workspace.querySelector("[data-markdown-line-numbers]");
+      const findInput = workspace.querySelector("[data-markdown-find]");
+      const replaceInput = workspace.querySelector("[data-markdown-replace]");
+      const findFeedback = workspace.querySelector("[data-find-feedback]");
+      let assets = {};
+
+      try {
+        assets = JSON.parse(workspace.dataset.documentAssets || "{}");
+      } catch (_error) {
+        assets = {};
+      }
+
+      const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"}[character]));
+      const render = () => {
+        const lines = editor.value.split("\n");
+        const html = lines.map((line) => {
+          const image = line.match(/^!\[([^\]]*)\]\(images\/([a-zA-Z0-9._-]+)\)$/);
+          if (image) {
+            const source = assets[image[2]];
+            return source ? `<figure><img src="${escapeHtml(source)}" alt="${escapeHtml(image[1])}" loading="lazy"><figcaption>${escapeHtml(image[1])}</figcaption></figure>` : `<p>${escapeHtml(line)}</p>`;
+          }
+          const heading = line.match(/^(#{1,3})\s+(.+)$/);
+          if (heading) return `<h${heading[1].length}>${escapeHtml(heading[2])}</h${heading[1].length}>`;
+          if (line.startsWith("- ")) return `<p class="markdown-preview-list-item">${escapeHtml(line.slice(2))}</p>`;
+          return line.trim() ? `<p>${escapeHtml(line)}</p>` : "";
+        }).join("");
+        preview.innerHTML = html || "<p>Önizlenecek içerik yok.</p>";
+        zipMarkdown.value = editor.value;
+        if (lineNumbers) lineNumbers.textContent = editor.value.split("\n").map((_, index) => index + 1).join("\n");
+      };
+
+      editor.addEventListener("input", render);
+      editor.addEventListener("scroll", () => {
+        if (lineNumbers) lineNumbers.scrollTop = editor.scrollTop;
+      });
+      const findNext = () => {
+        const query = findInput?.value || "";
+        if (!query) {
+          findFeedback.textContent = "Aranacak metni yazın.";
+          findInput?.focus();
+          return false;
+        }
+        const index = editor.value.indexOf(query, editor.selectionEnd);
+        const matchAt = index === -1 ? editor.value.indexOf(query) : index;
+        if (matchAt === -1) {
+          findFeedback.textContent = "Eşleşme bulunamadı.";
+          return false;
+        }
+        editor.focus();
+        editor.setSelectionRange(matchAt, matchAt + query.length);
+        findFeedback.textContent = index === -1 ? "Başa dönüldü." : "Eşleşme seçildi.";
+        return true;
+      };
+      workspace.querySelector("[data-find-next]")?.addEventListener("click", findNext);
+      workspace.querySelector("[data-replace-next]")?.addEventListener("click", () => {
+        const query = findInput?.value || "";
+        const selectedText = editor.value.slice(editor.selectionStart, editor.selectionEnd);
+        if (selectedText !== query && !findNext()) return;
+        editor.setRangeText(replaceInput?.value || "", editor.selectionStart, editor.selectionEnd, "select");
+        render();
+        findFeedback.textContent = "Bir eşleşme değiştirildi.";
+      });
+      workspace.querySelector("[data-replace-all]")?.addEventListener("click", () => {
+        const query = findInput?.value || "";
+        if (!query) return findNext();
+        const matches = editor.value.split(query).length - 1;
+        if (!matches) {
+          findFeedback.textContent = "Eşleşme bulunamadı.";
+          return;
+        }
+        editor.value = editor.value.split(query).join(replaceInput?.value || "");
+        render();
+        findFeedback.textContent = `${matches} eşleşme değiştirildi.`;
+      });
+      workspace.addEventListener("keydown", (event) => {
+        if (!(event.metaKey || event.ctrlKey)) return;
+        if (event.key.toLowerCase() === "f") {
+          event.preventDefault();
+          findInput?.focus();
+        } else if (event.key.toLowerCase() === "g") {
+          event.preventDefault();
+          findNext();
+        }
+      });
+      workspace.querySelectorAll("[data-insert-image]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const markdown = `![${button.dataset.imageAlt}](images/${button.dataset.imageFilename})`;
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const prefix = editor.value.slice(0, start);
+          const suffix = editor.value.slice(end);
+          const leadingBreak = prefix && !prefix.endsWith("\n") ? "\n\n" : "";
+          const trailingBreak = suffix && !suffix.startsWith("\n") ? "\n\n" : "";
+          editor.value = `${prefix}${leadingBreak}${markdown}${trailingBreak}${suffix}`;
+          const cursor = (prefix + leadingBreak + markdown).length;
+          editor.focus();
+          editor.setSelectionRange(cursor, cursor);
+          render();
+          feedback.textContent = "Görsel Markdown’a eklendi. Değişikliği kalıcı yapmak için kaydedin.";
+        });
+      });
+      copyButton?.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(editor.value);
+          feedback.textContent = "Markdown panoya kopyalandı.";
+        } catch (_error) {
+          feedback.textContent = "Kopyalama başarısız oldu; Markdown alanından elle kopyalayabilirsiniz.";
+        }
+      });
+      saveButton?.addEventListener("click", async () => {
+        const originalLabel = saveButton.textContent;
+        saveButton.disabled = true;
+        saveButton.textContent = "Kaydediliyor…";
+        feedback.textContent = "Markdown değişiklikleri kaydediliyor.";
+        try {
+          const response = await fetch(saveButton.dataset.saveUrl, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+            },
+            body: JSON.stringify({document_conversion: {markdown_content: editor.value}})
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Kaydetme başarısız oldu.");
+          feedback.textContent = "Markdown değişiklikleri kaydedildi.";
+        } catch (error) {
+          feedback.textContent = error.message || "Kaydetme başarısız oldu; tekrar deneyin.";
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent = originalLabel;
+        }
+      });
+      render();
+    });
+  };
+
+  const initDocumentConversionPolling = () => {
+    const processing = document.querySelector("[data-document-conversion-processing]");
+    if (!processing || processing.dataset.pollingBound) return;
+    processing.dataset.pollingBound = "true";
+    window.setTimeout(() => window.location.reload(), 5000);
+  };
+
   const init = () => {
     document.querySelectorAll("[data-auto-submit]").forEach((element) => {
       if (element.dataset.autoSubmitBound) return;
@@ -1055,6 +1211,8 @@
     initSpendingReport();
     initCashFlowForecast();
     initOnboardingWizard();
+    initDocumentWorkspace();
+    initDocumentConversionPolling();
     registerServiceWorker();
   };
 
