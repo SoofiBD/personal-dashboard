@@ -870,13 +870,14 @@ tr:
     delete_conversion: Dönüşümü sil
     workspace: Çalışma alanı
     workspace_meta: '%{count} görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.'
-    open_source_pdf: Kaynak PDF’yi aç
+    open_source_pdf: Kaynak PDF
     reprocess_btn: Yeniden dönüştür
+    reprocess_label: 'Yeniden İşle:'
     reprocess_annotation_label: Yeniden dönüştürme anotasyon modu
-    save_changes: Değişiklikleri kaydet
-    copy_markdown: Markdown’ı kopyala
-    download_zip: ZIP indir
-    download_html: HTML indir
+    save_changes: Kaydet
+    copy_markdown: Kopyala
+    download_zip: ZIP İndir
+    download_html: HTML İndir
     editor_title: Markdown
     editor_subtitle: İndirmeden önce içeriği düzenleyin.
     editor_aria: Düzenlenebilir Markdown içeriği
