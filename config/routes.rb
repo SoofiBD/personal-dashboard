@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   resource :profile, only: %i[show update]
   resources :users, only: %i[index new create edit update]
 
+  root to: "home#show"
+
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"
     resource :dashboard, only: :show
@@ -75,6 +77,4 @@ Rails.application.routes.draw do
   end
 
   match "locale/:locale", to: "locales#update", via: %i[get post], as: :change_locale
-
-  root to: redirect("/finance")
 end

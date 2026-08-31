@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
   before_action :prevent_sensitive_caching
 
   def new
-    redirect_to finance_root_path if authenticated?
+    redirect_to root_path if authenticated?
   end
 
   def create
@@ -73,7 +73,7 @@ class SessionsController < ApplicationController
 
   def safe_return_to
     destination = session.delete(:return_to).to_s
-    return finance_root_path unless destination.start_with?("/") && !destination.start_with?("//")
+    return root_path unless destination.start_with?("/") && !destination.start_with?("//")
 
     destination
   end

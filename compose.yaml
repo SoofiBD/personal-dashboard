@@ -53,6 +53,8 @@ services:
   pdf-worker:
     build:
       context: ./pdf_worker
+    volumes:
+      - ./pdf_worker:/app
     expose:
       - "8000"
     security_opt:

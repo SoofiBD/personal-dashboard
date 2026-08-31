@@ -5,23 +5,23 @@
         <%= finance_svg_icon("vault", class: "icon-brand") %>
       </div>
       <div class="brand-text">
-        <span class="brand-title">Personal</span>
-        <span class="brand-subtitle">Financial Hub</span>
+        <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+        <span class="brand-subtitle"><%= t("app.module", default: "Financial Hub") %></span>
       </div>
     </div>
     <div class="auth-title-block">
-      <h1 id="login-title">Yönetici Girişi</h1>
-      <p>Finansal egemenlik panelinize erişmek için parolanızı girin.</p>
+      <h1 id="login-title"><%= t("auth.title", default: "Yönetici Girişi") %></h1>
+      <p><%= t("auth.subtitle", default: "Finansal egemenlik panelinize erişmek için parolanızı girin.") %></p>
     </div>
   </div>
 
   <%= form_with url: session_path, method: :post, class: "auth-form" do |form| %>
     <div class="form-group auth-field-group">
-      <%= form.label :identifier, "E-posta veya kullanıcı adı (İsteğe bağlı)" %>
-      <%= form.text_field :identifier, autocomplete: "username", placeholder: "Yönetici girişi için boş bırakabilirsiniz", class: "auth-input auth-input-plain" %>
+      <%= form.label :identifier, t("auth.identifier_label", default: "E-posta veya kullanıcı adı (İsteğe bağlı)") %>
+      <%= form.text_field :identifier, autocomplete: "username", placeholder: t("auth.identifier_placeholder", default: "Yönetici girişi için boş bırakabilirsiniz"), class: "auth-input auth-input-plain" %>
     </div>
     <div class="form-group auth-field-group">
-      <%= form.label :password, "Yönetici Parolası" %>
+      <%= form.label :password, t("auth.password_label", default: "Yönetici Parolası") %>
       <div class="auth-input-wrapper">
         <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="auth-actions">
-      <%= form.submit "Kasaya Giriş Yap", class: "button button-primary auth-submit-btn" %>
+      <%= form.submit t("auth.submit", default: "Kasaya Giriş Yap"), class: "button button-primary auth-submit-btn" %>
     </div>
   <% end %>
 

@@ -1,0 +1,87 @@
+<div class="workspace-hub-container">
+  <header class="workspace-hub-nav">
+    <div class="brand">
+      <div class="brand-icon">
+        <%= finance_svg_icon("vault", class: "icon-brand") %>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+        <span class="brand-subtitle"><%= t("home.workspace_pill", default: "Workspace") %></span>
+      </div>
+    </div>
+
+    <div class="workspace-hub-controls">
+      <div class="workspace-hub-lang">
+        <%= language_switcher %>
+      </div>
+
+      <div class="workspace-hub-theme">
+        <%= form_with url: finance_theme_preference_path, method: :patch, class: "theme-form" do %>
+          <div class="theme-select-wrapper">
+            <svg class="theme-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+            <%= select_tag :theme_preference, options_for_select([[t("app.sidebar.theme_system", default: "Sistem"), "system"], [t("app.sidebar.theme_dark", default: "Koyu"), "dark"], [t("app.sidebar.theme_light", default: "Açık"), "light"]], current_panel_user.theme_preference), class: "theme-select", data: {auto_submit: true}, "aria-label": t("app.sidebar.theme", default: "Tema") %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="workspace-pill hub-user-pill">
+        <div class="status-indicator-dot"></div>
+        <div class="workspace-details">
+          <span class="workspace-title"><%= current_panel_user.name %></span>
+          <span class="workspace-currency"><%= current_panel_user.currency %></span>
+        </div>
+      </div>
+
+      <%= button_to session_path, method: :delete, class: "hub-logout-btn", form_class: "hub-logout-form", title: t("app.sidebar.logout", default: "Oturumu Kapat") do %>
+        <svg class="hub-logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" x2="9" y1="12" y2="12"/>
+        </svg>
+        <span><%= t("app.sidebar.logout", default: "Oturumu Kapat") %></span>
+      <% end %>
+    </div>
+  </header>
+
+  <section class="module-launcher-shell">
+    <div class="module-launcher">
+      <header class="module-launcher-header">
+        <div class="module-launcher-title-group">
+          <span class="module-pill"><%= t("home.workspace_pill", default: "Workspace") %></span>
+          <h1><%= t("home.title", default: "İçerik merkeziniz") %></h1>
+        </div>
+        <p><%= t("home.subtitle", default: "Finans ve belge işleme modülleri ayrı ayrı açılır. Gelişen bölüm eklemeleri için aynı akış korunur.") %></p>
+      </header>
+
+      <div class="module-launcher-grid">
+        <% @modules.each do |module_data| %>
+          <%= link_to module_data[:path], class: "module-launcher-card" do %>
+            <div class="module-launcher-card-content">
+              <div class="module-launcher-icon">
+                <%= finance_svg_icon(module_data[:icon], class: "icon-brand") %>
+              </div>
+
+              <div>
+                <h2><%= module_data[:title] %></h2>
+                <p><%= t(module_data[:description_key], default: module_data[:default_description]) %></p>
+              </div>
+            </div>
+
+            <div class="module-launcher-meta">
+              <span class="module-launcher-tag"><%= t(module_data[:badge_key], default: module_data[:default_badge]) %></span>
+              <span class="module-launcher-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m13 5 7 7-7 7"></path>
+                </svg>
+              </span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>

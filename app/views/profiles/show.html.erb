@@ -1,29 +1,29 @@
-<header class="page-header"><div><p class="eyebrow">HESAP & GÜVENLİK</p><h1>Profil Tercihleri</h1><p class="page-subtitle">Kişisel görünüm, bölge ve giriş güvenliği ayarlarınızı yönetin.</p></div></header>
+<header class="page-header"><div><p class="eyebrow"><%= t("profile.eyebrow", default: "HESAP & GÜVENLİK") %></p><h1><%= t("profile.title", default: "Profil Tercihleri") %></h1><p class="page-subtitle"><%= t("profile.subtitle", default: "Kişisel görünüm, bölge ve giriş güvenliği ayarlarınızı yönetin.") %></p></div></header>
 
 <div class="access-settings-grid">
   <section class="panel">
-    <div class="panel-header"><div><h2>Kişisel tercihler</h2><p>Bu tercihler yalnızca hesabınıza uygulanır.</p></div></div>
+    <div class="panel-header"><div><h2><%= t("profile.personal_prefs", default: "Kişisel tercihler") %></h2><p><%= t("profile.personal_prefs_note", default: "Bu tercihler yalnızca hesabınıza uygulanır.") %></p></div></div>
     <%= form_with model: @user, url: profile_path, method: :patch do |form| %>
       <% if @user.errors.any? %><div class="form-errors" role="alert" tabindex="-1"><%= @user.errors.full_messages.to_sentence %></div><% end %>
       <div class="profile-form-grid">
-        <div class="form-group"><%= form.label :name, "Görünen ad" %><%= form.text_field :name, required: true %></div>
-        <div class="form-group"><%= form.label :email, "E-posta" %><%= form.email_field :email, autocomplete: "email" %></div>
-        <div class="form-group"><%= form.label :currency, "Para birimi" %><%= form.text_field :currency, required: true, maxlength: 3, style: "text-transform:uppercase" %></div>
-        <div class="form-group"><%= form.label :locale, "Dil" %><%= form.select :locale, [["Türkçe", "tr"], ["English", "en"]] %></div>
-        <div class="form-group"><%= form.label :time_zone, "Saat dilimi" %><%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.all, default: @user.time_zone %></div>
-        <div class="form-group"><%= form.label :theme_preference, "Tema" %><%= form.select :theme_preference, [["Sistem", "system"], ["Koyu", "dark"], ["Açık", "light"]] %></div>
+        <div class="form-group"><%= form.label :name, t("profile.name", default: "Görünen ad") %><%= form.text_field :name, required: true %></div>
+        <div class="form-group"><%= form.label :email, t("profile.email", default: "E-posta") %><%= form.email_field :email, autocomplete: "email" %></div>
+        <div class="form-group"><%= form.label :currency, t("profile.currency", default: "Para birimi") %><%= form.text_field :currency, required: true, maxlength: 3, style: "text-transform:uppercase" %></div>
+        <div class="form-group"><%= form.label :locale, t("profile.locale", default: "Dil") %><%= form.select :locale, [["Türkçe", "tr"], ["English", "en"]] %></div>
+        <div class="form-group"><%= form.label :time_zone, t("profile.time_zone", default: "Saat dilimi") %><%= form.time_zone_select :time_zone, ActiveSupport::TimeZone.all, default: @user.time_zone %></div>
+        <div class="form-group"><%= form.label :theme_preference, t("profile.theme", default: "Tema") %><%= form.select :theme_preference, [[t("app.sidebar.theme_system", default: "Sistem"), "system"], [t("app.sidebar.theme_dark", default: "Koyu"), "dark"], [t("app.sidebar.theme_light", default: "Açık"), "light"]] %></div>
       </div>
-      <div class="form-actions"><%= form.submit "Tercihleri Kaydet", class: "button button-primary" %></div>
+      <div class="form-actions"><%= form.submit t("profile.save", default: "Tercihleri Kaydet"), class: "button button-primary" %></div>
     <% end %>
   </section>
 
   <section class="panel security-panel">
-    <div class="panel-header"><div><h2>İki adımlı doğrulama</h2><p>Parolanıza ek olarak doğrulama uygulaması kodu istenir.</p></div></div>
-    <p class="security-status <%= @user.mfa_enabled? ? "is-enabled" : "" %>"><%= @user.mfa_enabled? ? "Etkin" : "Kapalı" %></p>
+    <div class="panel-header"><div><h2><%= t("profile.mfa_title", default: "İki adımlı doğrulama") %></h2><p><%= t("profile.mfa_desc", default: "Parolanıza ek olarak doğrulama uygulaması kodu istenir.") %></p></div></div>
+    <p class="security-status <%= @user.mfa_enabled? ? "is-enabled" : "" %>"><%= @user.mfa_enabled? ? t("profile.mfa_enabled", default: "Etkin") : t("profile.mfa_disabled", default: "Kapalı") %></p>
     <% if @user.mfa_enabled? %>
-      <%= button_to "MFA’yı Kapat", mfa_path, method: :delete, class: "button button-secondary", data: {turbo_confirm: "İki adımlı doğrulamayı kapatmak istediğinizden emin misiniz?"} %>
+      <%= button_to t("profile.disable_mfa", default: "MFA’yı Kapat"), mfa_path, method: :delete, class: "button button-secondary", data: {turbo_confirm: t("profile.confirm_disable_mfa", default: "İki adımlı doğrulamayı kapatmak istediğinizden emin misiniz?")} %>
     <% else %>
-      <%= link_to "MFA’yı Kur", mfa_path, class: "button button-primary" %>
+      <%= link_to t("profile.setup_mfa", default: "MFA’yı Kur"), mfa_path, class: "button button-primary" %>
     <% end %>
   </section>
 </div>
