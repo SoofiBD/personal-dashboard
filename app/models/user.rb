@@ -24,6 +24,7 @@ class User < ApplicationRecord
   has_many :finance_debts, class_name: "PersonalFinance::Debt", dependent: :destroy
   has_many :finance_savings_goals, class_name: "PersonalFinance::SavingsGoal", dependent: :destroy
   has_many :finance_purchase_plans, class_name: "PersonalFinance::PurchasePlan", dependent: :destroy
+  has_many :document_conversions, class_name: "PersonalFinance::DocumentConversion", dependent: :destroy
 
   def onboarded?
     onboarded_at.present? || financial_accounts.exists? || finance_categories.exists? || finance_transactions.exists?

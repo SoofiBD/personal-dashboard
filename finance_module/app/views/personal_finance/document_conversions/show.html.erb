@@ -1,0 +1,105 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= finance_svg_icon("document", class: "icon-xs", "aria-hidden": true) %> DÖNÜŞÜM SONUCU</p>
+    <h1><%= @document_conversion.source_filename %></h1>
+    <p class="page-subtitle">Dönüşüm <%= l(@document_conversion.completed_at || @document_conversion.created_at, format: :short) %> tarihinde tamamlandı.</p>
+  </div>
+  <div class="page-header-actions">
+    <%= link_to "Tüm dönüşümler", finance_document_conversions_path, class: "button button-secondary" %>
+    <%= button_to "Dönüşümü sil", finance_document_conversion_path(@document_conversion), method: :delete, class: "button button-danger", form: {data: {turbo_confirm: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?"}} %>
+  </div>
+</header>
+
+<% if @document_conversion.completed? %>
+  <% asset_map = @document_conversion.assets.index_with { |asset| finance_document_conversion_asset_path(@document_conversion, asset) } %>
+  <section class="document-workspace" data-document-workspace data-document-assets="<%= json_escape(asset_map.to_json) %>">
+    <div class="document-workspace-toolbar">
+      <div><strong>Çalışma alanı</strong><span><%= @document_conversion.assets.count %> görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.</span></div>
+      <div class="document-workspace-actions">
+        <% if @document_conversion.source_pdf_available? %>
+          <%= link_to "Kaynak PDF’yi aç", source_pdf_finance_document_conversion_path(@document_conversion), class: "button button-secondary button-compact", target: "_blank", rel: "noopener" %>
+        <% end %>
+        <% if @document_conversion.source_pdf_available? %>
+          <%= form_with url: reprocess_finance_document_conversion_path(@document_conversion), method: :post, class: "document-reprocess-form" do |form| %>
+            <%= form.label :annotation_mode, "Anotasyon modu", class: "visually-hidden" %>
+            <%= form.select :annotation_mode, [["Metin içi + bölüm", "both"], ["Yalnızca bölüm", "section"], ["Yalnızca metin içi", "inline"]], {}, aria: {label: "Yeniden dönüştürme anotasyon modu"} %>
+            <%= render "conversion_options", compact: true, conversion_options: @document_conversion.conversion_options %>
+            <%= form.submit "Yeniden dönüştür", class: "button button-secondary button-compact" %>
+          <% end %>
+        <% end %>
+        <button class="button button-secondary button-compact" type="button" data-save-markdown data-save-url="<%= finance_document_conversion_path(@document_conversion) %>">Değişiklikleri kaydet</button>
+        <button class="button button-secondary button-compact" type="button" data-copy-markdown>Markdown’ı kopyala</button>
+        <%= form_with url: export_zip_finance_document_conversion_path(@document_conversion), method: :post, data: {export_zip_form: true} do |form| %>
+          <%= form.hidden_field :markdown_content, value: @document_conversion.markdown_content, data: {zip_markdown: true} %>
+          <%= form.submit "ZIP indir", class: "button button-primary button-compact" %>
+        <% end %>
+        <%= form_with url: export_html_finance_document_conversion_path(@document_conversion), method: :post, data: {export_html_form: true} do |form| %>
+          <%= form.hidden_field :markdown_content, value: @document_conversion.markdown_content, data: {html_markdown: true} %>
+          <%= form.submit "HTML indir", class: "button button-secondary button-compact" %>
+        <% end %>
+      </div>
+    </div>
+    <p class="document-workspace-feedback" data-workspace-feedback role="status" aria-atomic="true"></p>
+    <div class="document-workspace-grid">
+      <section class="panel markdown-editor-panel" aria-labelledby="markdown-editor-title">
+        <div class="panel-header"><div><h2 id="markdown-editor-title">Markdown</h2><p>İndirmeden önce içeriği düzenleyin.</p></div></div>
+        <div class="markdown-find-bar" role="search" aria-label="Markdown içinde bul ve değiştir">
+          <label class="visually-hidden" for="markdown-find">Bul</label>
+          <input id="markdown-find" type="search" placeholder="Metin bul" data-markdown-find autocomplete="off">
+          <button class="button button-secondary button-compact" type="button" data-find-next>Sonraki</button>
+          <label class="visually-hidden" for="markdown-replace">Değiştir</label>
+          <input id="markdown-replace" type="text" placeholder="Şununla değiştir" data-markdown-replace autocomplete="off">
+          <button class="button button-secondary button-compact" type="button" data-replace-next>Değiştir</button>
+          <button class="button button-secondary button-compact" type="button" data-replace-all>Tümünü değiştir</button>
+          <span data-find-feedback aria-live="polite"></span>
+        </div>
+        <div class="markdown-editor-shell">
+          <pre class="markdown-line-numbers" data-markdown-line-numbers aria-hidden="true"></pre>
+          <textarea class="markdown-result" data-markdown-editor aria-label="Düzenlenebilir Markdown içeriği"><%= @document_conversion.markdown_content %></textarea>
+        </div>
+      </section>
+      <section class="panel markdown-preview-panel" aria-labelledby="markdown-preview-title">
+        <div class="panel-header"><div><h2 id="markdown-preview-title">Önizleme</h2><p>Görseller güvenli medya rotasından yüklenir.</p></div></div>
+        <div class="markdown-preview" data-markdown-preview tabindex="0"></div>
+      </section>
+    </div>
+  </section>
+  <% if @document_conversion.source_pdf_available? %>
+    <section class="panel document-source-panel" aria-labelledby="document-source-title">
+      <div class="panel-header">
+        <div><h2 id="document-source-title">Kaynak PDF</h2><p>Çıktıyı kaynak belgeyle karşılaştırın. Tarayıcı önizlemesi yeni sekmede de açılabilir.</p></div>
+        <%= link_to "Yeni sekmede aç", source_pdf_finance_document_conversion_path(@document_conversion), class: "button button-secondary button-compact", target: "_blank", rel: "noopener" %>
+      </div>
+      <object class="document-source-viewer" data="<%= source_pdf_finance_document_conversion_path(@document_conversion) %>" type="application/pdf" aria-label="Kaynak PDF önizlemesi">
+        <p>Tarayıcınız PDF önizlemesini desteklemiyor. <%= link_to "PDF’yi indir veya aç", source_pdf_finance_document_conversion_path(@document_conversion) %>.</p>
+      </object>
+    </section>
+  <% end %>
+  <% stats = @document_conversion.processing_stats || {} %>
+  <section class="panel document-stats-panel" aria-labelledby="document-stats-title">
+    <div class="panel-header"><div><h2 id="document-stats-title">İşleme özeti</h2><p>Son dönüşümün deterministik çıkarım sonuçları.</p></div></div>
+    <dl class="document-stats-grid">
+      <% {"Sayfa" => stats["page_count"], "Görsel" => stats["images_extracted"], "Tablo" => stats["tables_converted"], "Anotasyon" => stats["annotations_extracted"], "Kaldırılan başlık/footer" => stats["headers_stripped"]}.each do |label, value| %>
+        <div><dt><%= label %></dt><dd><%= value || 0 %></dd></div>
+      <% end %>
+    </dl>
+  </section>
+  <% if @document_conversion.assets.any? %>
+    <section class="panel document-gallery-panel" aria-labelledby="document-gallery-title">
+      <div class="panel-header"><div><h2 id="document-gallery-title">Çıkarılan görseller</h2><p>Önizlemek için görsele tıklayın.</p></div></div>
+      <div class="document-gallery">
+        <% @document_conversion.assets.each do |asset| %>
+          <article class="document-gallery-item">
+            <%= link_to finance_document_conversion_asset_path(@document_conversion, asset), target: "_blank", rel: "noopener" do %>
+              <%= image_tag finance_document_conversion_asset_path(@document_conversion, asset), loading: "lazy", alt: "Sayfa #{asset.page_number} görseli: #{asset.filename}" %>
+              <span>Sayfa <%= asset.page_number %></span>
+            <% end %>
+            <button type="button" class="button button-secondary button-compact" data-insert-image data-image-filename="<%= asset.filename %>" data-image-alt="Sayfa <%= asset.page_number %> görseli">Markdown’a ekle</button>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+<% else %>
+  <section class="panel"><div class="empty-state" <%= "data-document-conversion-processing" if @document_conversion.processing? %>><p role="status"><%= @document_conversion.error_message.presence || "PDF dönüşümü işleniyor. Sonuç hazır olduğunda sayfa otomatik yenilenecek." %></p></div></section>
+<% end %>
