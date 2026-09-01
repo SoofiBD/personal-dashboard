@@ -17,9 +17,10 @@ class PersonalFinance::DashboardControllerTest < PersonalFinance::IntegrationTes
     get root_path
 
     assert_response :success
-    assert_select ".module-launcher-card", count: 2
+    assert_select ".module-launcher-card", count: 3
     assert_select ".module-launcher-card", text: /Finance/i
     assert_select ".module-launcher-card", text: /MarkItDown/i
+    assert_select ".module-launcher-card", text: /PDF (Düzenleme|Editor)/i
   end
 
   test "dashboard renders interactive cash flow chart and category bars with data" do

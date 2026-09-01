@@ -1,0 +1,12 @@
+{$DASHBOARD_DOMAIN} {
+  encode zstd gzip
+
+  @pdf_editor path /pdf-editor*
+  handle @pdf_editor {
+    reverse_proxy stirling-pdf:8080
+  }
+
+  handle {
+    reverse_proxy web:3000
+  }
+}

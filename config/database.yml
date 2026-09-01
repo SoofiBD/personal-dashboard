@@ -21,7 +21,10 @@ default: &default
 
 development:
   <<: *default
-  database: workspace_development
+  database: <%= ENV.fetch("POSTGRES_DB", "personal_dashboard_development") %>
+  username: <%= ENV.fetch("POSTGRES_USER", "personal_dashboard") %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -55,7 +58,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: workspace_test
+  url: <%= ENV.fetch("TEST_DATABASE_URL") { "postgresql://#{ENV.fetch("POSTGRES_USER", "personal_dashboard")}:#{ENV.fetch("POSTGRES_PASSWORD", "")}@#{ENV.fetch("POSTGRES_HOST", "localhost")}:#{ENV.fetch("POSTGRES_PORT", "5432")}/#{ENV.fetch("TEST_POSTGRES_DB", "personal_dashboard_test")}" } %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -79,6 +82,4 @@ test:
 #
 production:
   <<: *default
-  database: workspace_production
-  username: workspace
-  password: <%= ENV["WORKSPACE_DATABASE_PASSWORD"] %>
+  url: <%= ENV.fetch("DATABASE_URL") %>

@@ -4,13 +4,14 @@ module PersonalFinance
 
     belongs_to :user, class_name: "::User"
     has_many :assets, class_name: "PersonalFinance::DocumentAsset", foreign_key: :document_conversion_id, dependent: :destroy
+    has_one_attached :source_pdf
 
     enum :status, {pending: "pending", processing: "processing", completed: "completed", failed: "failed"}, validate: true
 
     validates :source_filename, presence: true, length: {maximum: 255}
-    validates :source_pdf_byte_size, numericality: {greater_than: 0, less_than_or_equal_to: 25.megabytes}, allow_nil: true
     validates :custom_notes, length: {maximum: 10_000}, allow_blank: true
     validates :markdown_content, length: {maximum: 10_000_000}, allow_blank: true
+    validate :source_pdf_size_is_allowed
 
     scope :older_than, ->(cutoff) { where("created_at < ?", cutoff) }
 
@@ -29,7 +30,19 @@ module PersonalFinance
     end
 
     def source_pdf_available?
-      source_pdf_data.present? && source_pdf_byte_size.to_i.positive?
+      source_pdf.attached?
+    end
+
+    def source_pdf_binary
+      source_pdf.download
+    end
+
+    private
+
+    def source_pdf_size_is_allowed
+      return unless source_pdf.attached? && source_pdf.blob.byte_size > 25.megabytes
+
+      errors.add(:source_pdf, "must be 25 MB or smaller")
     end
   end
 end

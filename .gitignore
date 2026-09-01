@@ -1,6 +1,7 @@
 /.env
 /.env.local
 /.env.*.local
+/.env.production
 /config/master.key
 /config/credentials/*.key
 /log/*
@@ -12,3 +13,7 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets
+.DS_Store
+*.rdb
+pdf_worker/__pycache__/
+pdf_worker/*.ses

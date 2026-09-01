@@ -838,6 +838,10 @@ tr:
         title: MarkItDown
         description: PDF ve belge içeriklerini temiz Markdown çıktısına dönüştürüp düzenleyin.
         badge: Docs
+      pdf_tools:
+        title: PDF Düzenleme
+        description: PDF birleştirme, bölme, dönüştürme ve düzenleme araçlarını yerelde kullanın.
+        badge: PDF Araçları
     logout: Oturumu Kapat
   document_conversions:
     eyebrow: DOKÜMAN ARAÇLARI
@@ -920,6 +924,37 @@ tr:
     opt_detect_tables: Tabloları Markdown’a çevir
     opt_min_image_dimension: Minimum görsel boyutu
     processing_notice: PDF dönüşümü işleniyor. Sonuç hazır olduğunda sayfa otomatik yenilenecek.
+  pdf_tools:
+    eyebrow: PDF ARAÇLARI
+    title: PDF Çalışma Alanı
+    subtitle: Düzenleme, dönüştürme ve güvenli dosya işlemleri tek bir yerel çalışma alanında.
+    open_editor: PDF Düzenleyiciyi Aç
+    service_status: Yerel servis durumu
+    engine_ready: PDF motoru hazır
+    engine_ready_description: Dosyalar yalnızca bu bilgisayardaki Stirling PDF servisine gönderilir.
+    engine_starting: PDF motoru başlatılıyor
+    engine_starting_description: Servis henüz hazır değil. Birkaç dakika sonra sayfayı yenileyin veya Docker servislerini kontrol edin.
+    ready: Hazır
+    waiting: Bekleniyor
+    aria_label: PDF araçları
+    open_tool: Aracı aç
+    tools:
+      edit:
+        title: Düzenle
+        description: Metin, görsel, sayfa sırası ve PDF form alanları üzerinde çalışın.
+      merge_split:
+        title: Birleştir ve böl
+        description: Dosyaları birleştirin, sayfaları ayırın veya yeniden sıralayın.
+      convert_compress:
+        title: Dönüştür ve sıkıştır
+        description: PDF, görsel ve ofis belgeleri arasında dönüşüm yapın.
+      security_signature:
+        title: Güvenlik ve imza
+        description: Parola, redaksiyon, filigran ve imzalama işlemlerini yönetin.
+    ai:
+      title: AI modu
+      description: Belge özeti, soru-cevap ve sınıflandırma için altyapı korunuyor; yerel sistemde varsayılan olarak kapalıdır.
+      coming_soon: Yakında
   profile:
     eyebrow: HESAP & GÜVENLİK
     title: Profil Tercihleri
