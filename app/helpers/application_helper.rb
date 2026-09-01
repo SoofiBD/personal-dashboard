@@ -12,11 +12,21 @@ module ApplicationHelper
     number_to_currency(value || 0, unit: account.currency, format: "%n %u", delimiter: ".", separator: ",")
   end
 
-  def finance_navigation_item(label, path, icon_name = nil, badge: nil)
-    is_active = current_page?(path)
+  def active_app_module
+    if controller_name.in?(%w[pdf_tools document_conversions document_assets]) || @current_module == :pdf_tools || @current_module == :markitdown
+      :pdf_tools
+    elsif controller_name.in?(%w[profiles users mfa]) || @current_module == :settings
+      :settings
+    else
+      :finance
+    end
+  end
+
+  def finance_navigation_item(label, path, icon_name = nil, badge: nil, target: nil)
+    is_active = current_page?(path) rescue false
     class_name = is_active ? "sidebar-link is-active" : "sidebar-link"
 
-    link_to path, class: class_name, "aria-current": (is_active ? "page" : nil) do
+    link_to path, class: class_name, "aria-current": (is_active ? "page" : nil), target: target do
       concat finance_svg_icon(icon_name, class: "nav-icon") if icon_name
       concat content_tag(:span, label, class: "nav-label")
       concat content_tag(:span, badge, class: "nav-unread-badge", "aria-label": "#{badge} okunmamış bildirim") if badge.to_i.positive?
@@ -137,6 +147,23 @@ module ApplicationHelper
           tag.line(x1: "12", x2: "12", y1: "14", y2: "16") +
           tag.line(x1: "8", x2: "10", y1: "12", y2: "12") +
           tag.line(x1: "14", x2: "16", y1: "12", y2: "12")
+      end
+    when "settings", "gear"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z") +
+          tag.circle(cx: "12", cy: "12", r: "3")
+      end
+    when "shield", "security"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+      end
+    when "merge"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "m8 6 4-4 4 4") + tag.path(d: "M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22") + tag.path(d: "m20 22-5-5")
+      end
+    when "compress"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "M4 14h6v6") + tag.path(d: "m10 14-7 7") + tag.path(d: "M20 10h-6V4") + tag.path(d: "m14 10 7-7")
       end
     else
       content_tag(:span, "•", class: css_class)
