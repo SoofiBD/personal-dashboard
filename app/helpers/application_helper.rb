@@ -23,7 +23,11 @@ module ApplicationHelper
   end
 
   def finance_navigation_item(label, path, icon_name = nil, badge: nil, target: nil)
-    is_active = current_page?(path) rescue false
+    is_active = begin
+      current_page?(path)
+    rescue ActionController::RoutingError, ActionController::UrlGenerationError, ArgumentError
+      false
+    end
     class_name = is_active ? "sidebar-link is-active" : "sidebar-link"
 
     link_to path, class: class_name, "aria-current": (is_active ? "page" : nil), target: target do
