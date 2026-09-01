@@ -31,8 +31,7 @@ class PersonalFinance::DocumentConversionTest < ActiveSupport::TestCase
 
     assert_not_predicate conversion, :source_pdf_available?
 
-    conversion.source_pdf_data = "%PDF-test"
-    conversion.source_pdf_byte_size = conversion.source_pdf_data.bytesize
+    conversion.source_pdf.attach(io: StringIO.new("%PDF-test"), filename: "report.pdf", content_type: "application/pdf")
     assert_predicate conversion, :source_pdf_available?
   end
 

@@ -1,3 +1,5 @@
+require "stringio"
+
 module PersonalFinance
   class DocumentConversionsController < ApplicationController
     def index
@@ -11,10 +13,9 @@ module PersonalFinance
       @document_conversion = owned(DocumentConversion).new(
         source_filename: File.basename(upload&.original_filename.to_s),
         custom_notes: document_conversion_params[:custom_notes],
-        source_pdf_data: source_pdf_data,
-        source_pdf_byte_size: source_pdf_data&.bytesize,
         conversion_options: conversion_options
       )
+      @document_conversion.source_pdf.attach(io: StringIO.new(source_pdf_data), filename: @document_conversion.source_filename, content_type: "application/pdf") if source_pdf_data.present?
 
       begin
         @document_conversion.save!
@@ -35,7 +36,7 @@ module PersonalFinance
       document_conversion = owned(DocumentConversion).find(params[:id])
       raise PdfConversionClient::Error, "Bu dönüşüm için kaynak PDF saklanmamış." unless document_conversion.source_pdf_available?
 
-      send_data document_conversion.source_pdf_data,
+      send_data document_conversion.source_pdf_binary,
         filename: document_conversion.source_filename,
         type: "application/pdf",
         disposition: "inline"

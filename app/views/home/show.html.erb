@@ -65,7 +65,7 @@
               </div>
 
               <div>
-                <h2><%= module_data[:title] %></h2>
+                <h2><%= t(module_data[:title_key], default: module_data[:default_title]) %></h2>
                 <p><%= t(module_data[:description_key], default: module_data[:default_description]) %></p>
               </div>
             </div>

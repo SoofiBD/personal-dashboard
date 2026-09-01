@@ -6,7 +6,8 @@ class HomeControllerTest < PersonalFinance::IntegrationTest
     assert_response :success
     assert_select ".workspace-hub-container"
     assert_select ".sidebar", count: 0
-    assert_select ".module-launcher-card", count: 2
+    assert_select ".module-launcher-card", count: 3
+    assert_select ".module-launcher-card", text: /PDF Düzenleme/i
     assert_select "h1", text: "İçerik Merkeziniz"
   end
 
@@ -15,7 +16,8 @@ class HomeControllerTest < PersonalFinance::IntegrationTest
     assert_response :success
     assert_select ".workspace-hub-container"
     assert_select ".sidebar", count: 0
-    assert_select ".module-launcher-card", count: 2
+    assert_select ".module-launcher-card", count: 3
+    assert_select ".module-launcher-card", text: /PDF Editor/i
     assert_select "h1", text: "Content Hub"
   end
 end

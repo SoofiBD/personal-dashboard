@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     resource :dashboard, only: :show
     resource :spending_report, only: :show
     resource :cash_flow_forecast, only: :show
+    resource :pdf_tools, only: :show
     resources :notifications, only: :index do
       post :mark_all_read, on: :collection
     end

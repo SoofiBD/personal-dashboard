@@ -4,7 +4,8 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
   setup do
     @user = User.dashboard_owner
     @user.update!(onboarded_at: Time.current)
-    @conversion = PersonalFinance::DocumentConversion.create!(user: @user, source_filename: "report.pdf", source_pdf_data: "%PDF-test", source_pdf_byte_size: 9)
+    @conversion = PersonalFinance::DocumentConversion.create!(user: @user, source_filename: "report.pdf")
+    @conversion.source_pdf.attach(io: StringIO.new("%PDF-test"), filename: "report.pdf", content_type: "application/pdf")
     @conversion.complete!(markdown_content: "# Report")
   end
 
@@ -46,7 +47,9 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
   end
 
   test "serves an image asset belonging to the current user" do
-    asset = @conversion.assets.create!(filename: "img_p1_1.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1, data: "abc")
+    asset = @conversion.assets.build(filename: "img_p1_1.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1)
+    asset.file.attach(io: StringIO.new("abc"), filename: asset.filename, content_type: asset.content_type)
+    asset.save!
 
     get finance_document_conversion_asset_path(@conversion, asset)
 
@@ -66,7 +69,9 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
   end
 
   test "destroys the conversion and its extracted assets" do
-    @conversion.assets.create!(filename: "img_p1_1.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1, data: "abc")
+    asset = @conversion.assets.build(filename: "img_p1_1.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1)
+    asset.file.attach(io: StringIO.new("abc"), filename: asset.filename, content_type: asset.content_type)
+    asset.save!
 
     assert_difference("PersonalFinance::DocumentConversion.count", -1) do
       assert_difference("PersonalFinance::DocumentAsset.count", -1) do
@@ -80,7 +85,9 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
   end
 
   test "queues reprocessing with the selected options" do
-    @conversion.assets.create!(filename: "old.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1, data: "old")
+    old_asset = @conversion.assets.build(filename: "old.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1)
+    old_asset.file.attach(io: StringIO.new("old"), filename: old_asset.filename, content_type: old_asset.content_type)
+    old_asset.save!
     assert_enqueued_with(job: PersonalFinance::PdfDocumentConversionJob, args: [@conversion.id, "inline"]) do
       post reprocess_finance_document_conversion_path(@conversion), params: {annotation_mode: "inline", conversion_options: {extract_images_enabled: "0", min_image_dimension: "200"}}
     end

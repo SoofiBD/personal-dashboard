@@ -833,6 +833,10 @@ en:
         title: MarkItDown
         description: Convert and edit PDF and document contents into clean Markdown format.
         badge: Docs
+      pdf_tools:
+        title: PDF Editor
+        description: Use local tools to merge, split, convert, and edit PDFs.
+        badge: PDF Tools
     logout: Sign Out
   document_conversions:
     eyebrow: DOCUMENT TOOLS
@@ -915,6 +919,37 @@ en:
     opt_detect_tables: Convert tables to Markdown
     opt_min_image_dimension: Minimum image dimension
     processing_notice: PDF conversion is in progress. The page will refresh automatically when ready.
+  pdf_tools:
+    eyebrow: PDF TOOLS
+    title: PDF Workspace
+    subtitle: Editing, conversion, and secure file operations in one local workspace.
+    open_editor: Open PDF Editor
+    service_status: Local service status
+    engine_ready: PDF engine is ready
+    engine_ready_description: Files are sent only to the Stirling PDF service running on this computer.
+    engine_starting: PDF engine is starting
+    engine_starting_description: The service is not ready yet. Refresh in a few minutes or check the Docker services.
+    ready: Ready
+    waiting: Waiting
+    aria_label: PDF tools
+    open_tool: Open tool
+    tools:
+      edit:
+        title: Edit
+        description: Work with text, images, page order, and PDF form fields.
+      merge_split:
+        title: Merge and split
+        description: Merge files, split pages, or reorder them.
+      convert_compress:
+        title: Convert and compress
+        description: Convert between PDFs, images, and office documents.
+      security_signature:
+        title: Security and signing
+        description: Manage passwords, redaction, watermarks, and signing.
+    ai:
+      title: AI mode
+      description: The foundation for document summaries, Q&A, and classification is retained; it is disabled by default in the local system.
+      coming_soon: Coming soon
   profile:
     eyebrow: ACCOUNT & SECURITY
     title: Profile Preferences
