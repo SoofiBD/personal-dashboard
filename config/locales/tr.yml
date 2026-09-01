@@ -61,13 +61,33 @@ tr:
     skip_link: Ana içeriğe atla
     meta_description: Kişisel finans ve bütçe yönetim paneli.
     sidebar:
+      module_switcher: Modül Değiştir
+      select_module: MODÜL SEÇİN
+      switch_btn: Modül
+      module_finance: Kişisel Finans
+      module_finance_desc: Gelir-gider, bütçe, nakit akışı
+      module_pdf: PDF & Doküman Araçları
+      module_pdf_desc: PDF düzenleme, Markdown, araçlar
+      module_hub: Çalışma Alanı (Hub)
+      module_hub_desc: Tüm modüllerin ana merkezi
       section_label: FİNANS MODÜLÜ
       section_overview: ÖZET & ANALİZ
       section_transactions: İŞLEMLER & BORÇLAR
       section_assets: VARLIK & BÜTÇE
       section_system: SİSTEM & VERİ
+      section_shared_settings: ORTAK AYARLAR
+      section_pdf_workspace: PDF & ÇALIŞMA ALANI
+      section_pdf_features: PDF İŞLEMLERİ
       section_modules: MODÜLLER & GEÇİŞ
+      pdf_workspace: PDF Çalışma Alanı
+      pdf_markdown: PDF’den Markdown’a
+      pdf_editor: PDF Düzenleyici
+      pdf_text_edit: Metin & Sayfa Düzenle
+      pdf_merge_split: Birleştir ve Böl
+      pdf_compress: Dönüştür ve Sıkıştır
+      pdf_security: Güvenlik ve İmza
       switch_to_finance: Finance Paneli
+      switch_to_pdf: PDF Araçları
       switch_to_markitdown: MarkItDown
       overview: Genel Bakış
       notifications: Bildirimler
@@ -90,7 +110,7 @@ tr:
       documents: PDF Dokümanları
       profile: Profil & Güvenlik
       users: Kullanıcılar
-      workspace_hub: Modül Seçimi
+      workspace_hub: Çalışma Alanı (Hub)
       workspace: Çalışma Alanı
       language: Dil
       theme: Tema
@@ -882,9 +902,25 @@ tr:
     copy_markdown: Kopyala
     download_zip: ZIP İndir
     download_html: HTML İndir
-    editor_title: Markdown
-    editor_subtitle: İndirmeden önce içeriği düzenleyin.
+    view_split: İkili Görünüm
+    view_editor: Yalnızca Düzenleyici
+    view_preview: Yalnızca Önizleme
+    format_unwrap: Paragrafları Düzelt
+    format_unwrap_title: Kırılmış satır sonlarını birleştirip düzgün paragraflara dönüştürür
+    toggle_wrap: Satır Kaydırma
+    format_bold: Kalın
+    format_italic: İtalik
+    format_heading: Başlık
+    format_quote: Alıntı
+    format_list: Liste
+    format_table: Tablo
+    format_code: Kod Bloğu
+    editor_title: Markdown Düzenleyici
+    editor_subtitle: İndirmeden önce içeriği düzenleyin veya paragrafları otomatik birleştirin.
     editor_aria: Düzenlenebilir Markdown içeriği
+    editor_status_lines: '%{count} satır'
+    editor_status_words: '%{count} kelime'
+    editor_status_chars: '%{count} karakter'
     find_replace_aria: Markdown içinde bul ve değiştir
     find_label: Bul
     find_placeholder: Metin bul
@@ -893,8 +929,8 @@ tr:
     replace_placeholder: Şununla değiştir
     replace_btn: Değiştir
     replace_all: Tümünü değiştir
-    preview_title: Önizleme
-    preview_subtitle: Görseller güvenli medya rotasından yüklenir.
+    preview_title: Canlı Önizleme
+    preview_subtitle: Görseller ve biçimlendirmeler anlık olarak işlenir.
     source_pdf_title: Kaynak PDF
     source_pdf_subtitle: Çıktıyı kaynak belgeyle karşılaştırın. Tarayıcı önizlemesi yeni sekmede de açılabilir.
     open_new_tab: Yeni sekmede aç

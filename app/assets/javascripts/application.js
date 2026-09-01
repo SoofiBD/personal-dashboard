@@ -975,10 +975,17 @@
       const copyButton = workspace.querySelector("[data-copy-markdown]");
       const saveButton = workspace.querySelector("[data-save-markdown]");
       const zipMarkdown = workspace.querySelector("[data-zip-markdown]");
+      const htmlMarkdown = workspace.querySelector("[data-html-markdown]");
       const lineNumbers = workspace.querySelector("[data-markdown-line-numbers]");
       const findInput = workspace.querySelector("[data-markdown-find]");
       const replaceInput = workspace.querySelector("[data-markdown-replace]");
       const findFeedback = workspace.querySelector("[data-find-feedback]");
+      const formatUnwrapBtn = workspace.querySelector("[data-format-unwrap]");
+      const toggleWrapBtn = workspace.querySelector("[data-toggle-wrap]");
+      const statusLines = workspace.querySelector("[data-status-lines]");
+      const statusWords = workspace.querySelector("[data-status-words]");
+      const statusChars = workspace.querySelector("[data-status-chars]");
+      const viewModeBtns = workspace.querySelectorAll("[data-view-mode]");
       let assets = {};
 
       try {
@@ -987,47 +994,409 @@
         assets = {};
       }
 
-      const escapeHtml = (value) => value.replace(/[&<>'"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"}[character]));
-      const render = () => {
-        const lines = editor.value.split("\n");
-        const html = lines.map((line) => {
-          const image = line.match(/^!\[([^\]]*)\]\(images\/([a-zA-Z0-9._-]+)\)$/);
-          if (image) {
-            const source = assets[image[2]];
-            return source ? `<figure><img src="${escapeHtml(source)}" alt="${escapeHtml(image[1])}" loading="lazy"><figcaption>${escapeHtml(image[1])}</figcaption></figure>` : `<p>${escapeHtml(line)}</p>`;
+      const escapeHtml = (value) => (value || "").replace(/[&<>'"]/g, (character) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"}[character]));
+
+      // Parse inline markdown elements
+      const parseInline = (text) => {
+        let out = escapeHtml(text);
+        // Images: ![alt](images/filename)
+        out = out.replace(/!\[([^\]]*)\]\(images\/([a-zA-Z0-9._-]+)\)/g, (_match, alt, filename) => {
+          const src = assets[filename];
+          return src
+            ? `<figure class="markdown-figure"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy"><figcaption>${alt || filename}</figcaption></figure>`
+            : `<figure class="markdown-figure is-placeholder"><figcaption>🖼️ ${alt || filename}</figcaption></figure>`;
+        });
+        // Links: [text](url)
+        out = out.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+        // Inline code: `code`
+        out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // Highlights: ==text==
+        out = out.replace(/==([^=]+)==/g, '<mark class="markdown-highlight">$1</mark>');
+        // Underlines: <u>text</u> (unescape previously escaped <u>)
+        out = out.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/gi, '<u class="markdown-underline">$1</u>');
+        // Strikethrough: ~~text~~
+        out = out.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+        // Bold: **text** or __text__
+        out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        out = out.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+        // Italic: *text* or _text_
+        out = out.replace(/(^|[^\*])\*([^*]+)\*([^\*]|$)/g, '$1<em>$2</em>$3');
+        out = out.replace(/(^|[^_])_([^_]+)_([^_]|$)/g, '$1<em>$2</em>$3');
+        return out;
+      };
+
+      // Full document Markdown Parser to clean HTML
+      const parseMarkdownToHtml = (markdownText) => {
+        if (!markdownText || !markdownText.trim()) {
+          return '<div class="markdown-empty-state"><p>Önizlenecek Markdown içeriği yok.</p></div>';
+        }
+
+        let content = markdownText.replace(/\r\n/g, "\n");
+        let htmlChunks = [];
+
+        // 1. Extract YAML Frontmatter if present
+        const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n*/);
+        if (frontmatterMatch) {
+          const metaLines = frontmatterMatch[1].split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
+          const metaItems = metaLines.map((line) => {
+            const splitIdx = line.indexOf(":");
+            if (splitIdx === -1) return `<span>${escapeHtml(line)}</span>`;
+            const key = line.slice(0, splitIdx).trim();
+            const val = line.slice(splitIdx + 1).trim().replace(/^["']|["']$/g, "");
+            return `<div class="frontmatter-item"><dt>${escapeHtml(key)}:</dt><dd>${escapeHtml(val)}</dd></div>`;
+          }).join("");
+          htmlChunks.push(`<div class="markdown-frontmatter-card"><div class="frontmatter-badge">METADATA</div><dl class="frontmatter-list">${metaItems}</dl></div>`);
+          content = content.slice(frontmatterMatch[0].length);
+        }
+
+        // 2. Split content into logical blocks separated by blank lines
+        const rawBlocks = content.split(/\n\s*\n+/);
+
+        for (let block of rawBlocks) {
+          block = block.trim();
+          if (!block) continue;
+
+          // A. Fenced Code Block
+          if (block.startsWith("```")) {
+            const codeLines = block.split("\n");
+            const lang = codeLines[0].replace(/^```/, "").trim();
+            const code = codeLines.slice(1, codeLines[codeLines.length - 1].startsWith("```") ? -1 : undefined).join("\n");
+            htmlChunks.push(`<pre class="markdown-code-block" data-lang="${escapeHtml(lang)}"><code>${escapeHtml(code)}</code></pre>`);
+            continue;
           }
-          const heading = line.match(/^(#{1,3})\s+(.+)$/);
-          if (heading) return `<h${heading[1].length}>${escapeHtml(heading[2])}</h${heading[1].length}>`;
-          if (line.startsWith("- ")) return `<p class="markdown-preview-list-item">${escapeHtml(line.slice(2))}</p>`;
-          return line.trim() ? `<p>${escapeHtml(line)}</p>` : "";
-        }).join("");
-        preview.innerHTML = html || "<p>Önizlenecek içerik yok.</p>";
-        zipMarkdown.value = editor.value;
-        if (lineNumbers) lineNumbers.textContent = editor.value.split("\n").map((_, index) => index + 1).join("\n");
+
+          // B. Horizontal Rule
+          if (/^(?:---|\*\*\*|___)$/.test(block)) {
+            htmlChunks.push('<hr class="markdown-divider">');
+            continue;
+          }
+
+          // C. GFM Table
+          if (block.startsWith("|") && block.includes("\n|")) {
+            const tableLines = block.split("\n").filter((l) => l.trim().startsWith("|"));
+            if (tableLines.length >= 2) {
+              const parseRow = (rowStr) => rowStr.split("|").slice(1, -1).map((c) => c.trim());
+              const headerCells = parseRow(tableLines[0]);
+              const isDelimiter = tableLines[1].replace(/[\s|:-]/g, "").length === 0;
+              const dataRows = isDelimiter ? tableLines.slice(2) : tableLines.slice(1);
+
+              let tableHtml = '<div class="table-responsive"><table class="markdown-rendered-table"><thead><tr>';
+              headerCells.forEach((c) => {
+                tableHtml += `<th>${parseInline(c)}</th>`;
+              });
+              tableHtml += '</tr></thead><tbody>';
+              dataRows.forEach((r) => {
+                const cells = parseRow(r);
+                tableHtml += '<tr>';
+                for (let i = 0; i < headerCells.length; i++) {
+                  tableHtml += `<td>${parseInline(cells[i] || "")}</td>`;
+                }
+                tableHtml += '</tr>';
+              });
+              tableHtml += '</tbody></table></div>';
+              htmlChunks.push(tableHtml);
+              continue;
+            }
+          }
+
+          // D. Blockquotes
+          if (block.startsWith(">")) {
+            const quoteLines = block.split("\n").map((l) => l.replace(/^>\s?/, "").trim()).filter(Boolean);
+            const quoteText = quoteLines.join(" ");
+            htmlChunks.push(`<blockquote class="markdown-quote"><p>${parseInline(quoteText)}</p></blockquote>`);
+            continue;
+          }
+
+          // E. Headings
+          const headingMatch = block.match(/^(#{1,6})\s+(.+)$/);
+          if (headingMatch && !block.includes("\n")) {
+            const level = headingMatch[1].length;
+            const headingText = headingMatch[2].trim();
+            htmlChunks.push(`<h${level} class="markdown-heading markdown-h${level}">${parseInline(headingText)}</h${level}>`);
+            continue;
+          }
+
+          // F. Standalone Image
+          const standaloneImg = block.match(/^!\[([^\]]*)\]\(images\/([a-zA-Z0-9._-]+)\)$/);
+          if (standaloneImg) {
+            const alt = standaloneImg[1];
+            const filename = standaloneImg[2];
+            const src = assets[filename];
+            htmlChunks.push(src
+              ? `<figure class="markdown-figure"><img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy"><figcaption>${escapeHtml(alt || filename)}</figcaption></figure>`
+              : `<figure class="markdown-figure is-placeholder"><figcaption>🖼️ ${escapeHtml(alt || filename)}</figcaption></figure>`
+            );
+            continue;
+          }
+
+          // G. Unordered List or Ordered List
+          const lines = block.split("\n");
+          const isUl = lines.some((l) => /^\s*[-*+]\s+/.test(l));
+          const isOl = lines.some((l) => /^\s*\d+\.\s+/.test(l));
+
+          if (isUl || isOl) {
+            const tag = isOl ? "ol" : "ul";
+            let listHtml = `<${tag} class="markdown-list">`;
+            let currentItem = "";
+
+            lines.forEach((l) => {
+              const bulletMatch = l.match(/^\s*(?:[-*+]|\d+\.)\s+(.+)$/);
+              if (bulletMatch) {
+                if (currentItem) listHtml += `<li>${parseInline(currentItem)}</li>`;
+                currentItem = bulletMatch[1];
+              } else if (currentItem) {
+                currentItem += " " + l.trim();
+              } else {
+                currentItem = l.trim();
+              }
+            });
+            if (currentItem) listHtml += `<li>${parseInline(currentItem)}</li>`;
+            listHtml += `</${tag}>`;
+            htmlChunks.push(listHtml);
+            continue;
+          }
+
+          // H. Standard Paragraph (Merge soft breaks into smooth paragraph text)
+          const paragraphParts = [];
+          for (let l of lines) {
+            const lineStr = l.trim();
+            if (!lineStr) continue;
+            // Heading embedded in a block
+            const subHead = lineStr.match(/^(#{1,6})\s+(.+)$/);
+            if (subHead) {
+              if (paragraphParts.length) {
+                htmlChunks.push(`<p class="markdown-p">${parseInline(paragraphParts.join(" "))}</p>`);
+                paragraphParts.length = 0;
+              }
+              htmlChunks.push(`<h${subHead[1].length} class="markdown-heading markdown-h${subHead[1].length}">${parseInline(subHead[2])}</h${subHead[1].length}>`);
+            } else {
+              paragraphParts.push(lineStr);
+            }
+          }
+          if (paragraphParts.length) {
+            htmlChunks.push(`<p class="markdown-p">${parseInline(paragraphParts.join(" "))}</p>`);
+          }
+        }
+
+        return htmlChunks.join("") || '<div class="markdown-empty-state"><p>Önizlenecek Markdown içeriği yok.</p></div>';
+      };
+
+      // Client-side unwrap and heal tool
+      const unwrapText = (raw) => {
+        let text = raw.replace(/\r\n/g, "\n");
+        // Heal hyphenated words
+        text = text.replace(/(\b[a-zA-ZğüşıöçĞÜŞİÖÇ]+)-\n[ \t]*([a-zA-ZğüşıöçĞÜŞİÖÇ]+)/g, "$1$2");
+
+        const rawBlocks = text.split(/\n\s*\n+/);
+        const processedBlocks = [];
+
+        for (let block of rawBlocks) {
+          block = block.trim();
+          if (!block) continue;
+
+          // Preserve code blocks, tables, frontmatter
+          if (block.startsWith("```") || block.startsWith("|") || block.startsWith("---")) {
+            processedBlocks.push(block);
+            continue;
+          }
+
+          const lines = block.split("\n");
+          // Lists
+          if (lines.some((l) => /^\s*([-*+]|\d+\.)\s+/.test(l))) {
+            const listItems = [];
+            lines.forEach((l) => {
+              const stripped = l.trim();
+              if (/^([-*+]|\d+\.)\s+/.test(stripped)) {
+                listItems.push(stripped);
+              } else if (listItems.length) {
+                listItems[listItems.length - 1] += " " + stripped;
+              } else {
+                listItems.push(stripped);
+              }
+            });
+            processedBlocks.push(listItems.join("\n"));
+            continue;
+          }
+
+          // Blockquotes
+          if (lines.every((l) => l.trim().startsWith(">") || !l.trim())) {
+            const quoteContent = lines.map((l) => l.replace(/^>\s?/, "").trim()).filter(Boolean).join(" ");
+            processedBlocks.push(`> ${quoteContent}`);
+            continue;
+          }
+
+          // Paragraphs: unwrap soft line breaks into continuous lines
+          const pLines = [];
+          for (let l of lines) {
+            const stripped = l.trim();
+            if (!stripped) continue;
+            if (/^#{1,6}\s+/.test(stripped)) {
+              if (pLines.length) {
+                processedBlocks.push(pLines.join(" "));
+                pLines.length = 0;
+              }
+              processedBlocks.push(stripped);
+            } else {
+              pLines.push(stripped);
+            }
+          }
+          if (pLines.length) {
+            processedBlocks.push(pLines.join(" "));
+          }
+        }
+
+        return processedBlocks.join("\n\n");
+      };
+
+      const updateStats = () => {
+        const val = editor.value || "";
+        const lines = val.length ? val.split("\n").length : 0;
+        const words = val.trim().length ? val.trim().split(/\s+/).length : 0;
+        const chars = val.length;
+
+        if (statusLines) statusLines.textContent = `${lines} satır`;
+        if (statusWords) statusWords.textContent = `${words} kelime`;
+        if (statusChars) statusChars.textContent = `${chars} karakter`;
+      };
+
+      const render = () => {
+        preview.innerHTML = parseMarkdownToHtml(editor.value);
+        if (zipMarkdown) zipMarkdown.value = editor.value;
+        if (htmlMarkdown) htmlMarkdown.value = editor.value;
+
+        if (lineNumbers) {
+          const count = editor.value.split("\n").length;
+          lineNumbers.textContent = Array.from({length: count}, (_, i) => i + 1).join("\n");
+        }
+        updateStats();
       };
 
       editor.addEventListener("input", render);
       editor.addEventListener("scroll", () => {
         if (lineNumbers) lineNumbers.scrollTop = editor.scrollTop;
       });
+
+      // View Mode Switcher
+      viewModeBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const mode = btn.dataset.viewMode;
+          workspace.classList.remove("workspace-view--split", "workspace-view--editor", "workspace-view--preview");
+          workspace.classList.add(`workspace-view--${mode}`);
+          viewModeBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+          try {
+            localStorage.setItem("pdf_workspace_view_mode", mode);
+          } catch (_e) {}
+        });
+      });
+
+      // Restore saved view mode preference
+      try {
+        const savedMode = localStorage.getItem("pdf_workspace_view_mode");
+        if (savedMode && ["split", "editor", "preview"].includes(savedMode)) {
+          const targetBtn = workspace.querySelector(`[data-view-mode="${savedMode}"]`);
+          if (targetBtn) targetBtn.click();
+        }
+      } catch (_e) {}
+
+      // One-click paragraph formatting / unwrapping
+      if (formatUnwrapBtn) {
+        formatUnwrapBtn.addEventListener("click", () => {
+          const original = editor.value;
+          const unwrapped = unwrapText(original);
+          if (original === unwrapped) {
+            feedback.textContent = "Paragraflar ve satırlar zaten düzgün formatlanmış.";
+          } else {
+            editor.value = unwrapped;
+            render();
+            feedback.textContent = "Kırılmış satır sonları birleştirildi ve paragraflar düzenlendi. Kalıcı yapmak için Kaydet'e tıklayın.";
+          }
+        });
+      }
+
+      // Toggle Word Wrap
+      if (toggleWrapBtn) {
+        toggleWrapBtn.addEventListener("click", () => {
+          editor.classList.toggle("is-no-wrap");
+          toggleWrapBtn.classList.toggle("is-active", !editor.classList.contains("is-no-wrap"));
+        });
+      }
+
+      // Syntax formatting buttons
+      workspace.querySelectorAll("[data-insert-syntax]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const syntax = btn.dataset.insertSyntax;
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const selected = editor.value.substring(start, end);
+          let before = "";
+          let after = "";
+          let placeholder = "";
+
+          switch (syntax) {
+            case "bold":
+              before = "**";
+              after = "**";
+              placeholder = "kalın metin";
+              break;
+            case "italic":
+              before = "*";
+              after = "*";
+              placeholder = "italik metin";
+              break;
+            case "heading":
+              before = "## ";
+              placeholder = "Başlık";
+              break;
+            case "link":
+              before = "[";
+              after = "](https://example.com)";
+              placeholder = "bağlantı metni";
+              break;
+            case "quote":
+              before = "> ";
+              placeholder = "Alıntı metni";
+              break;
+            case "list":
+              before = "- ";
+              placeholder = "Liste öğesi";
+              break;
+            case "code":
+              before = "```\n";
+              after = "\n```";
+              placeholder = "kod buraya";
+              break;
+            case "table":
+              before = "\n| Başlık 1 | Başlık 2 |\n|---|---|\n| Değer 1 | Değer 2 |\n";
+              break;
+          }
+
+          const insertText = selected || placeholder;
+          editor.setRangeText(`${before}${insertText}${after}`, start, end, "select");
+          render();
+          editor.focus();
+        });
+      });
+
+      // Find and Replace
       const findNext = () => {
         const query = findInput?.value || "";
         if (!query) {
-          findFeedback.textContent = "Aranacak metni yazın.";
+          if (findFeedback) findFeedback.textContent = "Aranacak metni yazın.";
           findInput?.focus();
           return false;
         }
         const index = editor.value.indexOf(query, editor.selectionEnd);
         const matchAt = index === -1 ? editor.value.indexOf(query) : index;
         if (matchAt === -1) {
-          findFeedback.textContent = "Eşleşme bulunamadı.";
+          if (findFeedback) findFeedback.textContent = "Eşleşme bulunamadı.";
           return false;
         }
         editor.focus();
         editor.setSelectionRange(matchAt, matchAt + query.length);
-        findFeedback.textContent = index === -1 ? "Başa dönüldü." : "Eşleşme seçildi.";
+        if (findFeedback) findFeedback.textContent = index === -1 ? "Başa dönüldü." : "Eşleşme seçildi.";
         return true;
       };
+
       workspace.querySelector("[data-find-next]")?.addEventListener("click", findNext);
       workspace.querySelector("[data-replace-next]")?.addEventListener("click", () => {
         const query = findInput?.value || "";
@@ -1035,20 +1404,22 @@
         if (selectedText !== query && !findNext()) return;
         editor.setRangeText(replaceInput?.value || "", editor.selectionStart, editor.selectionEnd, "select");
         render();
-        findFeedback.textContent = "Bir eşleşme değiştirildi.";
+        if (findFeedback) findFeedback.textContent = "Bir eşleşme değiştirildi.";
       });
+
       workspace.querySelector("[data-replace-all]")?.addEventListener("click", () => {
         const query = findInput?.value || "";
         if (!query) return findNext();
         const matches = editor.value.split(query).length - 1;
         if (!matches) {
-          findFeedback.textContent = "Eşleşme bulunamadı.";
+          if (findFeedback) findFeedback.textContent = "Eşleşme bulunamadı.";
           return;
         }
         editor.value = editor.value.split(query).join(replaceInput?.value || "");
         render();
-        findFeedback.textContent = `${matches} eşleşme değiştirildi.`;
+        if (findFeedback) findFeedback.textContent = `${matches} eşleşme değiştirildi.`;
       });
+
       workspace.addEventListener("keydown", (event) => {
         if (!(event.metaKey || event.ctrlKey)) return;
         if (event.key.toLowerCase() === "f") {
@@ -1057,8 +1428,19 @@
         } else if (event.key.toLowerCase() === "g") {
           event.preventDefault();
           findNext();
+        } else if (event.key.toLowerCase() === "b") {
+          event.preventDefault();
+          workspace.querySelector('[data-insert-syntax="bold"]')?.click();
+        } else if (event.key.toLowerCase() === "i") {
+          event.preventDefault();
+          workspace.querySelector('[data-insert-syntax="italic"]')?.click();
+        } else if (event.key.toLowerCase() === "s") {
+          event.preventDefault();
+          saveButton?.click();
         }
       });
+
+      // Insert image from gallery
       workspace.querySelectorAll("[data-insert-image]").forEach((button) => {
         button.addEventListener("click", () => {
           const markdown = `![${button.dataset.imageAlt}](images/${button.dataset.imageFilename})`;
@@ -1076,6 +1458,7 @@
           feedback.textContent = "Görsel Markdown’a eklendi. Değişikliği kalıcı yapmak için kaydedin.";
         });
       });
+
       copyButton?.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(editor.value);
@@ -1084,10 +1467,11 @@
           feedback.textContent = "Kopyalama başarısız oldu; Markdown alanından elle kopyalayabilirsiniz.";
         }
       });
+
       saveButton?.addEventListener("click", async () => {
-        const originalLabel = saveButton.textContent;
+        const originalLabel = saveButton.innerHTML;
         saveButton.disabled = true;
-        saveButton.textContent = "Kaydediliyor…";
+        saveButton.innerHTML = `<svg class="btn-icon animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg><span>Kaydediliyor…</span>`;
         feedback.textContent = "Markdown değişiklikleri kaydediliyor.";
         try {
           const response = await fetch(saveButton.dataset.saveUrl, {
@@ -1106,9 +1490,10 @@
           feedback.textContent = error.message || "Kaydetme başarısız oldu; tekrar deneyin.";
         } finally {
           saveButton.disabled = false;
-          saveButton.textContent = originalLabel;
+          saveButton.innerHTML = originalLabel;
         }
       });
+
       render();
     });
   };
@@ -1120,6 +1505,41 @@
     window.setTimeout(() => window.location.reload(), 5000);
   };
 
+  const initModuleSwitcher = () => {
+    const switcher = document.querySelector("[data-module-switcher]");
+    if (!switcher || switcher.dataset.moduleSwitcherBound) return;
+    switcher.dataset.moduleSwitcherBound = "true";
+
+    const trigger = switcher.querySelector("[data-module-switch-toggle]");
+    const dropdown = switcher.querySelector("[data-module-dropdown-menu]");
+    if (!trigger || !dropdown) return;
+
+    const toggle = (open) => {
+      const isExpanded = open !== undefined ? open : dropdown.hidden;
+      dropdown.hidden = !isExpanded;
+      trigger.setAttribute("aria-expanded", String(isExpanded));
+      trigger.classList.toggle("is-active", isExpanded);
+    };
+
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggle();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!switcher.contains(e.target)) {
+        toggle(false);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !dropdown.hidden) {
+        toggle(false);
+        trigger.focus();
+      }
+    });
+  };
+
   const init = () => {
     document.querySelectorAll("[data-auto-submit]").forEach((element) => {
       if (element.dataset.autoSubmitBound) return;
@@ -1127,6 +1547,7 @@
       element.addEventListener("change", () => element.form?.requestSubmit());
     });
     animateDashboard();
+    initModuleSwitcher();
     initLiveCounters();
     initHealthScoreGauge();
     initBudgetSelector();

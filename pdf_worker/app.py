@@ -277,25 +277,64 @@ def sanitize_markdown(markdown, running_artifacts, fix_hyphenation_enabled=True)
 
 
 def heal_hyphenation(markdown):
-    return re.sub(r"(?<=\w)-\n(?=[a-zà-öø-ÿğüşıöç])", "", markdown)
+    # Heal hyphenated words broken across lines (e.g. "nonradia-\ntive" -> "nonradiative")
+    return re.sub(r"(?<=\w)-\n[ \t]*(?=[a-zA-ZğüşıöçĞÜŞİÖÇ])", "", markdown)
 
 
 def unwrap_soft_breaks(markdown):
-    paragraphs = markdown.split("\n\n")
-    cleaned = []
-    for paragraph in paragraphs:
-        lines = paragraph.splitlines()
-        if len(lines) < 2 or any(line.startswith(("#", "- ", "* ", "|", "```")) for line in lines):
-            cleaned.append(paragraph)
+    # Split document by two or more newlines (paragraph boundaries)
+    raw_blocks = re.split(r"\n\s*\n", markdown)
+    cleaned_blocks = []
+    for raw_block in raw_blocks:
+        block = raw_block.strip()
+        if not block:
             continue
-        merged = lines[0]
-        for line in lines[1:]:
-            if merged.rstrip().endswith((".", "!", "?", ":", ";")):
-                merged += "\n" + line
+        # Preserve code blocks, tables, and YAML frontmatter verbatim
+        if block.startswith("```") or block.startswith("|") or block.startswith("---"):
+            cleaned_blocks.append(block)
+            continue
+
+        lines = block.splitlines()
+        # Check if this block is a list or contains list items
+        has_list_items = any(re.match(r"^\s*([-*+]|\d+\.)\s+", line) for line in lines)
+        if has_list_items:
+            item_lines = []
+            for line in lines:
+                stripped = line.strip()
+                if re.match(r"^([-*+]|\d+\.)\s+", stripped):
+                    item_lines.append(stripped)
+                elif item_lines:
+                    item_lines[-1] += " " + stripped
+                else:
+                    item_lines.append(stripped)
+            cleaned_blocks.append("\n".join(item_lines))
+            continue
+
+        # Check for blockquotes
+        has_blockquotes = all(line.strip().startswith(">") for line in lines if line.strip())
+        if has_blockquotes:
+            quote_text = " ".join(re.sub(r"^>\s*", "", line.strip()) for line in lines if line.strip())
+            cleaned_blocks.append(f"> {quote_text}")
+            continue
+
+        # Regular text block / paragraph: merge soft breaks into a smooth continuous paragraph
+        paragraph_parts = []
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            if re.match(r"^#{1,6}\s+", stripped):
+                if paragraph_parts:
+                    cleaned_blocks.append(" ".join(paragraph_parts))
+                    paragraph_parts = []
+                cleaned_blocks.append(stripped)
             else:
-                merged += " " + line.lstrip()
-        cleaned.append(merged)
-    return "\n\n".join(cleaned)
+                paragraph_parts.append(stripped)
+
+        if paragraph_parts:
+            cleaned_blocks.append(" ".join(paragraph_parts))
+
+    return "\n\n".join(cleaned_blocks)
 
 
 def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
