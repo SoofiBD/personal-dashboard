@@ -12,10 +12,26 @@
 
 <% if @document_conversion.completed? %>
   <% asset_map = @document_conversion.assets.index_with { |asset| finance_document_conversion_asset_path(@document_conversion, asset) } %>
-  <section class="document-workspace" data-document-workspace data-document-assets="<%= json_escape(asset_map.to_json) %>">
+  <section class="document-workspace workspace-view--split" data-document-workspace data-document-assets="<%= json_escape(asset_map.to_json) %>">
     <div class="document-workspace-toolbar">
       <div class="workspace-meta-group">
-        <strong><%= t("document_conversions.workspace", default: "Çalışma alanı") %></strong>
+        <div class="workspace-meta-title-row">
+          <strong><%= t("document_conversions.workspace", default: "Çalışma alanı") %></strong>
+          <div class="workspace-view-switcher" role="group" aria-label="<%= t("document_conversions.view_mode", default: "Görünüm modu") %>">
+            <button class="button button-ghost button-compact is-active" type="button" data-view-mode="split" title="<%= t("document_conversions.view_split", default: "İkili Görünüm") %>">
+              <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+              <span><%= t("document_conversions.view_split", default: "İkili") %></span>
+            </button>
+            <button class="button button-ghost button-compact" type="button" data-view-mode="editor" title="<%= t("document_conversions.view_editor", default: "Yalnızca Düzenleyici") %>">
+              <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span><%= t("document_conversions.view_editor", default: "Düzenleyici") %></span>
+            </button>
+            <button class="button button-ghost button-compact" type="button" data-view-mode="preview" title="<%= t("document_conversions.view_preview", default: "Yalnızca Önizleme") %>">
+              <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span><%= t("document_conversions.view_preview", default: "Önizleme") %></span>
+            </button>
+          </div>
+        </div>
         <span><%= t("document_conversions.workspace_meta", count: @document_conversion.assets.count, default: "#{@document_conversion.assets.count} görsel · Markdown değişiklikleri ZIP dışa aktarımına uygulanır.") %></span>
       </div>
       <div class="document-workspace-actions">
@@ -71,7 +87,42 @@
     <p class="document-workspace-feedback" data-workspace-feedback role="status" aria-atomic="true"></p>
     <div class="document-workspace-grid">
       <section class="panel markdown-editor-panel" aria-labelledby="markdown-editor-title">
-        <div class="panel-header"><div><h2 id="markdown-editor-title"><%= t("document_conversions.editor_title", default: "Markdown") %></h2><p><%= t("document_conversions.editor_subtitle", default: "İndirmeden önce içeriği düzenleyin.") %></p></div></div>
+        <div class="panel-header">
+          <div>
+            <h2 id="markdown-editor-title"><%= t("document_conversions.editor_title", default: "Markdown Düzenleyici") %></h2>
+            <p><%= t("document_conversions.editor_subtitle", default: "İndirmeden önce içeriği düzenleyin veya paragrafları otomatik birleştirin.") %></p>
+          </div>
+          <div class="editor-quick-tools">
+            <button class="button button-accent button-compact" type="button" data-format-unwrap title="<%= t("document_conversions.format_unwrap_title", default: "Kırılmış satır sonlarını birleştirip düzgün paragraflara dönüştürür") %>">
+              <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h14"/><polyline points="14 9 17 12 14 15"/></svg>
+              <span><%= t("document_conversions.format_unwrap", default: "Paragrafları Düzelt") %></span>
+            </button>
+            <button class="button button-secondary button-compact" type="button" data-toggle-wrap title="<%= t("document_conversions.toggle_wrap", default: "Satır Kaydırma") %>">
+              <svg class="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h15a3 3 0 1 1 0 6h-4"/><polyline points="16 16 14 18 16 20"/></svg>
+              <span><%= t("document_conversions.toggle_wrap", default: "Kaydır") %></span>
+            </button>
+          </div>
+        </div>
+        <div class="editor-format-bar" role="toolbar" aria-label="<%= t("document_conversions.editor_aria", default: "Biçimlendirme araçları") %>">
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="bold" title="<%= t("document_conversions.format_bold", default: "Kalın (Ctrl+B)") %>"><strong>B</strong></button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="italic" title="<%= t("document_conversions.format_italic", default: "İtalik (Ctrl+I)") %>"><em>I</em></button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="heading" title="<%= t("document_conversions.format_heading", default: "Başlık") %>"><strong>H</strong></button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="link" title="Link (Ctrl+K)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="quote" title="<%= t("document_conversions.format_quote", default: "Alıntı") %>">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 7 1 8 3 8z"/></svg>
+          </button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="list" title="<%= t("document_conversions.format_list", default: "Liste") %>">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="code" title="<%= t("document_conversions.format_code", default: "Kod Bloğu") %>">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </button>
+          <button class="button button-ghost button-icon-only" type="button" data-insert-syntax="table" title="<%= t("document_conversions.format_table", default: "Tablo") %>">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          </button>
+        </div>
         <div class="markdown-find-bar" role="search" aria-label="<%= t("document_conversions.find_replace_aria", default: "Markdown içinde bul ve değiştir") %>">
           <label class="visually-hidden" for="markdown-find"><%= t("document_conversions.find_label", default: "Bul") %></label>
           <input id="markdown-find" type="search" placeholder="<%= t("document_conversions.find_placeholder", default: "Metin bul") %>" data-markdown-find autocomplete="off">
@@ -84,11 +135,23 @@
         </div>
         <div class="markdown-editor-shell">
           <pre class="markdown-line-numbers" data-markdown-line-numbers aria-hidden="true"></pre>
-          <textarea class="markdown-result" data-markdown-editor aria-label="<%= t("document_conversions.editor_aria", default: "Düzenlenebilir Markdown içeriği") %>"><%= @document_conversion.markdown_content %></textarea>
+          <textarea class="markdown-result" data-markdown-editor aria-label="<%= t("document_conversions.editor_aria", default: "Düzenlenebilir Markdown içeriği") %>" spellcheck="false"><%= @document_conversion.markdown_content %></textarea>
+        </div>
+        <div class="editor-status-bar" data-editor-status-bar>
+          <span data-status-lines>0 satır</span>
+          <span class="status-sep">•</span>
+          <span data-status-words>0 kelime</span>
+          <span class="status-sep">•</span>
+          <span data-status-chars>0 karakter</span>
         </div>
       </section>
       <section class="panel markdown-preview-panel" aria-labelledby="markdown-preview-title">
-        <div class="panel-header"><div><h2 id="markdown-preview-title"><%= t("document_conversions.preview_title", default: "Önizleme") %></h2><p><%= t("document_conversions.preview_subtitle", default: "Görseller güvenli medya rotasından yüklenir.") %></p></div></div>
+        <div class="panel-header">
+          <div>
+            <h2 id="markdown-preview-title"><%= t("document_conversions.preview_title", default: "Canlı Önizleme") %></h2>
+            <p><%= t("document_conversions.preview_subtitle", default: "Görseller ve biçimlendirmeler anlık olarak işlenir.") %></p>
+          </div>
+        </div>
         <div class="markdown-preview" data-markdown-preview tabindex="0"></div>
       </section>
     </div>

@@ -77,6 +77,13 @@ class PdfWorkerTest(unittest.TestCase):
         self.assertEqual(0, result["stats"]["images_extracted"])
         self.assertNotIn("---", result["markdown_content"])
 
+    def test_unwraps_soft_breaks_and_heals_hyphenation(self):
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((72, 100), "A minimal theory of nonradia-\ntive energy transfer from a\ntwo-dimensional moire exciton.\nNext sentence starts here.")
+        result = convert_pdf(document, include_yaml_frontmatter=False)
+        self.assertIn("A minimal theory of nonradiative energy transfer from a two-dimensional moire exciton. Next sentence starts here.", result["markdown_content"])
+
     def test_orders_two_column_text_left_before_right(self):
         document = fitz.open()
         page = document.new_page(width=600, height=800)
