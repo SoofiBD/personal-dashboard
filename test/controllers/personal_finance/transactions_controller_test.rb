@@ -97,7 +97,8 @@ class PersonalFinance::TransactionsControllerTest < PersonalFinance::Integration
     assert_response :success
     assert_match "text/csv", response.content_type
     assert_equal "\uFEFF", response.body[0]
-    assert_includes response.headers["Content-Disposition"], "transactions_#{Date.current.strftime("%Y-%m")}_#{Date.current.strftime("%Y-%m")}.csv"
+    expected_month = @t1.occurred_on.strftime("%Y-%m")
+    assert_includes response.headers["Content-Disposition"], "transactions_#{expected_month}_#{expected_month}.csv"
 
     rows = CSV.parse(response.body.delete_prefix("\uFEFF"))
     assert_equal %w[date type amount category account tags note], rows.first

@@ -2,14 +2,15 @@ require "test_helper"
 
 class PersonalFinance::PdfDocumentConversionJobTest < ActiveJob::TestCase
   setup do
-    @conversion = PersonalFinance::DocumentConversion.create!(
-      user: User.dashboard_owner, source_filename: "report.pdf", source_pdf_data: "%PDF-test", source_pdf_byte_size: 9
-    )
+    @conversion = PersonalFinance::DocumentConversion.create!(user: User.dashboard_owner, source_filename: "report.pdf")
+    @conversion.source_pdf.attach(io: StringIO.new("%PDF-test"), filename: "report.pdf", content_type: "application/pdf")
     @conversion.processing!
   end
 
   test "stores the worker result and replaces old assets" do
-    @conversion.assets.create!(filename: "old.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1, data: "old")
+    old_asset = @conversion.assets.build(filename: "old.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1)
+    old_asset.file.attach(io: StringIO.new("old"), filename: old_asset.filename, content_type: old_asset.content_type)
+    old_asset.save!
     result = {
       markdown_content: "# Converted",
       processing_stats: {"page_count" => 2},
@@ -34,6 +35,7 @@ class PersonalFinance::PdfDocumentConversionJobTest < ActiveJob::TestCase
     assert_predicate @conversion.reload, :completed?
     assert_equal "# Converted", @conversion.markdown_content
     assert_equal ["img_p2_1.png"], @conversion.assets.pluck(:filename)
+    assert_equal "new", @conversion.assets.first.file.download
     assert_equal "inline", client.arguments[:annotation_mode]
     assert_equal "%PDF-test", client.arguments[:pdf_data]
   end

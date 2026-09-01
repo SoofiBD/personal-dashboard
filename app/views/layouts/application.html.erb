@@ -117,6 +117,7 @@
               <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
               <nav class="sidebar-nav">
                 <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                <%= finance_navigation_item "PDF Araçları", finance_pdf_tools_path, "document" %>
                 <%= finance_navigation_item t("app.sidebar.documents", default: "PDF Dokümanları (MarkItDown)"), finance_document_conversions_path, "document" %>
                 <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
                 <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>

@@ -2058,6 +2058,65 @@ textarea:focus-visible {
   margin-top: 0.25rem;
 }
 
+/* PDF tools stay a Dashboard-native landing page; Stirling itself is isolated behind /pdf-editor. */
+.pdf-tools-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.pdf-tools-hero h2,
+.pdf-tool-card h2 {
+  color: var(--text-main);
+  font-size: 1.1rem;
+  margin: 0.4rem 0;
+}
+
+.pdf-tools-hero p,
+.pdf-tool-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.pdf-tools-status {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.7rem;
+}
+
+.pdf-tools-status.is-ready { background: var(--positive-bg); color: var(--positive); }
+.pdf-tools-status.is-waiting { background: var(--warning-bg); color: var(--warning); }
+
+.pdf-tools-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 1.25rem;
+}
+
+.pdf-tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pdf-tool-card .text-link { margin-top: auto; padding-top: 0.5rem; }
+
+@media (max-width: 1024px) {
+  .pdf-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .pdf-tools-hero { align-items: flex-start; flex-direction: column; }
+  .pdf-tools-grid { grid-template-columns: 1fr; }
+}
+
 /* ==========================================================================
    8. ENHANCED BAR CHART & VISUALIZATIONS
    ========================================================================== */
