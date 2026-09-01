@@ -152,6 +152,16 @@ Make sure you have one of the following setups installed on your machine:
    ```
    *Migrations and initial database setup run automatically upon container boot.*
 
+### Production HTTPS
+
+Production uses a separate Compose definition so the local HTTP stack is never reused as an internet-facing deployment. Copy `.env.production.example` to `.env.production`, set a DNS-resolvable `DASHBOARD_DOMAIN`, strong database credentials, and `RAILS_MASTER_KEY`; then run:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yaml up --build -d
+```
+
+Caddy obtains and renews TLS certificates for the configured domain. Do not expose the development `compose.yaml` stack beyond `127.0.0.1`.
+
 6. **Stopping the containers:**
    ```bash
    docker compose down
@@ -221,7 +231,7 @@ RAILS_ENV=test bin/rails test
 
 Open **PDF Dokümanları** from the Finance navigation to upload a PDF (maximum 25 MB and 250 pages). The source PDF is retained in the owner-scoped conversion record so the same document can be reprocessed with different settings.
 
-The upload and reprocess forms support image extraction (50–500 px threshold), header/footer removal, caption binding, annotation extraction mode, YAML frontmatter, line-wrap repair, and table detection. Conversion runs through Active Job so the web request returns immediately; the development setup uses Rails’ async adapter. Configure a durable adapter such as Solid Queue before deploying where process restarts must not lose queued work. The worker is intentionally not published on a host port.
+The upload and reprocess forms support image extraction (50–500 px threshold), header/footer removal, caption binding, annotation extraction mode, YAML frontmatter, line-wrap repair, and table detection. Conversion runs through Solid Queue so the web request returns immediately and queued work survives web-process restarts. The worker is intentionally not published on a host port.
 
 To review old conversion records without deleting anything, run `docker compose run --rm web bin/rails document_conversions:purge[90]`. The task is dry-run by default; add `CONFIRM=yes` only after reviewing the count to permanently remove those records, their source PDFs, and extracted assets.
 

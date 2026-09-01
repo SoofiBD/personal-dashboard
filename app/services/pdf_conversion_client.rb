@@ -53,7 +53,7 @@ class PdfConversionClient
     request.body = JSON.generate(
       markdown_content: markdown_content,
       source_filename: safe_filename(source_filename),
-      images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.data)} }
+      images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.binary_data)} }
     )
     response = http.request(request)
     raise Error, "ZIP dışa aktarma servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)
@@ -71,7 +71,7 @@ class PdfConversionClient
     request.body = JSON.generate(
       markdown_content: markdown_content,
       source_filename: safe_filename(source_filename),
-      images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.data)} }
+      images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.binary_data)} }
     )
     response = http.request(request)
     raise Error, "HTML dışa aktarma servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)

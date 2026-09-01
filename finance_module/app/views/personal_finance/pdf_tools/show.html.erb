@@ -1,0 +1,55 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= finance_svg_icon("document", class: "icon-xs", "aria-hidden": true) %> <%= t("pdf_tools.eyebrow") %></p>
+    <h1><%= t("pdf_tools.title") %></h1>
+    <p class="page-subtitle"><%= t("pdf_tools.subtitle") %></p>
+  </div>
+  <% if @stirling_available %>
+    <%= link_to "/pdf-editor/", class: "button button-primary" do %>
+      <%= finance_svg_icon("edit", class: "icon-sm", "aria-hidden": true) %>
+      <span><%= t("pdf_tools.open_editor") %></span>
+    <% end %>
+  <% end %>
+</header>
+
+<section class="panel pdf-tools-hero" aria-labelledby="pdf-tools-status-title">
+  <div>
+    <p class="metric-label" id="pdf-tools-status-title"><%= t("pdf_tools.service_status") %></p>
+    <% if @stirling_available %>
+      <h2><%= t("pdf_tools.engine_ready") %></h2>
+      <p><%= t("pdf_tools.engine_ready_description") %></p>
+    <% else %>
+      <h2><%= t("pdf_tools.engine_starting") %></h2>
+      <p><%= t("pdf_tools.engine_starting_description") %></p>
+    <% end %>
+  </div>
+  <span class="pdf-tools-status <%= @stirling_available ? "is-ready" : "is-waiting" %>"><%= @stirling_available ? t("pdf_tools.ready") : t("pdf_tools.waiting") %></span>
+</section>
+
+<section class="pdf-tools-grid" aria-label="<%= t("pdf_tools.aria_label") %>">
+  <% [
+    ["edit", "edit", "/pdf-editor/add-text"],
+    ["document", "merge_split", "/pdf-editor/merge-pdfs"],
+    ["chart", "convert_compress", "/pdf-editor/compress-pdf"],
+    ["vault", "security_signature", "/pdf-editor/sign"]
+  ].each do |icon, tool, tool_path| %>
+    <article class="panel pdf-tool-card">
+      <div class="metric-badge-icon icon-cashflow-badge"><%= finance_svg_icon(icon, "aria-hidden": true) %></div>
+      <h2><%= t("pdf_tools.tools.#{tool}.title") %></h2>
+      <p><%= t("pdf_tools.tools.#{tool}.description") %></p>
+      <% if @stirling_available %>
+        <%= link_to t("pdf_tools.open_tool"), tool_path, class: "text-link" %>
+      <% end %>
+    </article>
+  <% end %>
+</section>
+
+<section class="panel pdf-tools-ai-note" aria-labelledby="pdf-tools-ai-title">
+  <div class="panel-header">
+    <div>
+      <h2 id="pdf-tools-ai-title"><%= t("pdf_tools.ai.title") %></h2>
+      <p><%= t("pdf_tools.ai.description") %></p>
+    </div>
+    <span class="pdf-tools-status is-waiting"><%= t("pdf_tools.ai.coming_soon") %></span>
+  </div>
+</section>

@@ -1,0 +1,9 @@
+:80 {
+  handle /pdf-editor* {
+    reverse_proxy stirling-pdf:8080
+  }
+
+  handle {
+    reverse_proxy web:3000
+  }
+}

@@ -6,6 +6,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @owner = User.dashboard_owner
     @owner.update!(password: PASSWORD, password_confirmation: PASSWORD, onboarded_at: Time.current)
+    MfaController::MFA_ATTEMPT_CACHE.clear
   end
 
   test "valid password creates an authenticated session" do
@@ -72,6 +73,40 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     get finance_root_path
     assert_redirected_to new_session_path
+
+    post verify_mfa_path, params: {code: Totp.code_for(@owner.mfa_secret)}
+    assert_redirected_to root_path
+  end
+
+  test "login MFA challenge is rate limited and invalidated after repeated invalid codes" do
+    @owner.prepare_mfa!
+    @owner.enable_mfa!(Totp.code_for(@owner.mfa_secret))
+
+    post session_path, params: {password: PASSWORD}
+    assert_redirected_to mfa_path
+
+    MfaController::MFA_ATTEMPT_LIMIT.times do
+      post verify_mfa_path, params: {code: "000000"}, headers: {"REMOTE_ADDR" => "192.0.2.1"}
+      assert_response :unprocessable_content
+    end
+
+    post verify_mfa_path, params: {code: "000000"}, headers: {"REMOTE_ADDR" => "198.51.100.1"}
+    assert_response :too_many_requests
+    assert_equal MfaController::MFA_ATTEMPT_WINDOW.to_i.to_s, response.headers["Retry-After"]
+
+    get finance_root_path
+    assert_redirected_to new_session_path
+  end
+
+  test "a valid MFA code remains accepted before the rate limit is reached" do
+    @owner.prepare_mfa!
+    @owner.enable_mfa!(Totp.code_for(@owner.mfa_secret))
+
+    post session_path, params: {password: PASSWORD}
+    (MfaController::MFA_ATTEMPT_LIMIT - 1).times do
+      post verify_mfa_path, params: {code: "000000"}
+      assert_response :unprocessable_content
+    end
 
     post verify_mfa_path, params: {code: Totp.code_for(@owner.mfa_secret)}
     assert_redirected_to root_path
