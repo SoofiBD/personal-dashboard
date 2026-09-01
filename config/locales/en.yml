@@ -61,13 +61,33 @@ en:
     skip_link: Skip to main content
     meta_description: Personal finance and budget management dashboard.
     sidebar:
+      module_switcher: Switch Module
+      select_module: SELECT MODULE
+      switch_btn: Module
+      module_finance: Personal Finance
+      module_finance_desc: Income, expenses, budget, cash flow
+      module_pdf: PDF & Document Tools
+      module_pdf_desc: PDF editing, Markdown, tools
+      module_hub: Workspace Hub
+      module_hub_desc: Central hub for all modules
       section_label: FINANCE MODULE
       section_overview: OVERVIEW & ANALYSIS
       section_transactions: TRANSACTIONS & DEBTS
       section_assets: ASSETS & BUDGET
       section_system: SYSTEM & DATA
+      section_shared_settings: SHARED SETTINGS
+      section_pdf_workspace: PDF & WORKSPACE
+      section_pdf_features: PDF OPERATIONS
       section_modules: MODULES & NAVIGATION
+      pdf_workspace: PDF Workspace
+      pdf_markdown: PDF to Markdown
+      pdf_editor: PDF Editor
+      pdf_text_edit: Edit Text & Pages
+      pdf_merge_split: Merge & Split
+      pdf_compress: Convert & Compress
+      pdf_security: Security & Sign
       switch_to_finance: Finance Dashboard
+      switch_to_pdf: PDF Tools
       switch_to_markitdown: MarkItDown
       overview: Overview
       notifications: Notifications
@@ -877,9 +897,25 @@ en:
     copy_markdown: Copy
     download_zip: Download ZIP
     download_html: Download HTML
-    editor_title: Markdown
-    editor_subtitle: Edit content before downloading.
+    view_split: Split View
+    view_editor: Editor Only
+    view_preview: Preview Only
+    format_unwrap: Format Paragraphs
+    format_unwrap_title: Merge broken line endings into continuous paragraphs
+    toggle_wrap: Word Wrap
+    format_bold: Bold
+    format_italic: Italic
+    format_heading: Heading
+    format_quote: Quote
+    format_list: List
+    format_table: Table
+    format_code: Code Block
+    editor_title: Markdown Editor
+    editor_subtitle: Edit content or automatically merge broken lines into clean paragraphs.
     editor_aria: Editable Markdown content
+    editor_status_lines: '%{count} lines'
+    editor_status_words: '%{count} words'
+    editor_status_chars: '%{count} chars'
     find_replace_aria: Find and replace in Markdown
     find_label: Find
     find_placeholder: Find text
@@ -888,8 +924,8 @@ en:
     replace_placeholder: Replace with
     replace_btn: Replace
     replace_all: Replace all
-    preview_title: Preview
-    preview_subtitle: Images are loaded from secure media routes.
+    preview_title: Live Preview
+    preview_subtitle: Images and formatting render in real-time.
     source_pdf_title: Source PDF
     source_pdf_subtitle: Compare output with source document. Browser preview can also open in a new tab.
     open_new_tab: Open in new tab

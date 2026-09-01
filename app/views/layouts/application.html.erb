@@ -26,108 +26,159 @@
     <a class="skip-link" href="#main-content"><%= t("app.skip_link", default: "Ana içeriğe atla") %></a>
     <%
       show_sidebar = !(@hide_sidebar || content_for?(:hide_sidebar))
-      is_markitdown = controller_name.in?(%w[document_conversions document_assets]) || @current_module == :markitdown
+      current_mod = active_app_module
     %>
     <div class="app-shell <%= 'app-shell-no-sidebar' unless show_sidebar %>">
       <% if show_sidebar %>
         <aside class="sidebar" aria-label="<%= t('app.sidebar.nav_aria_label', default: 'Ana Navigasyon') %>">
-        <% if is_markitdown %>
           <div class="brand-wrapper">
-            <%= link_to finance_document_conversions_path, class: "brand" do %>
-              <div class="brand-icon">
-                <%= finance_svg_icon("document", class: "icon-brand") %>
+            <div class="sidebar-module-selector" data-module-switcher>
+              <div class="active-module-header">
+                <%= link_to (current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
+                  <div class="brand-icon brand-icon--<%= current_mod %>">
+                    <%= finance_svg_icon(current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault"), class: "icon-brand") %>
+                  </div>
+                  <div class="brand-text">
+                    <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
+                    <span class="brand-subtitle"><%= current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
+                  </div>
+                <% end %>
+                <button type="button" class="module-switch-trigger" data-module-switch-toggle aria-expanded="false" aria-label="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>" title="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>">
+                  <svg class="icon-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
               </div>
-              <div class="brand-text">
-                <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-                <span class="brand-subtitle">MarkItDown</span>
+
+              <div class="module-dropdown-menu" data-module-dropdown-menu hidden>
+                <p class="module-dropdown-title"><%= t("app.sidebar.select_module", default: "MODÜL SEÇİN") %></p>
+                <%= link_to finance_root_path, class: "module-dropdown-item #{'is-active' if current_mod == :finance}" do %>
+                  <div class="module-dropdown-icon icon-finance"><%= finance_svg_icon("vault") %></div>
+                  <div class="module-dropdown-info">
+                    <strong><%= t("app.sidebar.module_finance", default: "Kişisel Finans") %></strong>
+                    <span><%= t("app.sidebar.module_finance_desc", default: "Gelir-gider, bütçe, nakit akışı") %></span>
+                  </div>
+                  <% if current_mod == :finance %>
+                    <span class="module-active-dot" aria-hidden="true"></span>
+                  <% end %>
+                <% end %>
+
+                <%= link_to finance_pdf_tools_path, class: "module-dropdown-item #{'is-active' if current_mod == :pdf_tools}" do %>
+                  <div class="module-dropdown-icon icon-pdf"><%= finance_svg_icon("document") %></div>
+                  <div class="module-dropdown-info">
+                    <strong><%= t("app.sidebar.module_pdf", default: "PDF & Doküman Araçları") %></strong>
+                    <span><%= t("app.sidebar.module_pdf_desc", default: "PDF düzenleme, Markdown, araçlar") %></span>
+                  </div>
+                  <% if current_mod == :pdf_tools %>
+                    <span class="module-active-dot" aria-hidden="true"></span>
+                  <% end %>
+                <% end %>
+
+                <div class="module-dropdown-divider"></div>
+                <%= link_to root_path, class: "module-dropdown-item #{'is-active' if current_page?(root_path)}" do %>
+                  <div class="module-dropdown-icon icon-hub"><%= finance_svg_icon("overview") %></div>
+                  <div class="module-dropdown-info">
+                    <strong><%= t("app.sidebar.module_hub", default: "Çalışma Alanı (Hub)") %></strong>
+                    <span><%= t("app.sidebar.module_hub_desc", default: "Tüm modüllerin ana merkezi") %></span>
+                  </div>
+                <% end %>
               </div>
-            <% end %>
+            </div>
           </div>
 
           <div class="sidebar-nav-groups">
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("document_conversions.eyebrow", default: "DOKÜMAN ARAÇLARI") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("document_conversions.title", default: "PDF’den Markdown’a"), finance_document_conversions_path, "document" %>
-              </nav>
-            </div>
-
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("app.sidebar.section_modules", default: "MODÜLLER & GEÇİŞ") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
-                <%= finance_navigation_item t("app.sidebar.switch_to_finance", default: "Finance Paneli"), finance_root_path, "vault" %>
-                <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
-                <% if current_panel_user.owner? %>
-                  <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
-                <% end %>
-              </nav>
-            </div>
-          </div>
-        <% else %>
-          <div class="brand-wrapper">
-            <%= link_to finance_root_path, class: "brand" do %>
-              <div class="brand-icon">
-                <%= finance_svg_icon("vault", class: "icon-brand") %>
+            <% if current_mod == :pdf_tools %>
+              <!-- PDF & Doküman Modülü -->
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_pdf_workspace", default: "PDF & ÇALIŞMA ALANI") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.pdf_workspace", default: "PDF Çalışma Alanı"), finance_pdf_tools_path, "document" %>
+                  <%= finance_navigation_item t("app.sidebar.pdf_markdown", default: "PDF’den Markdown’a"), finance_document_conversions_path, "document" %>
+                  <%= finance_navigation_item t("app.sidebar.pdf_editor", default: "PDF Düzenleyici"), "/pdf-editor/", "edit", target: "_blank" %>
+                </nav>
               </div>
-              <div class="brand-text">
-                <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-                <span class="brand-subtitle"><%= t("app.module", default: "Finance") %></span>
+
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_pdf_features", default: "PDF İŞLEMLERİ") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.pdf_text_edit", default: "Metin & Sayfa Düzenle"), "/pdf-editor/add-text", "edit", target: "_blank" %>
+                  <%= finance_navigation_item t("app.sidebar.pdf_merge_split", default: "Birleştir ve Böl"), "/pdf-editor/merge-pdfs", "merge", target: "_blank" %>
+                  <%= finance_navigation_item t("app.sidebar.pdf_compress", default: "Dönüştür ve Sıkıştır"), "/pdf-editor/compress-pdf", "compress", target: "_blank" %>
+                  <%= finance_navigation_item t("app.sidebar.pdf_security", default: "Güvenlik ve İmza"), "/pdf-editor/sign", "shield", target: "_blank" %>
+                </nav>
+              </div>
+            <% elsif current_mod == :settings %>
+              <!-- Ortak Ayarlar Modülü -->
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_shared_settings", default: "ORTAK AYARLAR") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
+                  <% if current_panel_user.owner? %>
+                    <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
+                  <% end %>
+                  <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
+                </nav>
+              </div>
+
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_modules", default: "MODÜLLER") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.switch_to_finance", default: "Finance Paneli"), finance_root_path, "vault" %>
+                  <%= finance_navigation_item t("app.sidebar.switch_to_pdf", default: "PDF Araçları"), finance_pdf_tools_path, "document" %>
+                  <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                </nav>
+              </div>
+            <% else %>
+              <!-- Finans Modülü -->
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_overview", default: "ÖZET & ANALİZ") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
+                  <%= finance_navigation_item t("app.sidebar.notifications", default: "Bildirimler"), finance_notifications_path, "chart", badge: current_panel_user.finance_notifications.unread.count %>
+                  <%= finance_navigation_item t("app.sidebar.spending_report", default: "Harcama Analizi"), finance_spending_report_path, "chart" %>
+                  <%= finance_navigation_item t("app.sidebar.cash_flow_forecast", default: "Nakit Akışı"), finance_cash_flow_forecast_path, "chart" %>
+                </nav>
+              </div>
+
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_transactions", default: "İŞLEMLER & BORÇLAR") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
+                  <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan"), finance_recurring_rules_path, "recurring" %>
+                  <%= finance_navigation_item t("app.sidebar.subscriptions", default: "Abonelikler"), finance_subscriptions_path, "recurring" %>
+                  <%= finance_navigation_item t("app.sidebar.debts", default: "Borç & Taksit"), finance_debts_path, "budget" %>
+                </nav>
+              </div>
+
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("app.sidebar.section_assets", default: "VARLIK & BÜTÇE") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
+                  <%= finance_navigation_item t("app.sidebar.exchange_rates", default: "Döviz Kurları"), finance_exchange_rates_path, "chart" %>
+                  <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
+                  <%= finance_navigation_item t("app.sidebar.tags", default: "Etiketler"), finance_tags_path, "tags" %>
+                  <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
+                  <%= finance_navigation_item t("app.sidebar.budget_templates", default: "Bütçe Şablonları"), finance_budget_templates_path, "budget" %>
+                  <%= finance_navigation_item t("app.sidebar.yearly_budget", default: "Yıllık Plan"), finance_year_budget_path(Date.current.year), "chart" %>
+                  <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
+                  <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma"), finance_purchase_plans_path, "purchase_plans" %>
+                </nav>
+              </div>
+            <% end %>
+
+            <!-- Ortak Ayarlar: Her Modülde Altta Yer Alır -->
+            <% unless current_mod == :settings %>
+              <div class="sidebar-section sidebar-section--common">
+                <p class="sidebar-label"><%= t("app.sidebar.section_shared_settings", default: "ORTAK AYARLAR") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
+                  <% if current_panel_user.owner? %>
+                    <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
+                  <% end %>
+                  <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
+                  <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                </nav>
               </div>
             <% end %>
           </div>
-
-          <div class="sidebar-nav-groups">
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("app.sidebar.section_overview", default: "ÖZET & ANALİZ") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("app.sidebar.overview", default: "Genel Bakış"), finance_root_path, "dashboard" %>
-                <%= finance_navigation_item t("app.sidebar.notifications", default: "Bildirimler"), finance_notifications_path, "chart", badge: current_panel_user.finance_notifications.unread.count %>
-                <%= finance_navigation_item t("app.sidebar.spending_report", default: "Harcama Analizi"), finance_spending_report_path, "chart" %>
-                <%= finance_navigation_item t("app.sidebar.cash_flow_forecast", default: "Nakit Akışı"), finance_cash_flow_forecast_path, "chart" %>
-              </nav>
-            </div>
-
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("app.sidebar.section_transactions", default: "İŞLEMLER & BORÇLAR") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("app.sidebar.transactions", default: "İşlemler"), finance_transactions_path, "transactions" %>
-                <%= finance_navigation_item t("app.sidebar.recurring_rules", default: "Tekrarlayan"), finance_recurring_rules_path, "recurring" %>
-                <%= finance_navigation_item t("app.sidebar.subscriptions", default: "Abonelikler"), finance_subscriptions_path, "recurring" %>
-                <%= finance_navigation_item t("app.sidebar.debts", default: "Borç & Taksit"), finance_debts_path, "budget" %>
-              </nav>
-            </div>
-
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("app.sidebar.section_assets", default: "VARLIK & BÜTÇE") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("app.sidebar.accounts", default: "Hesaplar"), finance_accounts_path, "accounts" %>
-                <%= finance_navigation_item t("app.sidebar.exchange_rates", default: "Döviz Kurları"), finance_exchange_rates_path, "chart" %>
-                <%= finance_navigation_item t("app.sidebar.categories", default: "Kategoriler"), finance_categories_path, "categories" %>
-                <%= finance_navigation_item t("app.sidebar.tags", default: "Etiketler"), finance_tags_path, "tags" %>
-                <%= finance_navigation_item t("app.sidebar.budget", default: "Aylık Bütçe"), finance_budget_path(Date.current.strftime("%Y-%m")), "budget" %>
-                <%= finance_navigation_item t("app.sidebar.budget_templates", default: "Bütçe Şablonları"), finance_budget_templates_path, "budget" %>
-                <%= finance_navigation_item t("app.sidebar.yearly_budget", default: "Yıllık Plan"), finance_year_budget_path(Date.current.year), "chart" %>
-                <%= finance_navigation_item t("app.sidebar.savings_goals", default: "Tasarruf Hedefleri"), finance_savings_goals_path, "savings_goals" %>
-                <%= finance_navigation_item t("app.sidebar.purchase_plans", default: "Satın Alma"), finance_purchase_plans_path, "purchase_plans" %>
-              </nav>
-            </div>
-
-            <div class="sidebar-section">
-              <p class="sidebar-label"><%= t("app.sidebar.section_system", default: "SİSTEM & VERİ") %></p>
-              <nav class="sidebar-nav">
-                <%= finance_navigation_item t("app.sidebar.workspace_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
-                <%= finance_navigation_item "PDF Araçları", finance_pdf_tools_path, "document" %>
-                <%= finance_navigation_item t("app.sidebar.documents", default: "PDF Dokümanları (MarkItDown)"), finance_document_conversions_path, "document" %>
-                <%= finance_navigation_item t("app.sidebar.data", default: "Veri Yedekleme"), finance_data_path, "chart" %>
-                <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "vault" %>
-                <% if current_panel_user.owner? %>
-                  <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
-                <% end %>
-              </nav>
-            </div>
-          </div>
-        <% end %>
 
         <div class="sidebar-footer">
           <div class="sidebar-footer-row">
@@ -194,6 +245,6 @@
         </main>
       </div>
     </div>
-    <%= render "personal_finance/shared/quick_add_sheet" if show_sidebar && !is_markitdown %>
+    <%= render "personal_finance/shared/quick_add_sheet" if show_sidebar && current_mod == :finance %>
   </body>
 </html>
