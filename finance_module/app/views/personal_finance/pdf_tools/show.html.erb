@@ -37,9 +37,7 @@
       <div class="metric-badge-icon icon-cashflow-badge"><%= finance_svg_icon(icon, "aria-hidden": true) %></div>
       <h2><%= t("pdf_tools.tools.#{tool}.title") %></h2>
       <p><%= t("pdf_tools.tools.#{tool}.description") %></p>
-      <% if @stirling_available %>
-        <%= link_to t("pdf_tools.open_tool"), tool_path, class: "text-link" %>
-      <% end %>
+      <%= link_to t("pdf_tools.open_tool"), tool_path, class: "text-link" %>
     </article>
   <% end %>
 </section>
