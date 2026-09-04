@@ -12,7 +12,7 @@ The original product goal is complete: users can upload a PDF from the Personal 
 - [x] Rails dashboard integration, authenticated owner-scoped document history, upload, delete, and source-PDF storage.
 - [x] Isolated `pdf-worker` service using Microsoft MarkItDown and PyMuPDF, reachable only by the application service network.
 - [x] Input safeguards: PDF signature check, 25 MB file limit, and 250-page conversion limit.
-- [x] Deterministic extraction and cleanup: two-column reading order, repeated header/footer removal, hyphen and line-wrap repair, headings, validated GFM tables, images, captions, and PDF annotations.
+- [x] Deterministic extraction and cleanup: two-column reading order, repeated header/footer removal, hyphen and line-wrap repair, headings, validated GFM tables, images, captions, annotations, and standalone chart/diagram assets with chart-region exclusion from table/text parsing.
 - [x] Configurable conversion settings: image extraction/size threshold, header/footer cleanup, caption binding, annotations, YAML frontmatter, hyphen repair, and table detection.
 - [x] Workspace UI: editable Markdown, live safe preview, line numbers, find/replace, copy, image insertion, reprocessing, processing-state refresh, and extraction statistics.
 - [x] Export: ZIP with relative `images/` links and standalone sanitized HTML with embedded images.

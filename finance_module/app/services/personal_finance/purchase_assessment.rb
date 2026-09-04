@@ -1,10 +1,10 @@
 module PersonalFinance
   class PurchaseAssessment
     SCENARIO_DEFINITIONS = [
-      {key: :cash, label: "Peşin (Nakit)", months: 0},
-      {key: :installment_3, label: "3 Taksit", months: 3},
-      {key: :installment_6, label: "6 Taksit", months: 6},
-      {key: :installment_12, label: "12 Taksit", months: 12}
+      {key: :cash, months: 0},
+      {key: :installment_3, months: 3},
+      {key: :installment_6, months: 6},
+      {key: :installment_12, months: 12}
     ].freeze
 
     def initialize(plan)
@@ -71,7 +71,7 @@ module PersonalFinance
           down = base_down
           monthly = (price - base_down) / defn[:months]
         end
-        build_scenario(defn[:key], defn[:label], down, monthly, false)
+        build_scenario(defn[:key], scenario_label(defn[:key]), down, monthly, false)
       end
 
       if affects_goal?
@@ -79,7 +79,7 @@ module PersonalFinance
         remaining_after_goal = price - applied
         down = [base_down, remaining_after_goal].min
         monthly = (remaining_after_goal - down) / 12.0
-        list << build_scenario(:savings_goal, "Birikim Hedefi Kullanımı", down, monthly, true)
+        list << build_scenario(:savings_goal, scenario_label(:savings_goal), down, monthly, true)
       end
 
       list
@@ -99,6 +99,10 @@ module PersonalFinance
         status: status(down_payment, monthly_cost, affects_goal: affects_goal),
         affects_goal: affects_goal
       }
+    end
+
+    def scenario_label(key)
+      I18n.t("backend.personal_finance.purchase_assessment.scenarios.#{key}", locale: @plan.user.locale)
     end
 
     def recent_transactions

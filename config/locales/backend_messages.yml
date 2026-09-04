@@ -1,0 +1,129 @@
+tr:
+  backend:
+    sessions:
+      mfa_prompt: "İki adımlı doğrulama kodunuzu girin."
+      signed_in: "Giriş başarılı."
+      invalid_credentials: "Parola geçersiz veya dashboard erişimi henüz yapılandırılmamış."
+      signed_out: "Oturum kapatıldı."
+    mfa:
+      password_first: "Önce parolanızla giriş yapın."
+      sign_in_first: "Önce giriş yapın."
+      disabled: "İki adımlı doğrulama kapatıldı."
+      invalid_or_expired: "Doğrulama kodu geçersiz veya süresi dolmuş."
+      enabled: "İki adımlı doğrulama etkinleştirildi."
+      invalid: "Doğrulama kodu geçersiz."
+    profiles:
+      updated: "Profil tercihleriniz güncellendi."
+    users:
+      created: "Kullanıcı oluşturuldu."
+      updated: "Kullanıcı güncellendi."
+      cannot_remove_owner: "sahip rolü kendi hesabınızdan kaldırılamaz"
+      owner_only: "Bu işlem yalnızca hesap sahibine açıktır."
+    personal_finance:
+      debts:
+        deleted: "Borç silindi."
+        payment_recorded: "Ödeme kaydedildi ve bakiye güncellendi."
+        payment_failed: "Ödeme kaydedilemedi."
+        saved: "Borç kaydedildi."
+      subscriptions:
+        saved: "Abonelik kaydedildi."
+        updated: "Abonelik güncellendi."
+        deleted: "Abonelik silindi."
+      budgets:
+        template_requires_empty_budget: "Şablonlar yalnızca boş bir aylık bütçeye uygulanabilir."
+        template_applied: "%{name} şablonu bütçenize uygulandı."
+        template_apply_failed: "Şablon uygulanamadı. Kategorilerinizi ve bütçe toplamını kontrol edin."
+        template_saved: "%{name} şablonu kaydedildi."
+        template_save_failed: "Şablon adı boş olamaz ve hazır şablon adı kullanılamaz."
+      notifications:
+        daily: "Günlük"
+        weekly: "Haftalık"
+        today: "Bugün"
+        this_week: "Bu hafta"
+        limit_title: "%{period} harcama limiti aşıldı"
+        limit_body: "%{period} %{spent} harcadınız; limitiniz %{limit}."
+        budget_title: "Kategori bütçesi aşıldı"
+        budget_body: "%{category} için planlanan %{amount} tutarını aştınız."
+        unusual_title: "Alışılmadık harcama tespit edildi"
+        unusual_body: "%{amount} tutarındaki işlem, son harcamalarınızın ortalamasının belirgin üzerinde."
+        goal_title: "Tasarruf hedefinde %{milestone}%"
+        goal_body: "%{goal} hedefinizin %{milestone}% seviyesine ulaştınız."
+      financial_health_score:
+        expenses: "Giderlerinizi gelirin altında tutmaya odaklanın."
+        savings: "Her ay gelirin en az %20'sini birikime ayırmayı deneyin."
+        budget: "Kategori bütçe limitlerini gözden geçirin."
+        emergency_fund: "Acil durum fonunuzu en az üç aylık gider seviyesine çıkarın."
+        debt: "Borç ödemelerini gelirinizin daha küçük bir bölümünde tutun."
+        balanced: "Finansal görünümünüz dengeli; bu alışkanlıkları koruyun."
+      purchase_assessment:
+        scenarios:
+          cash: "Peşin (Nakit)"
+          installment_3: "3 Taksit"
+          installment_6: "6 Taksit"
+          installment_12: "12 Taksit"
+          savings_goal: "Birikim Hedefi Kullanımı"
+
+en:
+  backend:
+    sessions:
+      mfa_prompt: "Enter your two-factor authentication code."
+      signed_in: "Signed in successfully."
+      invalid_credentials: "The password is invalid or dashboard access has not been configured yet."
+      signed_out: "Signed out successfully."
+    mfa:
+      password_first: "Sign in with your password first."
+      sign_in_first: "Sign in first."
+      disabled: "Two-factor authentication has been disabled."
+      invalid_or_expired: "The verification code is invalid or has expired."
+      enabled: "Two-factor authentication has been enabled."
+      invalid: "The verification code is invalid."
+    profiles:
+      updated: "Your profile preferences have been updated."
+    users:
+      created: "User created."
+      updated: "User updated."
+      cannot_remove_owner: "the owner role cannot be removed from your own account"
+      owner_only: "This action is available only to the account owner."
+    personal_finance:
+      debts:
+        deleted: "Debt deleted."
+        payment_recorded: "Payment recorded and balance updated."
+        payment_failed: "Payment could not be recorded."
+        saved: "Debt saved."
+      subscriptions:
+        saved: "Subscription saved."
+        updated: "Subscription updated."
+        deleted: "Subscription deleted."
+      budgets:
+        template_requires_empty_budget: "Templates can only be applied to an empty monthly budget."
+        template_applied: "%{name} template was applied to your budget."
+        template_apply_failed: "The template could not be applied. Check your categories and budget total."
+        template_saved: "%{name} template was saved."
+        template_save_failed: "The template name cannot be blank or use a built-in template name."
+      notifications:
+        daily: "Daily"
+        weekly: "Weekly"
+        today: "Today"
+        this_week: "This week"
+        limit_title: "%{period} spending limit exceeded"
+        limit_body: "You spent %{spent} %{period}; your limit is %{limit}."
+        budget_title: "Category budget exceeded"
+        budget_body: "You exceeded the planned %{amount} for %{category}."
+        unusual_title: "Unusual spending detected"
+        unusual_body: "A transaction of %{amount} is significantly above your recent spending average."
+        goal_title: "Savings goal %{milestone}%"
+        goal_body: "You reached %{milestone}% of your %{goal} savings goal."
+      financial_health_score:
+        expenses: "Focus on keeping your expenses below your income."
+        savings: "Try to set aside at least 20% of your income each month."
+        budget: "Review your category budget limits."
+        emergency_fund: "Build your emergency fund to at least three months of expenses."
+        debt: "Keep debt payments to a smaller share of your income."
+        balanced: "Your financial outlook is balanced; keep these habits going."
+      purchase_assessment:
+        scenarios:
+          cash: "Cash"
+          installment_3: "3 installments"
+          installment_6: "6 installments"
+          installment_12: "12 installments"
+          savings_goal: "Use savings goal"
