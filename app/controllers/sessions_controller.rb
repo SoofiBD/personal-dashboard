@@ -39,7 +39,6 @@ class SessionsController < ApplicationController
         redirect_to destination, notice: I18n.t("backend.sessions.signed_in")
       end
     else
-      record_login_attempt
       flash.now[:alert] = I18n.t("backend.sessions.invalid_credentials")
       render :new, status: :unprocessable_content
     end
