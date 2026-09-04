@@ -156,6 +156,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         self.assertGreaterEqual(result["stats"]["images_extracted"], 1)
         self.assertTrue(any("chart_p1_" in img["filename"] for img in result["images"]))
+        self.assertIn("![Grafik 1: Gelir Analizi](images/chart_p1_1.png)", result["markdown_content"])
         self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
 
     def test_rejects_pdf_over_the_page_limit(self):
@@ -167,4 +168,3 @@ class PdfWorkerTest(unittest.TestCase):
             convert_pdf(document)
 
         self.assertEqual(422, raised.exception.status_code)
-
