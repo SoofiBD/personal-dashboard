@@ -1,7 +1,6 @@
 module PersonalFinance
   class SpendingReportsController < ApplicationController
     def show
-      RecurringTransactionGenerator.generate_due_for(current_panel_user)
       @from, @to = selected_range
       @previous_from = @from - period_length
       @previous_to = @from - 1.day

@@ -6,7 +6,6 @@ module PersonalFinance
     before_action :set_transaction_import, only: %i[preview_import confirm_import]
 
     def index
-      RecurringTransactionGenerator.generate_due_for(current_panel_user)
       @filters = filter_params
 
       @transactions = filtered_transactions.order(occurred_on: :desc, created_at: :desc)
