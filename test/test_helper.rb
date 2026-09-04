@@ -1,5 +1,12 @@
 ENV["RAILS_ENV"] ||= "test"
 ENV["DASHBOARD_AUTH_PASSWORD"] = "test-dashboard-password"
+require "simplecov"
+SimpleCov.start "rails" do
+  formatter SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::JSONFormatter
+  ])
+end
 require_relative "../config/environment"
 require "rails/test_help"
 
