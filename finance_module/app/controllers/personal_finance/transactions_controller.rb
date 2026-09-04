@@ -9,7 +9,7 @@ module PersonalFinance
       RecurringTransactionGenerator.generate_due_for(current_panel_user)
       @filters = filter_params
 
-      @transactions = filtered_transactions.order(occurred_on: :desc, created_at: :desc)
+      transactions = filtered_transactions.order(occurred_on: :desc, created_at: :desc)
       @accounts = owned(Account).order(:name)
       @categories = owned(Category).order(:name)
       @tags = owned(Tag).order(:name)
@@ -22,11 +22,11 @@ module PersonalFinance
         @filters[:tag_id].present?
 
       respond_to do |format|
-        format.html
+        format.html { @pagy, @transactions = pagy(:offset, transactions, limit: 25) }
         format.csv do
-          send_data transactions_csv(@transactions),
-            filename: transactions_csv_filename(@transactions),
-            type: "text/csv; charset=utf-8"
+          response.headers["Content-Disposition"] = %(attachment; filename="#{transactions_csv_filename(transactions)}")
+          response.content_type = "text/csv; charset=utf-8"
+          self.response_body = transactions_csv(transactions)
         end
       end
     end
@@ -171,27 +171,28 @@ module PersonalFinance
     end
 
     def transactions_csv(transactions)
-      "\uFEFF" + CSV.generate do |csv|
-        csv << %w[date type amount category account tags note]
-        transactions.each do |transaction|
-          csv << [
+      Enumerator.new do |csv|
+        csv << "\uFEFF"
+        csv << CSV.generate_line(%w[date type amount category account tags note])
+        transactions.reorder(nil).find_each(batch_size: 500) do |transaction|
+          csv << CSV.generate_line([
             transaction.occurred_on.iso8601,
             transaction.kind,
             transaction.amount.to_s("F"),
             csv_safe(transaction.category&.name),
             csv_safe(transaction.account&.name),
-            transaction.tags.order(:name).pluck(:name).join(", "),
+            transaction.tags.sort_by(&:name).map(&:name).join(", "),
             csv_safe(transaction.note)
-          ]
+          ])
         end
       end
     end
 
     def transactions_csv_filename(transactions)
-      dates = transactions.pluck(:occurred_on)
-      return "transactions_empty.csv" if dates.empty?
+      first_date = transactions.minimum(:occurred_on)
+      return "transactions_empty.csv" unless first_date
 
-      "transactions_#{dates.min.strftime("%Y-%m")}_#{dates.max.strftime("%Y-%m")}.csv"
+      "transactions_#{first_date.strftime("%Y-%m")}_#{transactions.maximum(:occurred_on).strftime("%Y-%m")}.csv"
     end
 
     def csv_safe(value)
