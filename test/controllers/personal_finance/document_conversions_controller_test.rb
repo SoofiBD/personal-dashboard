@@ -44,6 +44,7 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "input[name='annotation_mode'][value='inline']"
     assert_select "input[name='conversion_options[extract_images_enabled]'][value='1'][checked]"
     assert_select "select[name='conversion_options[min_image_dimension]']"
+    assert_select "select[name='conversion_options[image_quality]']"
   end
 
   test "serves an image asset belonging to the current user" do
@@ -89,13 +90,14 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     old_asset.file.attach(io: StringIO.new("old"), filename: old_asset.filename, content_type: old_asset.content_type)
     old_asset.save!
     assert_enqueued_with(job: PersonalFinance::PdfDocumentConversionJob, args: [@conversion.id, "inline"]) do
-      post reprocess_finance_document_conversion_path(@conversion), params: {annotation_mode: "inline", conversion_options: {extract_images_enabled: "0", min_image_dimension: "200"}}
+      post reprocess_finance_document_conversion_path(@conversion), params: {annotation_mode: "inline", conversion_options: {extract_images_enabled: "0", min_image_dimension: "200", image_quality: "maximum"}}
     end
 
     assert_redirected_to finance_document_conversion_path(@conversion)
     assert_predicate @conversion.reload, :processing?
     assert_equal false, @conversion.conversion_options["extract_images_enabled"]
     assert_equal 200, @conversion.conversion_options["min_image_dimension"]
+    assert_equal "maximum", @conversion.conversion_options["image_quality"]
   end
 
   test "shows an auto-refreshing processing state" do
