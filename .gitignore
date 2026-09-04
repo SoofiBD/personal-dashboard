@@ -13,6 +13,7 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets
+/coverage/
 .DS_Store
 *.rdb
 pdf_worker/__pycache__/

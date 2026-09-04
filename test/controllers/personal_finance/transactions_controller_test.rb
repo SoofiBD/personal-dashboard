@@ -38,6 +38,18 @@ class PersonalFinance::TransactionsControllerTest < PersonalFinance::Integration
     assert_select ".transaction-category", text: /Monthly payout salary/
   end
 
+  test "paginates transaction results while preserving the requested page" do
+    24.times do |index|
+      PersonalFinance::Transaction.create!(user: @user, account: @account, category: @category_food, kind: :expense, amount: index + 1, occurred_on: Date.current, note: "Paged transaction #{index}")
+    end
+
+    get finance_transactions_path(page: 2)
+
+    assert_response :success
+    assert_select ".finance-item-row", count: 1
+    assert_select ".pagination a", text: "1"
+  end
+
   test "should filter by search query" do
     get finance_transactions_path(q: "groceries")
     assert_response :success
@@ -104,5 +116,16 @@ class PersonalFinance::TransactionsControllerTest < PersonalFinance::Integration
     assert_equal %w[date type amount category account tags note], rows.first
     assert_equal 2, rows.size
     assert_equal [(Date.current - 5.days).iso8601, "expense", "50.0", "Food", "Card", "Vacation", "Weekly groceries buy"], rows.second
+  end
+
+  test "exports every filtered transaction regardless of the requested page" do
+    24.times do |index|
+      PersonalFinance::Transaction.create!(user: @user, account: @account, category: @category_food, kind: :expense, amount: index + 1, occurred_on: Date.current, note: "Export transaction #{index}")
+    end
+
+    get finance_transactions_path(format: :csv, page: 2)
+
+    assert_response :success
+    assert_equal 27, CSV.parse(response.body.delete_prefix("\uFEFF")).size
   end
 end

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     resource :theme_preference, only: :update
     resource :data, only: :show do
       get :export
+      post :import
     end
     resources :document_conversions, only: %i[index create show update destroy] do
       get :source_pdf, on: :member

@@ -58,6 +58,8 @@ group :development do
 end
 
 group :test do
+  gem "simplecov", require: false
+
   # Rails 7.1's test runner currently requires the Minitest 5 API.
   gem "minitest", "< 6"
 
@@ -65,3 +67,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "pagy", "~> 43.0"
