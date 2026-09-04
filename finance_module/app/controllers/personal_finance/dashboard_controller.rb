@@ -5,8 +5,9 @@ module PersonalFinance
       @income = owned(Transaction).income.during(month).sum(:amount)
       @expenses = owned(Transaction).expense.during(month).sum(:amount)
       converter = CurrencyConverter.new(current_panel_user)
-      @total_balance = owned(Account).where(is_active: true).sum { |account| converter.convert(account.current_balance, account.currency) || 0 }
-      @unconverted_balance_accounts = owned(Account).where(is_active: true).reject { |account| converter.convert(account.current_balance, account.currency) }
+      @accounts_with_balances = owned(Account).where(is_active: true).left_joins(:transactions).group("financial_accounts.id").select("financial_accounts.*, COALESCE(SUM(CASE WHEN finance_transactions.kind = 'income' THEN finance_transactions.amount WHEN finance_transactions.kind = 'expense' THEN -finance_transactions.amount ELSE 0 END), 0) AS transaction_balance")
+      @total_balance = @accounts_with_balances.sum { |account| converter.convert(account.opening_balance + account.transaction_balance, account.currency) || 0 }
+      @unconverted_balance_accounts = @accounts_with_balances.reject { |account| converter.convert(account.opening_balance + account.transaction_balance, account.currency) }
       @budget = owned(BudgetPeriod).includes(allocations: {category: %i[parent children]}).find_by(starts_on: month.begin)
       @goals = owned(SavingsGoal).active.order(:target_date).limit(3)
       @recent_transactions = owned(Transaction).includes(:category).order(occurred_on: :desc, created_at: :desc).limit(8)
@@ -49,10 +50,17 @@ module PersonalFinance
     end
 
     def cash_flow_for_last_six_months
-      5.downto(0).map do |months_ago|
-        period = months_ago.months.ago.to_date.all_month
-        transactions = owned(Transaction).during(period)
-        {label: I18n.l(period.begin, format: "%b"), income: transactions.income.sum(:amount), expenses: transactions.expense.sum(:amount)}
+      first_month = 5.months.ago.to_date.beginning_of_month
+      totals = owned(Transaction).during(first_month..Date.current.end_of_month).group("DATE_TRUNC('month', occurred_on)").pluck(
+        Arel.sql("DATE_TRUNC('month', occurred_on)"),
+        Arel.sql("COALESCE(SUM(CASE WHEN kind = 'income' THEN amount ELSE 0 END), 0)"),
+        Arel.sql("COALESCE(SUM(CASE WHEN kind = 'expense' THEN amount ELSE 0 END), 0)")
+      ).to_h { |date, income, expenses| [date.to_date.beginning_of_month, {income: income, expenses: expenses}] }
+
+      6.times.map do |offset|
+        month = first_month + offset.months
+        values = totals.fetch(month, {income: 0, expenses: 0})
+        {label: I18n.l(month, format: "%b"), **values}
       end
     end
   end
