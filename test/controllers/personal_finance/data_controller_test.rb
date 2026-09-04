@@ -36,4 +36,15 @@ class PersonalFinance::DataControllerTest < PersonalFinance::IntegrationTest
     assert_equal "text/csv", response.media_type
     assert_equal %w[table id attributes], CSV.parse(response.body).first
   end
+
+  test "imports a JSON backup for the current user" do
+    upload = fixture_file_upload("finance-backup.json", "application/json")
+
+    assert_difference("PersonalFinance::Account.count", 1) do
+      post import_finance_data_path, params: {backup_file: upload}
+    end
+
+    assert_redirected_to finance_data_path
+    assert_equal "Imported account", PersonalFinance::Account.where(user: @user).order(:created_at).last.name
+  end
 end
