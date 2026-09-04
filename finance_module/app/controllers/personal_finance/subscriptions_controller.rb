@@ -17,7 +17,7 @@ module PersonalFinance
     def create
       @subscription = owned(Subscription).new(subscription_params)
       if @subscription.save
-        redirect_to finance_subscriptions_path, notice: "Abonelik kaydedildi."
+        redirect_to finance_subscriptions_path, notice: I18n.t("backend.personal_finance.subscriptions.saved")
       else
         load_recurring_rules
         render :new, status: :unprocessable_entity
@@ -30,7 +30,7 @@ module PersonalFinance
 
     def update
       if @subscription.update(subscription_params)
-        redirect_to finance_subscriptions_path, notice: "Abonelik güncellendi."
+        redirect_to finance_subscriptions_path, notice: I18n.t("backend.personal_finance.subscriptions.updated")
       else
         load_recurring_rules
         render :edit, status: :unprocessable_entity
@@ -39,7 +39,7 @@ module PersonalFinance
 
     def destroy
       @subscription.destroy!
-      redirect_to finance_subscriptions_path, notice: "Abonelik silindi."
+      redirect_to finance_subscriptions_path, notice: I18n.t("backend.personal_finance.subscriptions.deleted")
     end
 
     private
