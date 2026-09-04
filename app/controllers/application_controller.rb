@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Pagy::Method
+
   before_action :set_locale
   helper_method :current_user, :current_panel_user, :authenticated?
 
