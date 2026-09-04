@@ -76,12 +76,16 @@ module PersonalFinance
       @metrics = self.class.metrics_for(income: income, expenses: expenses, budget_ratio: budget_ratio, balance: balance, debt: debt)
       @score = self.class.score_for(@metrics)
       @suggestions = []
-      @suggestions << "Giderlerinizi gelirin altında tutmaya odaklanın." if @metrics[:income_ratio] < 0.6
-      @suggestions << "Her ay gelirin en az %20'sini birikime ayırmayı deneyin." if @metrics[:savings_rate] < 0.2
-      @suggestions << "Kategori bütçe limitlerini gözden geçirin." if @metrics[:budget_ratio] < 0.7
-      @suggestions << "Acil durum fonunuzu en az üç aylık gider seviyesine çıkarın." if @metrics[:emergency] < 0.5
-      @suggestions << "Borç ödemelerini gelirinizin daha küçük bir bölümünde tutun." if @metrics[:debt_ratio] < 0.5
-      @suggestions << "Finansal görünümünüz dengeli; bu alışkanlıkları koruyun." if @suggestions.empty?
+      @suggestions << translate("expenses") if @metrics[:income_ratio] < 0.6
+      @suggestions << translate("savings") if @metrics[:savings_rate] < 0.2
+      @suggestions << translate("budget") if @metrics[:budget_ratio] < 0.7
+      @suggestions << translate("emergency_fund") if @metrics[:emergency] < 0.5
+      @suggestions << translate("debt") if @metrics[:debt_ratio] < 0.5
+      @suggestions << translate("balanced") if @suggestions.empty?
+    end
+
+    def translate(key)
+      I18n.t("backend.personal_finance.financial_health_score.#{key}", locale: @user.locale)
     end
   end
 end

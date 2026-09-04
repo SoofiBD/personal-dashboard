@@ -28,10 +28,8 @@ module PersonalFinance
       spent = expenses.during(range).sum(:amount)
       return unless spent > limit
 
-      label = (period == :daily) ? "Günlük" : "Haftalık"
-      period_label = (period == :daily) ? "Bugün" : "Bu hafta"
-      body = "#{period_label} #{spent.to_d.to_s("F")} harcadınız; limitiniz #{limit.to_d.to_s("F")}."
-      create_once("#{period}_limit_#{@transaction.occurred_on}", "#{label} harcama limiti aşıldı", body)
+      body = translate("limit_body", period: translate((period == :daily) ? "today" : "this_week"), spent: spent.to_d.to_s("F"), limit: limit.to_d.to_s("F"))
+      create_once("#{period}_limit_#{@transaction.occurred_on}", translate("limit_title", period: translate(period)), body)
     end
 
     def create_budget_notification
@@ -41,8 +39,8 @@ module PersonalFinance
       allocation = budget.allocations.find_by(category: @transaction.category)
       return unless allocation && allocation.spent > allocation.planned_amount
 
-      body = "#{@transaction.category.name} için planlanan #{allocation.planned_amount.to_d.to_s("F")} tutarını aştınız."
-      create_once("budget_overspend_#{budget.id}_#{allocation.id}", "Kategori bütçesi aşıldı", body)
+      body = translate("budget_body", category: @transaction.category.name, amount: allocation.planned_amount.to_d.to_s("F"))
+      create_once("budget_overspend_#{budget.id}_#{allocation.id}", translate("budget_title"), body)
     end
 
     def create_unusual_spending_notification
@@ -52,8 +50,8 @@ module PersonalFinance
       average = previous.average(:amount).to_d
       return unless average.positive? && @transaction.amount >= average * 2
 
-      body = "#{@transaction.amount.to_d.to_s("F")} tutarındaki işlem, son harcamalarınızın ortalamasının belirgin üzerinde."
-      create_once("unusual_spending_#{@transaction.id}", "Alışılmadık harcama tespit edildi", body)
+      body = translate("unusual_body", amount: @transaction.amount.to_d.to_s("F"))
+      create_once("unusual_spending_#{@transaction.id}", translate("unusual_title"), body)
     end
 
     def create_goal_milestone_notification
@@ -61,8 +59,8 @@ module PersonalFinance
       milestone = [100, 75, 50, 25].find { |value| percentage >= value }
       return unless milestone
 
-      title = "Tasarruf hedefinde #{milestone}%"
-      body = "#{@goal.name} hedefinizin #{milestone}% seviyesine ulaştınız."
+      title = translate("goal_title", milestone: milestone)
+      body = translate("goal_body", goal: @goal.name, milestone: milestone)
       create_once("goal_milestone_#{@goal.id}_#{milestone}", title, body)
     end
 
@@ -74,6 +72,10 @@ module PersonalFinance
       return if Notification.exists?(user: @user, kind: kind)
 
       Notification.create!(user: @user, kind: kind, title: title, body: body)
+    end
+
+    def translate(key, **options)
+      I18n.t("backend.personal_finance.notifications.#{key}", **options, locale: @user.locale)
     end
   end
 end
