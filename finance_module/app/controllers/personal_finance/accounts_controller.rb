@@ -2,11 +2,12 @@ module PersonalFinance
   class AccountsController < ApplicationController
     before_action :set_account, only: %i[edit update destroy]
     def index
-      @accounts = owned(Account).order(:name)
-      @account_histories = @accounts.index_with { |account| account.balance_history }
+      @accounts = owned(Account).order(:name).to_a
+      @account_histories = Account.balance_histories(@accounts)
+      balances = @account_histories.transform_values { |history| history.last[:balance] }
       converter = CurrencyConverter.new(current_panel_user)
-      @converted_total = @accounts.sum { |account| converter.convert(account.current_balance, account.currency) || 0 }
-      @unconverted_accounts = @accounts.reject { |account| converter.convert(account.current_balance, account.currency) }
+      @converted_total = @accounts.sum { |account| converter.convert(balances[account], account.currency) || 0 }
+      @unconverted_accounts = @accounts.reject { |account| converter.convert(balances[account], account.currency) }
       @net_worth_history = 6.times.map do |offset|
         month = Date.current.beginning_of_month - (5 - offset).months
         {month: month, balance: @account_histories.values.sum { |history| history.find { |point| point[:month] == month }[:balance] }}
