@@ -1,7 +1,6 @@
 module PersonalFinance
   class DashboardController < ApplicationController
     def show
-      RecurringTransactionGenerator.generate_due_for(current_panel_user)
       month = Date.current.all_month
       @income = owned(Transaction).income.during(month).sum(:amount)
       @expenses = owned(Transaction).expense.during(month).sum(:amount)
