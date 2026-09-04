@@ -97,16 +97,17 @@ module PersonalFinance
 
     def conversion_options(saved_options: {})
       defaults = {
-        "extract_images_enabled" => true, "min_image_dimension" => 100, "strip_headers_footers" => true,
+        "extract_images_enabled" => true, "min_image_dimension" => 100, "image_quality" => "high", "strip_headers_footers" => true,
         "bind_captions_enabled" => true, "extract_annotations_enabled" => true,
         "include_yaml_frontmatter" => true, "fix_hyphenation_enabled" => true, "detect_tables" => true
       }
       submitted = params.fetch(:conversion_options, {}).permit(*defaults.keys).to_h
       defaults.merge!(saved_options.slice(*defaults.keys)) if saved_options.present?
-      boolean_options = defaults.except("min_image_dimension").each_with_object({}) do |(key, default), options|
+      boolean_options = defaults.except("min_image_dimension", "image_quality").each_with_object({}) do |(key, default), options|
         options[key] = submitted.key?(key) ? ActiveModel::Type::Boolean.new.cast(submitted[key]) : default
       end
-      boolean_options.merge("min_image_dimension" => submitted.fetch("min_image_dimension", defaults["min_image_dimension"]).to_i.clamp(50, 500))
+      quality = submitted.fetch("image_quality", defaults["image_quality"])
+      boolean_options.merge("min_image_dimension" => submitted.fetch("min_image_dimension", defaults["min_image_dimension"]).to_i.clamp(50, 500), "image_quality" => %w[balanced high maximum].include?(quality) ? quality : defaults["image_quality"])
     end
 
     def annotation_mode
