@@ -73,8 +73,9 @@ async def convert(
         heading_candidates = find_heading_candidates(document)
         annotations = extract_annotations(document) if extract_annotations_enabled else []
         images = extract_images(document, min_image_dimension) if extract_images_enabled else []
-        tables = extract_tables(document) if detect_tables else []
-        markdown = extract_layout_text(document)
+        chart_rects = chart_rects_by_page(images)
+        tables = extract_tables(document, chart_rects) if detect_tables else []
+        markdown = extract_layout_text(document, chart_rects)
         if not markdown:
             markdown = MarkItDown().convert_stream(io.BytesIO(contents), file_extension=".pdf").text_content.strip()
         document.close()
@@ -234,14 +235,17 @@ def normalize_plain_text(value):
     return re.sub(r"\s+", " ", value).strip()
 
 
-def extract_layout_text(document):
+def extract_layout_text(document, excluded_rects_by_page=None):
     """Build a predictable reading order for common single- and two-column PDFs."""
     pages = []
-    for page in document:
+    for page_number, page in enumerate(document, start=1):
         page_width, page_height = page.rect.width, page.rect.height
         blocks = []
         for block in page.get_text("blocks", sort=False):
             x0, y0, x1, y1, text, *_rest = block
+            block_rect = fitz.Rect(x0, y0, x1, y1)
+            if any(block_rect.intersects(rect) for rect in (excluded_rects_by_page or {}).get(page_number, [])):
+                continue
             if not text.strip():
                 continue
             cleaned = re.sub(r"[ \t]+", " ", text).strip()
@@ -384,6 +388,7 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
                 "content_type": "image/png",
                 "caption": chart["caption"],
                 "data_base64": base64.b64encode(chart_data).decode("ascii"),
+                "bounds": chart["bounds"],
             })
             extracted_bytes += len(chart_data)
 
@@ -507,13 +512,22 @@ def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=M
             "height": pix.height,
             "caption": caption,
             "data": chart_bytes,
+            "bounds": [padded_rect.x0, padded_rect.y0, padded_rect.x1, padded_rect.y1],
         })
         chart_index += 1
 
     return charts
 
 
-def extract_tables(document):
+def chart_rects_by_page(images):
+    rects = {}
+    for image in images:
+        if image.get("bounds"):
+            rects.setdefault(image["page"], []).append(fitz.Rect(image["bounds"]))
+    return rects
+
+
+def extract_tables(document, excluded_rects_by_page=None):
     tables = []
     for page_number, page in enumerate(document, start=1):
         try:
@@ -521,6 +535,12 @@ def extract_tables(document):
         except Exception:
             continue
         for table in found_tables:
+            table_rect = fitz.Rect(table.bbox)
+            if any(
+                table_rect.intersect(chart_rect).get_area() / max(1, table_rect.get_area()) > 0.4
+                for chart_rect in (excluded_rects_by_page or {}).get(page_number, [])
+            ):
+                continue
             rows = normalize_table_rows(table.extract())
             if is_valid_table(rows):
                 tables.append({"page": page_number, "rows": rows})
@@ -585,7 +605,9 @@ def bind_captions(markdown, images):
         if not caption:
             continue
         pattern = r"(?im)^\s*" + r"\s+".join(re.escape(token) for token in caption.split()) + r"\s*$\n?"
-        cleaned, replacements = re.subn(pattern, "", cleaned, count=1)
+        image_link = f'![{caption}](images/{image["filename"]})\n\n*{caption}*'
+        cleaned, replacements = re.subn(pattern, image_link + "\n", cleaned, count=1)
+        image["embedded"] = replacements > 0
         bound_count += replacements
     return cleaned, bound_count
 
@@ -646,10 +668,14 @@ def append_images(markdown, images):
         return markdown
     items = ["## Extracted Images"]
     for image in images:
+        if image.get("embedded"):
+            continue
         caption = image.get("caption") or f'Extracted image from page {image["page"]}'
         items.append(f'![{caption}](images/{image["filename"]})')
         if image.get("caption"):
             items.append(f'*{image["caption"]}*')
+    if len(items) == 1:
+        return markdown
     return markdown.rstrip() + "\n\n" + "\n\n".join(items) + "\n"
 
 
