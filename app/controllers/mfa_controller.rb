@@ -1,8 +1,6 @@
 class MfaController < ApplicationController
   MFA_ATTEMPT_LIMIT = 5
   MFA_ATTEMPT_WINDOW = 15.minutes
-  MFA_ATTEMPT_CACHE = ActiveSupport::Cache::MemoryStore.new
-  MFA_ATTEMPT_LOCK = Mutex.new
 
   layout "authentication"
   before_action :prevent_sensitive_caching
@@ -80,25 +78,13 @@ class MfaController < ApplicationController
     "dashboard-mfa:#{user.id}"
   end
 
-  def record_mfa_attempt(user)
-    key = mfa_attempt_cache_key(user)
-    MFA_ATTEMPT_CACHE.write(key, MFA_ATTEMPT_CACHE.read(key).to_i + 1, expires_in: MFA_ATTEMPT_WINDOW)
-  end
-
-  def mfa_throttled?(user)
-    MFA_ATTEMPT_CACHE.read(mfa_attempt_cache_key(user)).to_i >= MFA_ATTEMPT_LIMIT
-  end
-
   def verify_mfa_attempt(user, code)
-    MFA_ATTEMPT_LOCK.synchronize do
-      return :throttled if mfa_throttled?(user)
-      if Totp.valid?(user.mfa_secret, code)
-        MFA_ATTEMPT_CACHE.delete(mfa_attempt_cache_key(user))
-        return :valid
-      end
-
-      record_mfa_attempt(user)
-      :invalid
+    RateLimitCounter.with_attempt(
+      key: mfa_attempt_cache_key(user),
+      limit: MFA_ATTEMPT_LIMIT,
+      window: MFA_ATTEMPT_WINDOW
+    ) do
+      Totp.valid?(user.mfa_secret, code) ? :valid : :invalid
     end
   end
 

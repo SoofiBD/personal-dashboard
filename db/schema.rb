@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_10_000003) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_11_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -320,6 +320,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_10_000003) do
     t.string "currency", default: "TRY", null: false
     t.index ["currency"], name: "index_financial_accounts_on_currency"
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
+  end
+
+  create_table "rate_limit_counters", force: :cascade do |t|
+    t.string "key", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_rate_limit_counters_on_key", unique: true
   end
 
   create_table "solid_queue_batch_executions", force: :cascade do |t|

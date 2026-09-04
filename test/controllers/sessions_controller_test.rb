@@ -6,7 +6,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @owner = User.dashboard_owner
     @owner.update!(password: PASSWORD, password_confirmation: PASSWORD, onboarded_at: Time.current)
-    MfaController::MFA_ATTEMPT_CACHE.clear
+    RateLimitCounter.delete_all
   end
 
   test "valid password creates an authenticated session" do
@@ -37,6 +37,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
     get finance_root_path
     assert_redirected_to new_session_path
+  end
+
+  test "login is rate limited after repeated invalid passwords" do
+    SessionsController::LOGIN_ATTEMPT_LIMIT.times do
+      post session_path, params: {password: "incorrect-password"}, headers: {"REMOTE_ADDR" => "192.0.2.1"}
+      assert_response :unprocessable_content
+    end
+
+    post session_path, params: {password: "incorrect-password"}, headers: {"REMOTE_ADDR" => "192.0.2.1"}
+    assert_response :too_many_requests
+    assert_equal SessionsController::LOGIN_ATTEMPT_WINDOW.to_i.to_s, response.headers["Retry-After"]
   end
 
   test "logout invalidates the authenticated session" do
