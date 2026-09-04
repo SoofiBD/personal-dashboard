@@ -61,21 +61,21 @@ module PersonalFinance
     def apply_template
       template = owned(BudgetTemplate).find(params[:template_id])
       if @budget.allocations.exists?
-        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablonlar yalnızca boş bir aylık bütçeye uygulanabilir."
+        redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: I18n.t("backend.personal_finance.budgets.template_requires_empty_budget")
         return
       end
 
       template.apply_to!(@budget)
-      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: "#{template.name} şablonu bütçenize uygulandı."
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: I18n.t("backend.personal_finance.budgets.template_applied", name: template.name)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
-      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablon uygulanamadı. Kategorilerinizi ve bütçe toplamını kontrol edin."
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: I18n.t("backend.personal_finance.budgets.template_apply_failed")
     end
 
     def save_as_template
       template = BudgetTemplate.save_budget!(user: current_panel_user, budget: @budget, name: params[:name].to_s)
-      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: "#{template.name} şablonu kaydedildi."
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), notice: I18n.t("backend.personal_finance.budgets.template_saved", name: template.name)
     rescue ActiveRecord::RecordInvalid
-      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: "Şablon adı boş olamaz ve hazır şablon adı kullanılamaz."
+      redirect_to finance_budget_path(@budget.starts_on.strftime("%Y-%m")), alert: I18n.t("backend.personal_finance.budgets.template_save_failed")
     end
 
     def year

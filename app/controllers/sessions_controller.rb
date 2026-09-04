@@ -27,21 +27,21 @@ class SessionsController < ApplicationController
         session[:pending_mfa_user_id] = user.id
         session[:pending_mfa_authentication_version] = user.authentication_version
         session[:pending_mfa_return_to] = destination
-        redirect_to mfa_path, notice: "İki adımlı doğrulama kodunuzu girin."
+        redirect_to mfa_path, notice: I18n.t("backend.sessions.mfa_prompt")
       else
         establish_authenticated_session(user)
-        redirect_to destination, notice: "Giriş başarılı."
+        redirect_to destination, notice: I18n.t("backend.sessions.signed_in")
       end
     else
       record_login_attempt
-      flash.now[:alert] = "Parola geçersiz veya dashboard erişimi henüz yapılandırılmamış."
+      flash.now[:alert] = I18n.t("backend.sessions.invalid_credentials")
       render :new, status: :unprocessable_content
     end
   end
 
   def destroy
     reset_session
-    redirect_to new_session_path, notice: "Oturum kapatıldı."
+    redirect_to new_session_path, notice: I18n.t("backend.sessions.signed_out")
   end
 
   private

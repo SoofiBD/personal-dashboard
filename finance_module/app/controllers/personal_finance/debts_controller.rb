@@ -27,14 +27,14 @@ module PersonalFinance
 
     def destroy
       @debt.destroy!
-      redirect_to finance_debts_path, notice: "Borç silindi."
+      redirect_to finance_debts_path, notice: I18n.t("backend.personal_finance.debts.deleted")
     end
 
     def pay
       @debt.payments.create!(amount: params[:amount].presence || @debt.monthly_payment, paid_on: params[:paid_on].presence || Date.current)
-      redirect_to finance_debts_path, notice: "Ödeme kaydedildi ve bakiye güncellendi."
+      redirect_to finance_debts_path, notice: I18n.t("backend.personal_finance.debts.payment_recorded")
     rescue ActiveRecord::RecordInvalid
-      redirect_to finance_debts_path, alert: "Ödeme kaydedilemedi."
+      redirect_to finance_debts_path, alert: I18n.t("backend.personal_finance.debts.payment_failed")
     end
 
     private
@@ -49,7 +49,7 @@ module PersonalFinance
 
     def save_or_render
       if @debt.save
-        redirect_to(finance_debts_path, notice: "Borç kaydedildi.")
+        redirect_to(finance_debts_path, notice: I18n.t("backend.personal_finance.debts.saved"))
       else
         render((action_name == "update") ? :edit : :new, status: :unprocessable_entity)
       end

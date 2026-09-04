@@ -13,7 +13,7 @@ class MfaController < ApplicationController
       @setup_user.prepare_mfa! unless @setup_user.mfa_enabled? || @setup_user.mfa_pending_setup?
     else
       @challenge_user = pending_mfa_user
-      redirect_to new_session_path, alert: "Önce parolanızla giriş yapın." unless @challenge_user
+      redirect_to new_session_path, alert: I18n.t("backend.mfa.password_first") unless @challenge_user
     end
   end
 
@@ -27,12 +27,12 @@ class MfaController < ApplicationController
 
   def destroy
     unless authenticated?
-      redirect_to new_session_path, alert: "Önce giriş yapın."
+      redirect_to new_session_path, alert: I18n.t("backend.mfa.sign_in_first")
       return
     end
 
     current_user.disable_mfa!
-    redirect_to profile_path, notice: "İki adımlı doğrulama kapatıldı."
+    redirect_to profile_path, notice: I18n.t("backend.mfa.disabled")
   end
 
   private
@@ -53,7 +53,7 @@ class MfaController < ApplicationController
     end
 
     if result == :invalid
-      flash.now[:alert] = "Doğrulama kodu geçersiz veya süresi dolmuş."
+      flash.now[:alert] = I18n.t("backend.mfa.invalid_or_expired")
       @challenge_user = user
       render :show, status: :unprocessable_content
       return
@@ -63,14 +63,14 @@ class MfaController < ApplicationController
     reset_session
     session[:user_id] = user.id
     session[:authentication_version] = user.authentication_version
-    redirect_to destination, notice: "Giriş başarılı."
+    redirect_to destination, notice: I18n.t("backend.sessions.signed_in")
   end
 
   def verify_setup
     if current_user.enable_mfa!(params[:code])
-      redirect_to profile_path, notice: "İki adımlı doğrulama etkinleştirildi."
+      redirect_to profile_path, notice: I18n.t("backend.mfa.enabled")
     else
-      flash.now[:alert] = "Doğrulama kodu geçersiz."
+      flash.now[:alert] = I18n.t("backend.mfa.invalid")
       @setup_user = current_user
       render :show, status: :unprocessable_content
     end

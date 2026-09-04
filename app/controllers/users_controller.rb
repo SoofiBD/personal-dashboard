@@ -16,7 +16,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     @user.role = role_param || "viewer"
     if @user.save
-      redirect_to users_path, notice: "Kullanıcı oluşturuldu."
+      redirect_to users_path, notice: I18n.t("backend.users.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -24,10 +24,10 @@ class UsersController < ApplicationController
 
   def update
     if @user == current_user && role_param.present? && role_param != "owner"
-      @user.errors.add(:role, "sahip rolü kendi hesabınızdan kaldırılamaz")
+      @user.errors.add(:role, I18n.t("backend.users.cannot_remove_owner"))
       render :edit, status: :unprocessable_content
     elsif update_user
-      redirect_to users_path, notice: "Kullanıcı güncellendi."
+      redirect_to users_path, notice: I18n.t("backend.users.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   def require_owner
     return if current_user&.owner?
 
-    redirect_to finance_root_path, alert: "Bu işlem yalnızca hesap sahibine açıktır."
+    redirect_to finance_root_path, alert: I18n.t("backend.users.owner_only")
   end
 
   def set_user

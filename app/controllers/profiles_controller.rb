@@ -11,7 +11,7 @@ class ProfilesController < ApplicationController
     if @user.update(profile_params)
       session[:locale] = @user.locale
       I18n.locale = @user.locale
-      redirect_to profile_path, notice: "Profil tercihleriniz güncellendi."
+      redirect_to profile_path, notice: I18n.t("backend.profiles.updated")
     else
       render :show, status: :unprocessable_content
     end
