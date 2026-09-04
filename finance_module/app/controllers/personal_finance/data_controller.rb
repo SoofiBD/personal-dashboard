@@ -16,6 +16,18 @@ module PersonalFinance
       end
     end
 
+    def import
+      upload = params[:backup_file]
+      raise FinancialBackupRestorer::InvalidBackup, "Select a JSON backup file" unless upload
+      raise FinancialBackupRestorer::InvalidBackup, "Backup files must be 10 MB or smaller" if upload.size > 10.megabytes
+
+      payload = JSON.parse(upload.read)
+      FinancialBackupRestorer.new(current_panel_user, payload).call
+      redirect_to finance_data_path, notice: "Financial backup restored."
+    rescue JSON::ParserError, FinancialBackupRestorer::InvalidBackup, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => error
+      redirect_to finance_data_path, alert: "Backup could not be restored: #{error.message}"
+    end
+
     private
 
     def csv_export(records)
