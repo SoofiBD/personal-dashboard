@@ -1,4 +1,4 @@
-<% defaults = {"extract_images_enabled" => true, "min_image_dimension" => 100, "strip_headers_footers" => true, "bind_captions_enabled" => true, "extract_annotations_enabled" => true, "include_yaml_frontmatter" => true, "fix_hyphenation_enabled" => true, "detect_tables" => true} %>
+<% defaults = {"extract_images_enabled" => true, "min_image_dimension" => 100, "image_quality" => "high", "strip_headers_footers" => true, "bind_captions_enabled" => true, "extract_annotations_enabled" => true, "include_yaml_frontmatter" => true, "fix_hyphenation_enabled" => true, "detect_tables" => true} %>
 <% options = defaults.merge(local_assigns.fetch(:conversion_options, {})) %>
 <details class="conversion-options" <%= "open" unless local_assigns[:compact] %>>
   <summary><%= t("document_conversions.options_summary", default: "Dönüştürme ayarları") %></summary>
@@ -22,6 +22,10 @@
     <div class="conversion-option conversion-option--select">
       <%= label_tag "conversion_options_min_image_dimension", t("document_conversions.opt_min_image_dimension", default: "Minimum görsel boyutu") %>
       <%= select_tag "conversion_options[min_image_dimension]", options_for_select([["50 px", 50], ["100 px", 100], ["200 px", 200], ["300 px", 300], ["500 px", 500]], options["min_image_dimension"]), id: "conversion_options_min_image_dimension" %>
+    </div>
+    <div class="conversion-option conversion-option--select">
+      <%= label_tag "conversion_options_image_quality", t("document_conversions.opt_image_quality", default: "Görsel kalitesi") %>
+      <%= select_tag "conversion_options[image_quality]", options_for_select([["Dengeli (200 DPI WebP)", "balanced"], ["Yüksek (240 DPI PNG)", "high"], ["Maksimum (300 DPI PNG)", "maximum"]], options["image_quality"]), id: "conversion_options_image_quality" %>
     </div>
   </div>
 </details>

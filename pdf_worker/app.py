@@ -21,6 +21,11 @@ MAX_PAGE_COUNT = 250
 MIN_IMAGE_DIMENSION = 100
 MAX_IMAGE_COUNT = 50
 MAX_EXTRACTED_IMAGE_BYTES = 20 * 1024 * 1024
+IMAGE_RENDER_PROFILES = {
+    "balanced": {"dpi": 200, "format": "webp", "content_type": "image/webp"},
+    "high": {"dpi": 240, "format": "png", "content_type": "image/png"},
+    "maximum": {"dpi": 300, "format": "png", "content_type": "image/png"},
+}
 
 app = FastAPI(title="Personal Dashboard PDF Worker", docs_url=None, redoc_url=None)
 
@@ -48,7 +53,7 @@ def health():
 @app.post("/convert")
 async def convert(
     file: UploadFile = File(...), custom_notes: str = Form(default=""), annotation_mode: str = Form(default="both"),
-    extract_images_enabled: bool = Form(default=True), min_image_dimension: int = Form(default=MIN_IMAGE_DIMENSION),
+    extract_images_enabled: bool = Form(default=True), min_image_dimension: int = Form(default=MIN_IMAGE_DIMENSION), image_quality: str = Form(default="high"),
     strip_headers_footers: bool = Form(default=True), bind_captions_enabled: bool = Form(default=True),
     extract_annotations_enabled: bool = Form(default=True), include_yaml_frontmatter: bool = Form(default=True),
     fix_hyphenation_enabled: bool = Form(default=True), detect_tables: bool = Form(default=True),
@@ -62,6 +67,8 @@ async def convert(
         raise HTTPException(status_code=422, detail="Geçersiz anotasyon modu.")
     if not 50 <= min_image_dimension <= 500:
         raise HTTPException(status_code=422, detail="Minimum görsel boyutu 50 ile 500 piksel arasında olmalıdır.")
+    if image_quality not in IMAGE_RENDER_PROFILES:
+        raise HTTPException(status_code=422, detail="Geçersiz görsel kalite profili.")
 
     started_at = time.perf_counter()
     try:
@@ -72,7 +79,7 @@ async def convert(
         running_artifacts = find_running_artifacts(document) if strip_headers_footers else []
         heading_candidates = find_heading_candidates(document)
         annotations = extract_annotations(document) if extract_annotations_enabled else []
-        images = extract_images(document, min_image_dimension) if extract_images_enabled else []
+        images = extract_images(document, min_image_dimension, image_quality) if extract_images_enabled else []
         tables = extract_tables(document) if detect_tables else []
         markdown = extract_layout_text(document)
         if not markdown:
@@ -337,7 +344,7 @@ def unwrap_soft_breaks(markdown):
     return "\n\n".join(cleaned_blocks)
 
 
-def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
+def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
     images = []
     extracted_bytes = 0
     allowed_types = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp"}
@@ -371,7 +378,7 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
             extracted_bytes += len(image_data)
 
         # 2. Extract vector graphics, charts, plots and diagrams
-        charts = extract_vector_charts(page, page_number, page_raster_rects, min_image_dimension)
+        charts = extract_vector_charts(page, page_number, page_raster_rects, min_image_dimension, image_quality)
         for chart in charts:
             chart_data = chart["data"]
             if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(chart_data) > MAX_EXTRACTED_IMAGE_BYTES:
@@ -381,7 +388,7 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
                 "page": page_number,
                 "width": chart["width"],
                 "height": chart["height"],
-                "content_type": "image/png",
+                "content_type": chart["content_type"],
                 "caption": chart["caption"],
                 "data_base64": base64.b64encode(chart_data).decode("ascii"),
             })
@@ -390,7 +397,8 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION):
     return images
 
 
-def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION):
+def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
+    profile = IMAGE_RENDER_PROFILES[image_quality]
     drawings = page.get_drawings()
     if not drawings:
         return []
@@ -451,7 +459,7 @@ def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=M
     charts = []
     chart_index = 1
     for cluster_rect in merged_clusters:
-        min_pt = max(45, min_image_dimension * 72 / 150)
+        min_pt = max(45, min_image_dimension * 72 / profile["dpi"])
         if cluster_rect.width < min_pt or cluster_rect.height < min_pt:
             continue
         if cluster_rect.width * cluster_rect.height < 3000:
@@ -494,19 +502,21 @@ def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=M
             min(page_rect.height, clip_rect.y1 + 4)
         )
 
-        pix = page.get_pixmap(clip=padded_rect, dpi=150)
+        scale = profile["dpi"] / 72
+        pix = page.get_pixmap(clip=padded_rect, matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB, alpha=False)
         if pix.width < min_image_dimension or pix.height < min_image_dimension:
             continue
 
         caption = find_caption(page, padded_rect)
-        chart_bytes = pix.tobytes("png")
+        chart_bytes = pix.tobytes(profile["format"])
 
         charts.append({
-            "filename": f"chart_p{page_number}_{chart_index}.png",
+            "filename": f"chart_p{page_number}_{chart_index}.{profile['format']}",
             "width": pix.width,
             "height": pix.height,
             "caption": caption,
             "data": chart_bytes,
+            "content_type": profile["content_type"],
         })
         chart_index += 1
 
