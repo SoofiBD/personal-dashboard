@@ -156,6 +156,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         self.assertGreaterEqual(result["stats"]["images_extracted"], 1)
         self.assertTrue(any("chart_p1_" in img["filename"] for img in result["images"]))
+        self.assertIn("![Grafik 1: Gelir Analizi](images/chart_p1_1.png)", result["markdown_content"])
         self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
 
     def test_renders_vector_charts_at_the_selected_high_quality_profile(self):
