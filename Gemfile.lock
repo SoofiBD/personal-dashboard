@@ -265,6 +265,7 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
+    simplecov (1.1.1)
     solid_queue (1.7.0)
       activejob (>= 7.1)
       activerecord (>= 7.1)
@@ -336,6 +337,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.2.3)
   selenium-webdriver
+  simplecov
   solid_queue (~> 1.2)
   sprockets-rails
   standard
