@@ -16,7 +16,7 @@ def convert_pdf(document, annotation_mode="both", **options):
     document.close()
     upload = UploadFile(filename="report.pdf", file=io.BytesIO(payload))
     defaults = {
-        "extract_images_enabled": True, "min_image_dimension": 100, "strip_headers_footers": True,
+        "extract_images_enabled": True, "min_image_dimension": 100, "image_quality": "high", "strip_headers_footers": True,
         "bind_captions_enabled": True, "extract_annotations_enabled": True,
         "include_yaml_frontmatter": True, "fix_hyphenation_enabled": True, "detect_tables": True,
     }
@@ -158,6 +158,18 @@ class PdfWorkerTest(unittest.TestCase):
         self.assertTrue(any("chart_p1_" in img["filename"] for img in result["images"]))
         self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
 
+    def test_renders_vector_charts_at_the_selected_high_quality_profile(self):
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        page.draw_rect(fitz.Rect(100, 150, 400, 350), color=(0.1, 0.3, 0.8), fill=(0.4, 0.7, 1.0))
+        page.draw_line((100, 350), (400, 150), color=(0.0, 0.0, 0.0))
+
+        result = convert_pdf(document, image_quality="maximum")
+        chart = next(image for image in result["images"] if image["filename"].startswith("chart_p1_"))
+
+        self.assertEqual("image/png", chart["content_type"])
+        self.assertGreater(chart["width"], 1000)
+
     def test_rejects_pdf_over_the_page_limit(self):
         document = fitz.open()
         for _page_number in range(251):
@@ -167,4 +179,3 @@ class PdfWorkerTest(unittest.TestCase):
             convert_pdf(document)
 
         self.assertEqual(422, raised.exception.status_code)
-
