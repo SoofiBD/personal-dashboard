@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 module Workspace
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -30,6 +30,9 @@ module Workspace
     config.i18n.available_locales = %i[tr en]
     config.i18n.default_locale = :tr
     config.i18n.fallbacks = true
+
+    # Existing migrations are intentionally dated ahead of the deployment clock.
+    config.active_record.validate_migration_timestamps = false
 
     # Configuration for the application, engines, and railties goes here.
     #
