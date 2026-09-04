@@ -6,8 +6,7 @@ class UserFlowsTest < ActionDispatch::IntegrationTest
   setup do
     @owner = User.dashboard_owner
     @owner.update!(password: PASSWORD, password_confirmation: PASSWORD, onboarded_at: Time.current)
-    SessionsController::LOGIN_ATTEMPT_CACHE.clear
-    MfaController::MFA_ATTEMPT_CACHE.clear
+    RateLimitCounter.delete_all
   end
 
   test "authenticates, completes MFA, and logs out" do
