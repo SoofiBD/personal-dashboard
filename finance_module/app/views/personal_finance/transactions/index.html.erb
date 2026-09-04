@@ -96,5 +96,10 @@
 
   <section class="panel">
     <%= render "list", transactions: @transactions, filters_active: @filters_active %>
+    <% if @pagy.pages > 1 %>
+      <nav class="pagination" aria-label="Transaction pages">
+        <%== @pagy.series_nav %>
+      </nav>
+    <% end %>
   </section>
 </turbo-frame>
