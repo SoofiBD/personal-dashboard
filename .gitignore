@@ -16,5 +16,6 @@
 /coverage/
 .DS_Store
 *.rdb
-pdf_worker/__pycache__/
+pdf_worker/**/__pycache__/
+**/__pycache__/
 pdf_worker/*.ses
