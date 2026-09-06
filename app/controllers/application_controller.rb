@@ -45,6 +45,17 @@ class ApplicationController < ActionController::Base
     response.headers["Pragma"] = "no-cache"
   end
 
+  def audit_security_event(action, details = {})
+    Rails.logger.info({
+      event: "security_audit",
+      action: action,
+      user_id: current_user&.id,
+      request_id: request.request_id,
+      remote_ip: request.remote_ip,
+      details: details
+    }.to_json)
+  end
+
   def set_locale
     locale = params[:locale] || current_user&.locale || session[:locale] || cookies[:locale] || I18n.default_locale
     locale = I18n.available_locales.map(&:to_s).include?(locale.to_s) ? locale.to_sym : I18n.default_locale

@@ -16,6 +16,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     @user.role = role_param || "viewer"
     if @user.save
+      audit_security_event("user_created", target_user_id: @user.id, role: @user.role)
       redirect_to users_path, notice: I18n.t("backend.users.created")
     else
       render :new, status: :unprocessable_content
@@ -27,6 +28,7 @@ class UsersController < ApplicationController
       @user.errors.add(:role, I18n.t("backend.users.cannot_remove_owner"))
       render :edit, status: :unprocessable_content
     elsif update_user
+      audit_security_event("user_updated", target_user_id: @user.id, role: @user.role)
       redirect_to users_path, notice: I18n.t("backend.users.updated")
     else
       render :edit, status: :unprocessable_content

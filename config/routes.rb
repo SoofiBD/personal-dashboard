@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
+  get "internal/pdf_editor_authorization" => "internal#pdf_editor_authorization"
   resource :session, only: %i[new create destroy]
   resource :mfa, controller: "mfa", only: %i[show destroy] do
     post :verify

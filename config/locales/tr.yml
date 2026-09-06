@@ -1036,6 +1036,8 @@ tr:
     identifier_label: E-posta veya kullanıcı adı (İsteğe bağlı)
     identifier_placeholder: Yönetici girişi için boş bırakabilirsiniz
     password_label: Yönetici Parolası
+    password_placeholder: "••••••••••••••••"
+    toggle_password: Parolayı göster veya gizle
     submit: Kasaya Giriş Yap
     mfa_setup_title: İki Adımlı Doğrulamayı Kur
     mfa_verify_title: Güvenlik Kodunu Girin

@@ -162,6 +162,13 @@ docker compose --env-file .env.production -f compose.production.yaml up --build 
 
 Caddy obtains and renews TLS certificates for the configured domain. Do not expose the development `compose.yaml` stack beyond `127.0.0.1`.
 
+#### Production data-protection requirements
+
+- Place the Docker host and its `postgres_data` and `storage_data` volumes on encrypted storage; these volumes contain financial records, uploaded PDFs, and extracted images.
+- Back up both volumes to encrypted off-host storage and test a restore at least quarterly.
+- Set `DOCUMENT_RETENTION_DAYS` (default: `90`) to the shortest retention period that meets your needs. The production job service permanently purges older PDF conversions and their attachments every day.
+- Collect the gateway access logs and Rails `security_audit` JSON events. Alert on repeated `login_failed` / `mfa_challenge_failed` events, any `user_created` or `user_updated` event, and unusually frequent document-conversion or financial-data export events.
+
 6. **Stopping the containers:**
    ```bash
    docker compose down

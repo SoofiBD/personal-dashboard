@@ -8,6 +8,7 @@ module PersonalFinance
     end
 
     def export
+      audit_security_event("financial_data_exported", format: request.format.symbol)
       records = TABLES.transform_values { |model| model.where(user_id: current_panel_user.id).as_json }
       payload = {metadata: {version: 1, exported_at: Time.current.iso8601, record_counts: records.transform_values(&:size)}, data: records}
       respond_to do |format|
@@ -23,6 +24,7 @@ module PersonalFinance
 
       payload = JSON.parse(upload.read)
       FinancialBackupRestorer.new(current_panel_user, payload).call
+      audit_security_event("financial_data_imported", bytes: upload.size)
       redirect_to finance_data_path, notice: "Financial backup restored."
     rescue JSON::ParserError, FinancialBackupRestorer::InvalidBackup, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => error
       redirect_to finance_data_path, alert: "Backup could not be restored: #{error.message}"
