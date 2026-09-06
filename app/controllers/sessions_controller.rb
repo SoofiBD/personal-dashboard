@@ -21,12 +21,14 @@ class SessionsController < ApplicationController
     end
 
     if result == :throttled
+      audit_security_event("login_throttled")
       response.set_header("Retry-After", LOGIN_ATTEMPT_WINDOW.to_i.to_s)
       render plain: "Too many login attempts. Try again later.", status: :too_many_requests
       return
     end
 
     if result == :valid
+      audit_security_event("login_succeeded", user_id: user.id)
       destination = safe_return_to
       reset_session
       if user.mfa_enabled?
@@ -39,12 +41,14 @@ class SessionsController < ApplicationController
         redirect_to destination, notice: I18n.t("backend.sessions.signed_in")
       end
     else
+      audit_security_event("login_failed")
       flash.now[:alert] = I18n.t("backend.sessions.invalid_credentials")
       render :new, status: :unprocessable_content
     end
   end
 
   def destroy
+    audit_security_event("logout")
     reset_session
     redirect_to new_session_path, notice: I18n.t("backend.sessions.signed_out")
   end

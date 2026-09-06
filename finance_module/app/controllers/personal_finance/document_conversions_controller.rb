@@ -21,6 +21,7 @@ module PersonalFinance
         @document_conversion.save!
         @document_conversion.processing!
         PdfDocumentConversionJob.perform_later(@document_conversion.id, annotation_mode)
+        audit_security_event("document_conversion_queued", conversion_id: @document_conversion.id, bytes: source_pdf_data.bytesize)
         redirect_to finance_document_conversion_path(@document_conversion), notice: "PDF dönüşümü sıraya alındı. Tamamlandığında çalışma alanı hazır olacak."
       rescue ActiveRecord::RecordInvalid
         @document_conversions = owned(DocumentConversion).order(created_at: :desc).limit(20)
@@ -66,6 +67,7 @@ module PersonalFinance
       document_conversion.update!(conversion_options: options)
       document_conversion.processing!
       PdfDocumentConversionJob.perform_later(document_conversion.id, annotation_mode)
+      audit_security_event("document_conversion_requeued", conversion_id: document_conversion.id)
       redirect_to finance_document_conversion_path(document_conversion), notice: "PDF güncel ayarlarla yeniden işlenmek üzere sıraya alındı."
     rescue PdfConversionClient::Error => e
       redirect_to finance_document_conversion_path(params[:id]), alert: e.message
@@ -75,6 +77,7 @@ module PersonalFinance
       document_conversion = owned(DocumentConversion).completed.find(params[:id])
       markdown_content = params[:markdown_content].presence || document_conversion.markdown_content
       zip = PdfConversionClient.new.export_zip(markdown_content: markdown_content, source_filename: document_conversion.source_filename, assets: document_conversion.assets)
+      audit_security_event("document_conversion_zip_exported", conversion_id: document_conversion.id)
       send_data zip, filename: "#{File.basename(document_conversion.source_filename, ".pdf")}.zip", type: "application/zip", disposition: "attachment"
     rescue PdfConversionClient::Error => e
       redirect_to finance_document_conversion_path(params[:id]), alert: e.message
@@ -84,6 +87,7 @@ module PersonalFinance
       document_conversion = owned(DocumentConversion).completed.find(params[:id])
       markdown_content = params[:markdown_content].presence || document_conversion.markdown_content
       html = PdfConversionClient.new.export_html(markdown_content: markdown_content, source_filename: document_conversion.source_filename, assets: document_conversion.assets)
+      audit_security_event("document_conversion_html_exported", conversion_id: document_conversion.id)
       send_data html, filename: "#{File.basename(document_conversion.source_filename, ".pdf")}.html", type: "text/html", disposition: "attachment"
     rescue PdfConversionClient::Error => e
       redirect_to finance_document_conversion_path(params[:id]), alert: e.message
