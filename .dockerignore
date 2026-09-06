@@ -35,3 +35,9 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 /public/assets
+
+# NAS credentials and local recovery material
+.private/
+.env.nas*
+*.pem
+*.pem.bak

@@ -34,13 +34,13 @@
           <div class="brand-wrapper">
             <div class="sidebar-module-selector" data-module-switcher>
               <div class="active-module-header">
-                <%= link_to (current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
+                <%= link_to (current_mod == :nas ? nas_path : current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
                   <div class="brand-icon brand-icon--<%= current_mod %>">
                     <%= finance_svg_icon(current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault"), class: "icon-brand") %>
                   </div>
                   <div class="brand-text">
                     <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-                    <span class="brand-subtitle"><%= current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
+                    <span class="brand-subtitle"><%= current_mod == :nas ? t("nas.title") : current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
                   </div>
                 <% end %>
                 <button type="button" class="module-switch-trigger" data-module-switch-toggle aria-expanded="false" aria-label="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>" title="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>">
@@ -72,6 +72,12 @@
                   <% end %>
                 <% end %>
 
+                <% if current_user&.owner? %>
+                  <%= link_to nas_path, class: "module-dropdown-item" do %>
+                    <div class="module-dropdown-icon"><%= finance_svg_icon("vault") %></div>
+                    <div class="module-dropdown-info"><strong>NAS</strong><span><%= t("nas.storage") %></span></div>
+                  <% end %>
+                <% end %>
                 <div class="module-dropdown-divider"></div>
                 <%= link_to root_path, class: "module-dropdown-item #{'is-active' if current_page?(root_path)}" do %>
                   <div class="module-dropdown-icon icon-hub"><%= finance_svg_icon("overview") %></div>
@@ -85,7 +91,23 @@
           </div>
 
           <div class="sidebar-nav-groups">
-            <% if current_mod == :pdf_tools %>
+            <% if current_mod == :nas %>
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("nas.storage") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("nas.all_files"), nas_path, "vault" %>
+                  <%= finance_navigation_item t("nas.upload"), nas_path(path: params[:path], anchor: "nas-upload"), "plus" %>
+                  <%= finance_navigation_item t("nas.new_folder"), nas_path(path: params[:path], anchor: "nas-new-folder"), "categories" %>
+                </nav>
+              </div>
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("nas.workspace") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
+                  <%= finance_navigation_item t("nas.workspace"), root_path, "overview" %>
+                </nav>
+              </div>
+            <% elsif current_mod == :pdf_tools %>
               <!-- PDF & Doküman Modülü -->
               <div class="sidebar-section">
                 <p class="sidebar-label"><%= t("app.sidebar.section_pdf_workspace", default: "PDF & ÇALIŞMA ALANI") %></p>

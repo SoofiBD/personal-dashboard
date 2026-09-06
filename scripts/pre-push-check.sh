@@ -2,6 +2,8 @@
 # Pre-push checks — run before pushing to ensure CI will pass
 set -e
 
+python3 scripts/check-nas-secrets.py
+
 echo ""
 echo "═══════════════════════════════════════════"
 echo "  🚀 Pre-Push Check Suite"

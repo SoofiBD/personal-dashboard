@@ -1,0 +1,25 @@
+# Shared NAS service: included by compose.yaml; also usable as a production overlay.
+services:
+  nas-worker:
+    build: ./nas_worker
+    env_file:
+      - path: .env.nas.local
+        format: raw
+        required: false
+    expose:
+      - "8000"
+    read_only: true
+    tmpfs:
+      - /tmp:size=1200m,mode=1777
+    mem_limit: 1536m
+    cpus: 1.0
+    pids_limit: 64
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 30s
+      timeout: 3s
+      retries: 3

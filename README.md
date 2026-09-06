@@ -292,3 +292,7 @@ Contributions, feature requests, and feedback are welcome!
 ## 📄 License
 
 Distributed under the **MIT License**. See `LICENSE` for more information.
+
+## NAS dosyaları
+
+Çalışma alanındaki NAS modülü yalnızca hesap sahibine açıktır. Kurulum, güvenli yerel yapılandırma ve işlem sınırları için [NAS rehberine](nas_worker/README.md) bakın. Gerçek şifreleri veya `.private/` içeriğini GitHub’a eklemeyin.
