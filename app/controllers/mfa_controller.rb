@@ -30,6 +30,7 @@ class MfaController < ApplicationController
     end
 
     current_user.disable_mfa!
+    audit_security_event("mfa_disabled", user_id: current_user.id)
     redirect_to profile_path, notice: I18n.t("backend.mfa.disabled")
   end
 
@@ -51,6 +52,7 @@ class MfaController < ApplicationController
     end
 
     if result == :invalid
+      audit_security_event("mfa_challenge_failed", user_id: user&.id)
       flash.now[:alert] = I18n.t("backend.mfa.invalid_or_expired")
       @challenge_user = user
       render :show, status: :unprocessable_content
@@ -61,11 +63,13 @@ class MfaController < ApplicationController
     reset_session
     session[:user_id] = user.id
     session[:authentication_version] = user.authentication_version
+    audit_security_event("mfa_challenge_succeeded", user_id: user.id)
     redirect_to destination, notice: I18n.t("backend.sessions.signed_in")
   end
 
   def verify_setup
     if current_user.enable_mfa!(params[:code])
+      audit_security_event("mfa_enabled", user_id: current_user.id)
       redirect_to profile_path, notice: I18n.t("backend.mfa.enabled")
     else
       flash.now[:alert] = I18n.t("backend.mfa.invalid")
@@ -89,6 +93,7 @@ class MfaController < ApplicationController
   end
 
   def reject_mfa_challenge
+    audit_security_event("mfa_challenge_throttled")
     reset_session
     response.set_header("Retry-After", MFA_ATTEMPT_WINDOW.to_i.to_s)
     render plain: "Too many MFA attempts. Try again later.", status: :too_many_requests

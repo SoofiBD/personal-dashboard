@@ -5235,25 +5235,73 @@ select optgroup {
   z-index: 2;
 }
 
+input.auth-input,
 .auth-input {
-  width: 100%;
-  padding: 0.85rem 1rem 0.85rem 3.25rem;
-  background: rgba(11, 17, 32, 0.85);
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-md);
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  box-sizing: border-box;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 0.85rem 1.1rem !important;
+  background: rgba(11, 17, 32, 0.85) !important;
+  border: 1px solid var(--border-card) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-main) !important;
+  font-size: 0.95rem !important;
+  font-family: var(--font-sans) !important;
+  letter-spacing: normal !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
+  box-sizing: border-box !important;
 }
 
-.auth-input-plain {
+.auth-input-wrapper input.auth-input,
+.auth-input-wrapper .auth-input {
+  padding-left: 3rem !important;
+  padding-right: 2.85rem !important;
+}
+
+input[type="password"].auth-input,
+.auth-password-input {
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.08em !important;
+}
+
+.auth-input-plain,
+input.auth-input-plain {
   padding: 0.85rem 1.1rem !important;
-  font-family: var(--font-sans);
-  letter-spacing: normal;
+  font-family: var(--font-sans) !important;
+  letter-spacing: normal !important;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  padding: 0.35rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s ease, background-color 0.2s ease;
+  z-index: 3;
+}
+
+.auth-password-toggle:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.auth-password-toggle:focus-visible {
+  outline: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.auth-password-toggle svg {
+  width: 18px;
+  height: 18px;
 }
 .mfa-code-input {
   text-align: center;
@@ -5275,10 +5323,11 @@ select optgroup {
 .access-user-row:last-child { border-bottom: 0; }
 .access-user-row h2 { margin: 0; font-size: 1rem; }.access-user-row p { margin: .3rem 0 0; color: var(--text-muted); font-size: .85rem; }.access-user-actions { display: flex; align-items: center; gap: .65rem; }
 @media (max-width: 760px) { .access-settings-grid, .profile-form-grid { grid-template-columns: 1fr; } .access-user-row { align-items: flex-start; flex-direction: column; }.access-user-actions { width: 100%; justify-content: space-between; } }
+input.auth-input:focus,
 .auth-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), 0 0 16px var(--primary-glow);
-  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2), 0 0 16px var(--primary-glow) !important;
+  background: rgba(15, 23, 42, 0.95) !important;
 }
 
 .auth-input:focus + .auth-input-icon,
