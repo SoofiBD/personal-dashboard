@@ -120,7 +120,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         self.assertIn("# Financial Overview", result["markdown_content"])
         self.assertIn("![Figure 1: Revenue trend](images/figure_p1_1.png)", result["markdown_content"])
-        self.assertEqual(0, result["stats"]["captions_bound"])
+        self.assertEqual(1, result["stats"]["captions_bound"])
 
     def test_exports_markdown_and_images_as_zip(self):
         response = export_zip(ZipExport(markdown_content="# Report", source_filename="report.pdf", images=[]))
@@ -155,7 +155,7 @@ class PdfWorkerTest(unittest.TestCase):
         result = convert_pdf(document)
 
         self.assertGreaterEqual(result["stats"]["images_extracted"], 1)
-        asset = next(image for image in result["images"] if image["filename"].startswith(("chart_p1_", "figure_p1_", "page_p1_")))
+        asset = next(image for image in result["images"] if image["filename"].startswith("figure_p1_"))
         self.assertIn(f"](images/{asset['filename']})", result["markdown_content"])
         self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
 
@@ -164,9 +164,10 @@ class PdfWorkerTest(unittest.TestCase):
         page = document.new_page(width=600, height=800)
         page.draw_rect(fitz.Rect(100, 150, 400, 350), color=(0.1, 0.3, 0.8), fill=(0.4, 0.7, 1.0))
         page.draw_line((100, 350), (400, 150), color=(0.0, 0.0, 0.0))
+        page.insert_text((100, 380), "Figure 1: Rendered vector chart", fontsize=10)
 
         result = convert_pdf(document, image_quality="maximum")
-        chart = next(image for image in result["images"] if image["filename"].startswith(("chart_p1_", "page_p1_")))
+        chart = next(image for image in result["images"] if image["filename"].startswith("figure_p1_"))
 
         self.assertEqual("image/png", chart["content_type"])
         self.assertGreater(chart["width"], 1000)
