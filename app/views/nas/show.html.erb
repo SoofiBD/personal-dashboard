@@ -1,0 +1,59 @@
+<div class="nas-workspace">
+  <header class="nas-header">
+    <div><%= link_to t("nas.workspace"), root_path, class: "nas-back" %><p class="nas-eyebrow"><%= t("nas.eyebrow") %></p><h1><%= t("nas.title") %></h1><p><%= t("nas.subtitle") %></p></div>
+    <%= link_to t("nas.refresh"), nas_path(path: @path, q: params[:q], sort: params[:sort]), class: "button button-primary" %>
+  </header>
+  <% if @error || !NasClient.configured? %>
+    <section class="nas-panel" role="status"><h2><%= @error ? t("nas.unavailable") : t("nas.waiting") %></h2><p><%= @error || t("nas.configure") %></p><p><%= t("nas.network_hint") %></p></section>
+  <% elsif @listing %>
+    <section class="nas-metrics" aria-label="<%= t("nas.summary") %>">
+      <div class="nas-panel"><span><%= t("nas.connection") %></span><strong><%= t("nas.online") %></strong><small><%= @listing["latency_ms"] %> ms · <%= l(Time.iso8601(@listing["checked_at"]).in_time_zone, format: :short) %></small></div>
+      <div class="nas-panel"><span><%= t("nas.file") %></span><strong><%= @listing.dig("summary", "files") %></strong><small><%= t("nas.in_folder") %></small></div>
+      <div class="nas-panel"><span><%= t("nas.folder") %></span><strong><%= @listing.dig("summary", "folders") %></strong><small><%= t("nas.subfolders") %></small></div>
+      <div class="nas-panel"><span><%= t("nas.size") %></span><strong><%= number_to_human_size(@listing.dig("summary", "bytes")) %></strong><small><%= t("nas.excluding") %></small></div>
+    </section>
+    <section class="nas-panel">
+      <nav class="nas-breadcrumb" aria-label="<%= t("nas.breadcrumb") %>">
+        <%= link_to t("nas.root"), nas_path %>
+        <% pieces = @listing["path"].split("/").reject(&:blank?) %>
+        <% pieces.each_with_index do |piece, index| %><span aria-hidden="true">/</span><%= link_to piece, nas_path(path: "/" + pieces.first(index + 1).join("/")) %><% end %>
+      </nav>
+      <%= form_with url: nas_path, method: :get, class: "nas-toolbar" do |f| %>
+        <%= f.hidden_field :path, value: @listing["path"] %>
+        <div><%= f.label :q, t("nas.search") %><%= f.search_field :q, value: params[:q], maxlength: 100, placeholder: t("nas.search_placeholder") %></div>
+        <div><%= f.label :sort, t("nas.sort") %><%= f.select :sort, [[t("nas.name"), "name"], [t("nas.largest"), "size"], [t("nas.modified"), "modified"]], selected: params[:sort] %></div>
+        <%= f.submit t("nas.apply"), class: "button" %>
+      <% end %>
+      <div class="nas-file-list">
+        <% @listing["files"].each do |file| %>
+          <article class="nas-file">
+            <div class="nas-file-name"><span aria-hidden="true"><%= finance_svg_icon(file["is_dir"] ? "vault" : "document") %></span><div>
+              <% if file["is_dir"] %><%= link_to file["name"], nas_path(path: file["path"]) %><% else %><%= link_to file["name"], download_nas_path(path: file["path"]) %><% end %>
+              <small><%= file["is_dir"] ? t("nas.folder") : number_to_human_size(file["size"]) %> · <%= l(Time.at(file["modified"]).in_time_zone, format: :short) %></small>
+            </div></div>
+            <% unless file["is_dir"] %>
+              <%= link_to t("nas.download"), download_nas_path(path: file["path"]), class: "button button-secondary nas-download", aria: {label: "#{t('nas.download')}: #{file['name']}"} %>
+            <% end %>
+            <details class="nas-delete"><summary><%= t("nas.delete") %></summary><%= form_with url: nas_path, method: :delete do |f| %>
+              <%= f.hidden_field :path, value: file["path"] %><%= f.label :confirmation, t("nas.confirm", name: file["name"]), for: "confirm-#{file["path"].hash.abs}" %>
+              <%= f.text_field :confirmation, required: true, autocomplete: "off", id: "confirm-#{file["path"].hash.abs}" %><p><%= t("nas.delete_warning") %></p><%= f.submit t("nas.delete_permanently"), class: "button" %>
+            <% end %></details>
+          </article>
+        <% end %>
+        <% if @listing["files"].empty? %><p class="nas-empty"><%= t("nas.empty") %></p><% end %>
+      </div>
+      <nav class="nas-pagination" aria-label="<%= t("nas.pages") %>"><span><%= t("nas.pagination", total: @listing["total"], page: @listing["page"]) %></span>
+        <% if @listing["page"] > 1 %><%= link_to t("nas.previous"), nas_path(path: @path, q: params[:q], sort: params[:sort], page: @listing["page"] - 1) %><% end %>
+        <% if @listing["page"] * 100 < @listing["total"] %><%= link_to t("nas.next"), nas_path(path: @path, q: params[:q], sort: params[:sort], page: @listing["page"] + 1) %><% end %>
+      </nav>
+    </section>
+    <section class="nas-actions">
+      <div class="nas-panel" id="nas-upload"><h2><%= t("nas.upload_title") %></h2><p><%= t("nas.upload_hint") %></p><%= form_with url: upload_nas_path, multipart: true do |f| %>
+        <%= f.hidden_field :path, value: @listing["path"] %><%= f.label :file, t("nas.choose") %><%= f.file_field :file, required: true %><%= f.submit t("nas.upload"), class: "button button-primary", data: {disable_with: t("nas.uploading")} %>
+      <% end %></div>
+      <div class="nas-panel" id="nas-new-folder"><h2><%= t("nas.new_folder") %></h2><p><%= t("nas.folder_hint") %></p><%= form_with url: folder_nas_path do |f| %>
+        <%= f.hidden_field :path, value: @listing["path"] %><%= f.label :name, t("nas.folder_name") %><%= f.text_field :name, required: true, maxlength: 255 %><%= f.submit t("nas.create_folder"), class: "button", data: {disable_with: t("nas.creating")} %>
+      <% end %></div>
+    </section>
+  <% end %>
+</div>

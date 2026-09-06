@@ -38,5 +38,12 @@ class HomeController < ApplicationController
         icon: "document"
       }
     ]
+    if current_user.owner?
+      @modules << {
+        key: "nas", title_key: "home.modules.nas.title", default_title: "NAS Dosyaları",
+        description_key: "home.modules.nas.description", default_description: "Ev sunucunuzdaki dosyalara erişin, yedeklerinizi inceleyin ve düzenleyin.",
+        path: nas_path, badge_key: "home.modules.nas.badge", default_badge: "Özel depolama", icon: "vault"
+      }
+    end
   end
 end

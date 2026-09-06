@@ -1597,3 +1597,35 @@
     }
   });
 })();
+
+// Keep the native file input for keyboard access, validation and file dialogs.
+(() => {
+  const enhanceFileInputs = () => {
+    const tr = document.documentElement.lang.toLowerCase().startsWith("tr");
+    document.querySelectorAll('input[type="file"]').forEach((input) => {
+      if (input.closest('.file-picker')) return;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'file-picker';
+      const button = document.createElement('span');
+      button.className = 'file-picker-button';
+      button.textContent = tr ? 'Dosya seç' : 'Choose file';
+      button.setAttribute('aria-hidden', 'true');
+      const status = document.createElement('span');
+      status.className = 'file-picker-status';
+      status.setAttribute('aria-live', 'polite');
+      const update = () => {
+        const files = Array.from(input.files || []);
+        status.textContent = files.length ? files.map(file => file.name).join(', ') : (tr ? 'Henüz dosya seçilmedi' : 'No file selected');
+        wrapper.classList.toggle('has-file', files.length > 0);
+      };
+      input.before(wrapper);
+      wrapper.append(input, button, status);
+      input.addEventListener('change', update);
+      input.form?.addEventListener('reset', () => requestAnimationFrame(update));
+      update();
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhanceFileInputs);
+  else enhanceFileInputs();
+  document.addEventListener('turbo:load', enhanceFileInputs);
+})();
