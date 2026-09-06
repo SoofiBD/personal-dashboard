@@ -119,8 +119,8 @@ class PdfWorkerTest(unittest.TestCase):
         result = convert_pdf(document)
 
         self.assertIn("# Financial Overview", result["markdown_content"])
-        self.assertIn("![Figure 1: Revenue trend](images/img_p1_1.png)", result["markdown_content"])
-        self.assertEqual(1, result["stats"]["captions_bound"])
+        self.assertIn("![Figure 1: Revenue trend](images/figure_p1_1.png)", result["markdown_content"])
+        self.assertEqual(0, result["stats"]["captions_bound"])
 
     def test_exports_markdown_and_images_as_zip(self):
         response = export_zip(ZipExport(markdown_content="# Report", source_filename="report.pdf", images=[]))
@@ -155,8 +155,8 @@ class PdfWorkerTest(unittest.TestCase):
         result = convert_pdf(document)
 
         self.assertGreaterEqual(result["stats"]["images_extracted"], 1)
-        self.assertTrue(any("chart_p1_" in img["filename"] for img in result["images"]))
-        self.assertIn("![Grafik 1: Gelir Analizi](images/chart_p1_1.png)", result["markdown_content"])
+        asset = next(image for image in result["images"] if image["filename"].startswith(("chart_p1_", "figure_p1_", "page_p1_")))
+        self.assertIn(f"](images/{asset['filename']})", result["markdown_content"])
         self.assertIn("Grafik 1: Gelir Analizi", result["markdown_content"])
 
     def test_renders_vector_charts_at_the_selected_high_quality_profile(self):
@@ -166,10 +166,52 @@ class PdfWorkerTest(unittest.TestCase):
         page.draw_line((100, 350), (400, 150), color=(0.0, 0.0, 0.0))
 
         result = convert_pdf(document, image_quality="maximum")
-        chart = next(image for image in result["images"] if image["filename"].startswith("chart_p1_"))
+        chart = next(image for image in result["images"] if image["filename"].startswith(("chart_p1_", "page_p1_")))
 
         self.assertEqual("image/png", chart["content_type"])
         self.assertGreater(chart["width"], 1000)
+
+    def test_renders_mixed_figures_with_their_labels_as_one_asset(self):
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        pixmap = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 120, 100), False)
+        pixmap.clear_with(128)
+        page.draw_rect(fitz.Rect(90, 110, 480, 300), color=(0.4, 0.4, 0.4), width=3)
+        page.insert_image(fitz.Rect(120, 150, 240, 250), stream=pixmap.tobytes("png"))
+        page.insert_image(fitz.Rect(320, 150, 440, 250), stream=pixmap.tobytes("png"))
+        page.insert_text((122, 285), "2012 detector", fontsize=11)
+        page.insert_text((322, 285), "2014 solar cell", fontsize=11)
+        page.insert_text((92, 325), "Fig. 1 Composite figure", fontsize=10)
+
+        result = convert_pdf(document)
+
+        figure = next(image for image in result["images"] if image["filename"].startswith("figure_p1_"))
+        self.assertEqual(0, figure["bounds"][0])
+        self.assertGreaterEqual(figure["bounds"][3], 335)
+        self.assertGreater(figure["width"], 1000)
+        self.assertFalse(any(image["filename"].startswith("img_p1_") for image in result["images"]))
+
+    def test_renders_a_captioned_figure_even_when_pdf_object_bounds_are_missing(self):
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        page.insert_text((72, 100), "Figure 1: A fully rendered visual record", fontsize=10)
+
+        result = convert_pdf(document)
+
+        figure = next(image for image in result["images"] if image["filename"].startswith("figure_p1_"))
+        self.assertEqual(0, figure["bounds"][0])
+        self.assertGreaterEqual(figure["bounds"][3], 108)
+
+    def test_does_not_export_highlight_annotations_as_page_images(self):
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((72, 100), "This sentence is highlighted for review.")
+        annotation = page.add_highlight_annot(page.search_for("highlighted for review")[0])
+        annotation.update()
+
+        result = convert_pdf(document)
+
+        self.assertEqual([], result["images"])
 
     def test_rejects_pdf_over_the_page_limit(self):
         document = fitz.open()
