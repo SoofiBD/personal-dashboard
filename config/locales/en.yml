@@ -1031,6 +1031,8 @@ en:
     identifier_label: Email or username (Optional)
     identifier_placeholder: Leave blank for owner login
     password_label: Password
+    password_placeholder: "••••••••••••••••"
+    toggle_password: Show or hide password
     submit: Sign In
     mfa_setup_title: Set Up Two-Factor Authentication
     mfa_verify_title: Enter Security Code
