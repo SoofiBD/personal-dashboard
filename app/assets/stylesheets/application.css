@@ -737,12 +737,65 @@ body::after {
 .document-stats-grid div { background: var(--surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: .75rem; }
 .document-stats-grid dt { color: var(--text-muted); font-size: .75rem; }
 .document-stats-grid dd { font-size: 1.35rem; font-weight: 700; margin: .15rem 0 0; }
-.document-gallery { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-.document-gallery-item { background: var(--surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-muted); overflow: hidden; padding-bottom: .625rem; }
-.document-gallery-item > a { color: inherit; display: block; }
-.document-gallery-item img { aspect-ratio: 4 / 3; display: block; object-fit: cover; width: 100%; }
-.document-gallery-item span { display: block; font-size: .75rem; padding: .5rem .625rem; }
-.document-gallery-item button { margin: 0 .625rem; width: calc(100% - 1.25rem); }
+.document-gallery {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+}
+.document-gallery-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  overflow: hidden;
+  padding-bottom: 0.625rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.document-gallery-item:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+}
+.document-gallery-item > a {
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+.document-gallery-item img {
+  aspect-ratio: 4 / 3;
+  display: block;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.25);
+  width: 100%;
+}
+.document-gallery-item span {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 0.625rem 0.35rem;
+  color: var(--text-muted);
+}
+.document-gallery-item button,
+.document-gallery-item .button {
+  margin: auto 0.625rem 0;
+  width: calc(100% - 1.25rem);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.45rem 0.5rem;
+  min-height: 34px;
+  height: auto;
+  white-space: normal;
+  line-height: 1.25;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  box-sizing: border-box;
+}
 
 @media (max-width: 62rem) {
   .document-workspace-grid { grid-template-columns: 1fr; }
