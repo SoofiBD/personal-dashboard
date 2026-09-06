@@ -5433,3 +5433,53 @@ input.auth-input:focus,
   border-radius: var(--radius-sm);
   border: 1px solid rgba(56, 189, 248, 0.3);
 }
+
+/* NAS workspace uses the shared light/dark theme. */
+.nas-workspace { max-width: 1200px; margin: 0 auto; padding: 32px 20px; color: var(--text-main); }
+.nas-header, .nas-toolbar, .nas-breadcrumb, .nas-pagination { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.nas-header { justify-content: space-between; margin-bottom: 24px; }
+.nas-header h1 { margin: 8px 0; font-size: clamp(28px, 4vw, 40px); }
+.nas-eyebrow { letter-spacing: .12em; font-size: 12px; margin-top: 24px; }
+.nas-workspace p, .nas-workspace small, .nas-metrics span { color: var(--text-muted); }
+.nas-workspace a { color: var(--text-main); text-underline-offset: 4px; }
+.nas-workspace a:focus-visible, .nas-workspace summary:focus-visible { outline: 2px solid var(--text-main); outline-offset: 4px; }
+.nas-panel { background: var(--surface-card); border: 1px solid var(--border-card); border-radius: 16px; padding: 24px; min-width: 0; }
+.nas-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.nas-metrics strong, .nas-metrics small { display: block; margin-top: 8px; }
+.nas-metrics strong { font-size: 26px; }
+.nas-breadcrumb { padding-bottom: 20px; overflow-wrap: anywhere; }
+.nas-toolbar { align-items: end; padding-bottom: 24px; }
+.nas-toolbar > div:first-child { flex: 1; min-width: 180px; }
+.nas-workspace label { display: block; margin-bottom: 8px; }
+.nas-workspace input:not([type=hidden]), .nas-workspace select, .nas-workspace .button { min-height: 44px; max-width: 100%; }
+.nas-workspace input:not([type=submit]):not([type=hidden]), .nas-workspace select { width: 100%; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-hover); border-radius: 8px; padding: 10px; }
+.nas-workspace .button { display: inline-flex; align-items: center; justify-content: center; margin-top: 12px; cursor: pointer; }
+.nas-file { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border-card); }
+.nas-file-name { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.nas-file-name svg { width: 24px; height: 24px; }
+.nas-file-name small { display: block; margin-top: 6px; }
+.nas-delete summary { cursor: pointer; min-height: 44px; padding: 12px; }
+.nas-delete[open] { width: 100%; }
+.nas-delete form { max-width: 540px; padding: 16px; background: var(--surface-elevated); border-radius: 8px; }
+.nas-pagination { justify-content: flex-end; padding-top: 16px; }
+.nas-pagination a, .nas-back, .nas-breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; }
+.nas-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
+.nas-empty { padding: 32px 0; }
+@media (max-width: 760px) { .nas-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nas-actions { grid-template-columns: 1fr; } .nas-panel { padding: 16px; } }
+@media (max-width: 400px) { .nas-metrics { grid-template-columns: 1fr; } .nas-workspace { padding: 20px 12px; } }
+
+/* Shared file selection control: native input remains keyboard accessible. */
+input[type="file"]::file-selector-button {
+  border: 1px solid var(--border-hover); border-radius: 8px; padding: 10px 16px;
+  margin-right: 16px; background: var(--surface-elevated); color: var(--text-main); cursor: pointer;
+}
+.file-picker { position: relative; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; min-height: 64px; padding: 12px; border: 1px dashed var(--border-hover); border-radius: 12px; background: var(--surface-input); min-width: 0; }
+.file-picker input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; z-index: 1; }
+.file-picker-button { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 8px; background: var(--surface-elevated); color: var(--text-main); border: 1px solid var(--border-hover); font-weight: 600; }
+.file-picker-status { flex: 1; min-width: 120px; color: var(--text-muted); overflow-wrap: anywhere; }
+.file-picker:focus-within { outline: 2px solid var(--text-main); outline-offset: 3px; }
+.file-picker:hover, .file-picker.has-file { border-style: solid; }
+.file-picker:has(input:disabled) { opacity: .55; }
+.file-picker input:disabled { cursor: not-allowed; }
+.nas-workspace .nas-download { margin-top: 0; }
+#nas-upload, #nas-new-folder { scroll-margin-top: 32px; }

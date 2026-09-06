@@ -1,4 +1,9 @@
 services:
+  nas-worker:
+    extends:
+      file: compose.nas.yaml
+      service: nas-worker
+
   web:
     image: personal-dashboard-web
     build:
