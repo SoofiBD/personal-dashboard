@@ -15,5 +15,9 @@ Rails.application.configure do
     policy.connect_src :self
     policy.base_uri :none
     policy.frame_ancestors :none
+    policy.form_action :self
+    policy.frame_src :none
+    policy.manifest_src :self
+    policy.upgrade_insecure_requests true
   end
 end

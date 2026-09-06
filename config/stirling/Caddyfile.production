@@ -1,8 +1,24 @@
 {$DASHBOARD_DOMAIN} {
   encode zstd gzip
+  log {
+    output stdout
+    format json
+  }
+  header {
+    Referrer-Policy "strict-origin-when-cross-origin"
+    X-Content-Type-Options "nosniff"
+    Permissions-Policy "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+    -Server
+  }
 
   @pdf_editor path /pdf-editor*
   handle @pdf_editor {
+    request_body {
+      max_size 25MB
+    }
+    forward_auth web:3000 {
+      uri /internal/pdf_editor_authorization
+    }
     reverse_proxy stirling-pdf:8080
   }
 

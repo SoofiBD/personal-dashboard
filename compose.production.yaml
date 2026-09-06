@@ -13,6 +13,13 @@ services:
       - "3000"
     volumes:
       - storage_data:/rails/storage
+    read_only: true
+    tmpfs:
+      - /rails/tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     depends_on:
       db:
         condition: service_healthy
@@ -30,6 +37,13 @@ services:
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
     volumes:
       - storage_data:/rails/storage
+    read_only: true
+    tmpfs:
+      - /rails/tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     depends_on:
       db:
         condition: service_healthy
@@ -47,6 +61,8 @@ services:
       - "8000"
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     read_only: true
     tmpfs:
       - /tmp
