@@ -349,154 +349,47 @@ def unwrap_soft_breaks(markdown):
 
 
 def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
+    """Extract figures only from rendered, caption-bounded PDF page regions.
+
+    PDF object extraction is deliberately not used here: a visible figure may
+    consist of arbitrary text, vector and raster objects, while annotations
+    can look identical to vector drawings. Rendering the original page is the
+    only lossless representation of a figure.
+    """
     images = []
     extracted_bytes = 0
-    allowed_types = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "gif": "image/gif", "webp": "image/webp"}
     for page_number, page in enumerate(document, start=1):
-        page_raster_rects = []
-        raster_images = []
-        # Collect embedded raster images before returning them. PDF figures often
-        # layer those images with vector paths and text labels.
-        for image_index, image_info in enumerate(page.get_images(full=True), start=1):
-            xref = image_info[0]
-            image = document.extract_image(xref)
-            width, height = image["width"], image["height"]
-            extension = image.get("ext", "png").lower()
-            content_type = allowed_types.get(extension)
-            if width < min_image_dimension or height < min_image_dimension or not content_type:
-                continue
-            image_data = image["image"]
-            bounds = [fitz.Rect(rect) for rect in page.get_image_rects(xref)]
-            page_raster_rects.extend(bounds)
-            raster_images.append({
-                "filename": f"img_p{page_number}_{image_index}.{extension}",
-                "page": page_number,
-                "width": width,
-                "height": height,
-                "content_type": content_type,
-                "caption": find_caption(page, xref),
-                "data_base64": base64.b64encode(image_data).decode("ascii"),
-                "bounds": bounds,
-            })
-
-        # 1. Prefer a screenshot-derived visual snapshot when a figure caption
-        # identifies a figure region. PDF figures routinely split labels,
-        # paths and raster panels into unrelated objects, so object-level crops
-        # cannot be treated as the source of truth.
-        snapshots = extract_visual_snapshots(page, page_number, page_raster_rects, min_image_dimension, image_quality)
-        if snapshots:
-            for snapshot in snapshots:
-                snapshot_data = snapshot.pop("data")
-                if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(snapshot_data) > MAX_EXTRACTED_IMAGE_BYTES:
-                    return images
-                snapshot["data_base64"] = base64.b64encode(snapshot_data).decode("ascii")
-                images.append(snapshot)
-                extracted_bytes += len(snapshot_data)
-            # The rendered snapshot is canonical for this page. Do not also
-            # return incomplete constituent panels as independent figures.
-            continue
-
-        # 2. Render composite figures before exposing their individual source
-        # images. This preserves PDF text and vector overlays when no caption
-        # identifies a safer screenshot region.
-        composites = extract_composite_figures(page, page_number, page_raster_rects, min_image_dimension, image_quality)
-        composite_rects = [fitz.Rect(composite["bounds"]) for composite in composites]
-        for composite in composites:
-            composite_data = composite.pop("data")
-            if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(composite_data) > MAX_EXTRACTED_IMAGE_BYTES:
+        for snapshot in extract_visual_snapshots(page, page_number, min_image_dimension, image_quality):
+            snapshot_data = snapshot.pop("data")
+            if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(snapshot_data) > MAX_EXTRACTED_IMAGE_BYTES:
                 return images
-            composite["data_base64"] = base64.b64encode(composite_data).decode("ascii")
-            images.append(composite)
-            extracted_bytes += len(composite_data)
-
-        # 3. Preserve stand-alone raster images, but do not duplicate images
-        # already represented by a rendered composite figure.
-        for image in raster_images:
-            image_bounds = image.pop("bounds")
-            if image_bounds and all(rect_is_covered_by_any(rect, composite_rects) for rect in image_bounds):
-                continue
-            image_data = base64.b64decode(image["data_base64"])
-            if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(image_data) > MAX_EXTRACTED_IMAGE_BYTES:
-                return images
-            images.append(image)
-            extracted_bytes += len(image_data)
-
-        # 4. Extract stand-alone vector graphics, charts, plots and diagrams.
-        charts = extract_vector_charts(page, page_number, page_raster_rects + composite_rects, min_image_dimension, image_quality)
-        for chart in charts:
-            chart_data = chart["data"]
-            if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(chart_data) > MAX_EXTRACTED_IMAGE_BYTES:
-                return images
-            images.append({
-                "filename": chart["filename"],
-                "page": page_number,
-                "width": chart["width"],
-                "height": chart["height"],
-                "content_type": chart["content_type"],
-                "caption": chart["caption"],
-                "data_base64": base64.b64encode(chart_data).decode("ascii"),
-                "bounds": chart["bounds"],
-            })
-            extracted_bytes += len(chart_data)
+            snapshot["data_base64"] = base64.b64encode(snapshot_data).decode("ascii")
+            images.append(snapshot)
+            extracted_bytes += len(snapshot_data)
 
     return images
 
 
-def rect_is_covered_by_any(rect, containers):
-    return any(
-        rect.intersect(container).get_area() / max(1, rect.get_area()) >= 0.95
-        for container in containers
-    )
-
-
-def extract_visual_snapshots(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
+def extract_visual_snapshots(page, page_number, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
     """Render captioned figures as screenshots so no PDF layer is lost."""
-    annotation_rects = [fitz.Rect(annotation.rect) for annotation in (page.annots() or [])]
-    drawings = []
-    for drawing in page.get_drawings():
-        rect = fitz.Rect(drawing["rect"])
-        if rect.is_empty or rect.width < 4 or rect.height < 4:
-            continue
-        # Highlights and review marks are annotations, not document figures.
-        if any(rect.intersects(annotation_rect) for annotation_rect in annotation_rects):
-            continue
-        if (rect.height <= 2.5 and rect.width >= page.rect.width * 0.4) or (rect.width <= 2.5 and rect.height >= page.rect.height * 0.4):
-            continue
-        drawings.append(rect)
-    visual_rects = raster_rects + drawings
     captions = find_caption_blocks(page)
-    if not visual_rects and not captions:
+    if not captions:
         return []
 
     profile = IMAGE_RENDER_PROFILES[image_quality]
     snapshots = []
     previous_caption_bottom = 0
-    for caption in captions:
+    for index, caption in enumerate(captions, start=1):
         caption_rect = caption["rect"]
-        figure_components = [
-            rect for rect in visual_rects
-            if rect.y0 >= previous_caption_bottom - 4 and rect.y1 <= caption_rect.y0 + 8
-        ]
-
-        # Preserve the full page width. It may retain harmless whitespace, but
-        # never loses labels positioned beside a panel or drawing boundary.
-        # A caption is sufficient evidence of a figure. When object bounds are
-        # absent or fragmented, begin at the prior caption instead of falling
-        # back to incomplete embedded-image extraction.
-        top = max(0, min(rect.y0 for rect in figure_components) - 8) if figure_components else previous_caption_bottom
-        bottom = min(page.rect.height, max(caption_rect.y1 + 8, max((rect.y1 for rect in figure_components), default=0) + 8))
+        # A full-width page strip is intentionally conservative. It includes
+        # every visible layer above the caption without guessing which PDF
+        # object belongs to the figure.
+        top = previous_caption_bottom
+        bottom = min(page.rect.height, caption_rect.y1 + 8)
         previous_caption_bottom = caption_rect.y1
         if bottom - top < 40:
             continue
-        snapshot = render_visual_snapshot(page, fitz.Rect(0, top, page.rect.width, bottom), page_number, len(snapshots) + 1, caption["text"], profile)
-        if snapshot:
-            snapshots.append(snapshot)
-
-    # Without a recognizable caption, use a page render only when actual
-    # raster artwork is present. Vector-only annotations (highlights,
-    # underlines, review marks) must never be promoted to images.
-    if not snapshots and (len(raster_rects) >= 2 or len(drawings) >= 2):
-        snapshot = render_visual_snapshot(page, page.rect, page_number, 1, "", profile, prefix="page")
+        snapshot = render_visual_snapshot(page, fitz.Rect(0, top, page.rect.width, bottom), page_number, index, caption["text"], profile)
         if snapshot:
             snapshots.append(snapshot)
     return snapshots
@@ -528,219 +421,6 @@ def find_caption_blocks(page):
         if caption_pattern.match(value):
             captions.append({"text": value, "rect": fitz.Rect(x0, y0, x1, y1)})
     return captions
-
-
-def extract_composite_figures(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
-    """Render mixed PDF figures made from vector paths, raster images and labels."""
-    if len(raster_rects) < 2:
-        return []
-
-    profile = IMAGE_RENDER_PROFILES[image_quality]
-    page_rect = page.rect
-    drawing_rects = []
-    for drawing in page.get_drawings():
-        rect = fitz.Rect(drawing["rect"])
-        if rect.is_empty or rect.width < 4 or rect.height < 4:
-            continue
-        # Ignore full-page backgrounds and running-rule separators.
-        if rect.width >= page_rect.width * 0.92 and rect.height >= page_rect.height * 0.92:
-            continue
-        if (rect.height <= 2.5 and rect.width >= page_rect.width * 0.4) or (rect.width <= 2.5 and rect.height >= page_rect.height * 0.4):
-            continue
-        drawing_rects.append(rect)
-
-    figures = []
-    for cluster in cluster_rectangles(drawing_rects, margin=32):
-        nearby_rasters = [rect for rect in raster_rects if expanded_rect(cluster, 36).intersects(rect)]
-        # A single raster is usually a photo with decoration, not a compound figure.
-        if len(nearby_rasters) < 2:
-            continue
-
-        figure_rect = fitz.Rect(cluster)
-        for rect in nearby_rasters:
-            figure_rect |= rect
-
-        # Labels may be laid out just outside a plot or illustration. Add only
-        # short text blocks, avoiding the document's surrounding body prose.
-        label_area = expanded_rect(figure_rect, 28)
-        for block in page.get_text("blocks", sort=True):
-            x0, y0, x1, y1, text, *_ = block
-            text = text.strip()
-            text_rect = fitz.Rect(x0, y0, x1, y1)
-            if text and len(text) <= 140 and text.count("\n") <= 4 and label_area.intersects(text_rect):
-                figure_rect |= text_rect
-
-        padded = fitz.Rect(
-            max(0, figure_rect.x0 - 6), max(0, figure_rect.y0 - 6),
-            min(page_rect.width, figure_rect.x1 + 6), min(page_rect.height, figure_rect.y1 + 6)
-        )
-        if padded.width * padded.height < 8_000:
-            continue
-        scale = profile["dpi"] / 72
-        pix = page.get_pixmap(clip=padded, matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB, alpha=False)
-        if pix.width < min_image_dimension or pix.height < min_image_dimension:
-            continue
-        figure_data = pix.tobytes(profile["format"])
-        figures.append({
-            "filename": f"figure_p{page_number}_{len(figures) + 1}.{profile['format']}",
-            "page": page_number,
-            "width": pix.width,
-            "height": pix.height,
-            "content_type": profile["content_type"],
-            "caption": find_caption(page, padded),
-            "data": figure_data,
-            "bounds": [padded.x0, padded.y0, padded.x1, padded.y1],
-        })
-    return figures
-
-
-def expanded_rect(rect, margin):
-    return fitz.Rect(rect.x0 - margin, rect.y0 - margin, rect.x1 + margin, rect.y1 + margin)
-
-
-def cluster_rectangles(rectangles, margin):
-    """Return transitive clusters; figures are frequently built from linked paths."""
-    pending = [fitz.Rect(rect) for rect in rectangles]
-    clusters = []
-    while pending:
-        cluster = pending.pop()
-        changed = True
-        while changed:
-            changed = False
-            for rect in pending[:]:
-                if expanded_rect(cluster, margin).intersects(rect):
-                    cluster |= rect
-                    pending.remove(rect)
-                    changed = True
-        clusters.append(cluster)
-    return clusters
-
-
-def extract_vector_charts(page, page_number, raster_rects, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
-    profile = IMAGE_RENDER_PROFILES[image_quality]
-    drawings = page.get_drawings()
-    if not drawings:
-        return []
-
-    page_rect = page.rect
-    table_rects = []
-    try:
-        for table in page.find_tables().tables:
-            table_rects.append(fitz.Rect(table.bbox))
-    except Exception:
-        pass
-
-    candidate_rects = []
-    for d in drawings:
-        r = fitz.Rect(d["rect"])
-        # Ignore full-page background boxes
-        if r.width >= page_rect.width * 0.92 and r.height >= page_rect.height * 0.92:
-            continue
-        # Ignore thin header/footer line separators
-        if (r.height <= 2.5 and r.width >= page_rect.width * 0.4) or (r.width <= 2.5 and r.height >= page_rect.height * 0.4):
-            continue
-        # Ignore drawings strictly inside table borders
-        if any(r in t_rect for t_rect in table_rects):
-            continue
-        candidate_rects.append(r)
-
-    if not candidate_rects:
-        return []
-
-    # Cluster nearby drawing rectangles (threshold 25pt)
-    clusters = []
-    for r in candidate_rects:
-        merged = False
-        margin = 25
-        for i, cluster in enumerate(clusters):
-            expanded_cluster = fitz.Rect(cluster.x0 - margin, cluster.y0 - margin, cluster.x1 + margin, cluster.y1 + margin)
-            if expanded_cluster.intersects(r):
-                clusters[i] = cluster | r
-                merged = True
-                break
-        if not merged:
-            clusters.append(fitz.Rect(r))
-
-    merged_clusters = []
-    while clusters:
-        current = clusters.pop(0)
-        merged = False
-        margin = 20
-        for i, other in enumerate(merged_clusters):
-            expanded = fitz.Rect(other.x0 - margin, other.y0 - margin, other.x1 + margin, other.y1 + margin)
-            if expanded.intersects(current):
-                merged_clusters[i] = other | current
-                merged = True
-                break
-        if not merged:
-            merged_clusters.append(current)
-
-    charts = []
-    chart_index = 1
-    for cluster_rect in merged_clusters:
-        min_pt = max(45, min_image_dimension * 72 / profile["dpi"])
-        if cluster_rect.width < min_pt or cluster_rect.height < min_pt:
-            continue
-        if cluster_rect.width * cluster_rect.height < 3000:
-            continue
-
-        # Skip if covered by raster image
-        if any(
-            (cluster_rect.intersect(r_rect).get_area() / max(1, cluster_rect.get_area())) > 0.5
-            for r_rect in raster_rects
-        ):
-            continue
-
-        # Skip if predominantly a table
-        if any(
-            (cluster_rect.intersect(t_rect).get_area() / max(1, cluster_rect.get_area())) > 0.6
-            for t_rect in table_rects
-        ):
-            continue
-
-        # Check drawing density
-        drawings_in_cluster = [d for d in drawings if fitz.Rect(d["rect"]).intersects(cluster_rect)]
-        if len(drawings_in_cluster) < 2 and not any(d.get("fill") for d in drawings_in_cluster):
-            continue
-
-        # Expand to include axis labels or text blocks located inside/adjacent
-        clip_rect = fitz.Rect(cluster_rect)
-        for block in page.get_text("blocks", sort=True):
-            bx0, by0, bx1, by1, btext, *_ = block
-            b_rect = fitz.Rect(bx0, by0, bx1, by1)
-            if b_rect.intersects(cluster_rect) or (
-                abs(b_rect.y0 - cluster_rect.y1) <= 12 and (b_rect.x0 >= cluster_rect.x0 - 20 and b_rect.x1 <= cluster_rect.x1 + 20)
-            ):
-                if len(btext.strip()) <= 80:
-                    clip_rect |= b_rect
-
-        padded_rect = fitz.Rect(
-            max(0, clip_rect.x0 - 4),
-            max(0, clip_rect.y0 - 4),
-            min(page_rect.width, clip_rect.x1 + 4),
-            min(page_rect.height, clip_rect.y1 + 4)
-        )
-
-        scale = profile["dpi"] / 72
-        pix = page.get_pixmap(clip=padded_rect, matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB, alpha=False)
-        if pix.width < min_image_dimension or pix.height < min_image_dimension:
-            continue
-
-        caption = find_caption(page, padded_rect)
-        chart_bytes = pix.tobytes(profile["format"])
-
-        charts.append({
-            "filename": f"chart_p{page_number}_{chart_index}.{profile['format']}",
-            "width": pix.width,
-            "height": pix.height,
-            "caption": caption,
-            "data": chart_bytes,
-            "content_type": profile["content_type"],
-            "bounds": [padded_rect.x0, padded_rect.y0, padded_rect.x1, padded_rect.y1],
-        })
-        chart_index += 1
-
-    return charts
 
 
 def chart_rects_by_page(images):
@@ -788,29 +468,6 @@ def is_valid_table(rows):
     if len(non_empty_cells) / total_cells < 0.6:
         return False
     return sum(len(cell) > 120 for cell in non_empty_cells) / len(non_empty_cells) <= 0.3
-
-
-def find_caption(page, target):
-    caption_pattern = re.compile(r"^(figure|fig\.|şekil|resim|görsel|table|tablo|chart|grafik|diagram|çizelge)\s*\d*[:.\s-].*", re.IGNORECASE)
-    if isinstance(target, fitz.Rect):
-        image_rects = [target]
-    elif isinstance(target, int):
-        image_rects = page.get_image_rects(target)
-    else:
-        image_rects = [fitz.Rect(target)]
-
-    candidates = []
-    for block in page.get_text("blocks", sort=True):
-        _x0, y0, _x1, y1, text, *_rest = block
-        value = normalize_plain_text(text)
-        if not caption_pattern.match(value):
-            continue
-        for image_rect in image_rects:
-            below_gap = y0 - image_rect.y1
-            above_gap = image_rect.y0 - y1
-            if 0 <= below_gap <= 45 or 0 <= above_gap <= 30:
-                candidates.append((min(abs(below_gap), abs(above_gap)), value))
-    return min(candidates, default=(0, ""))[1]
 
 
 def inject_frontmatter(markdown, filename, custom_notes):
