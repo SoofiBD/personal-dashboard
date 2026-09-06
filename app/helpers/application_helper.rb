@@ -13,6 +13,8 @@ module ApplicationHelper
   end
 
   def active_app_module
+    return :nas if controller_name == "nas"
+
     if controller_name.in?(%w[pdf_tools document_conversions document_assets]) || @current_module == :pdf_tools || @current_module == :markitdown
       :pdf_tools
     elsif controller_name.in?(%w[profiles users mfa]) || @current_module == :settings

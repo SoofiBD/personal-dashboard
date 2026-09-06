@@ -8,6 +8,12 @@ Rails.application.routes.draw do
   resource :profile, only: %i[show update]
   resources :users, only: %i[index new create edit update]
 
+  resource :nas, controller: "nas", only: %i[show destroy] do
+    get :download
+    post :upload
+    post :folder
+  end
+
   root to: "home#show"
 
   scope :finance, module: :personal_finance, as: :finance do
