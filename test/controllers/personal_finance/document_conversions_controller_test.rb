@@ -62,6 +62,12 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "button[data-insert-image][data-image-filename='img_p1_1.png']", text: "Markdown’a ekle"
   end
 
+  test "binds gallery image buttons outside the workspace to the editor" do
+    source = Rails.root.join("app/assets/javascripts/application.js").read
+
+    assert_includes source, 'document.querySelectorAll("[data-insert-image]")'
+  end
+
   test "persists edited markdown for the current user" do
     patch finance_document_conversion_path(@conversion), params: {document_conversion: {markdown_content: "# Updated report"}}, as: :json
 

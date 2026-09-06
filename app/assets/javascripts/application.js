@@ -1441,7 +1441,9 @@
       });
 
       // Insert image from gallery
-      workspace.querySelectorAll("[data-insert-image]").forEach((button) => {
+      // The gallery follows the workspace section so it can remain visible
+      // beneath the source PDF and processing summary.
+      document.querySelectorAll("[data-insert-image]").forEach((button) => {
         button.addEventListener("click", () => {
           const markdown = `![${button.dataset.imageAlt}](images/${button.dataset.imageFilename})`;
           const start = editor.selectionStart;
