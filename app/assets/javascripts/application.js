@@ -1562,7 +1562,30 @@
     initOnboardingWizard();
     initDocumentWorkspace();
     initDocumentConversionPolling();
+    initPasswordToggle();
     registerServiceWorker();
+  };
+
+  const initPasswordToggle = () => {
+    document.querySelectorAll(".auth-password-toggle").forEach((btn) => {
+      if (btn.dataset.toggleBound) return;
+      btn.dataset.toggleBound = "true";
+      btn.addEventListener("click", () => {
+        const wrapper = btn.closest(".auth-input-wrapper");
+        if (!wrapper) return;
+        const input = wrapper.querySelector("input");
+        if (!input) return;
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        const eyeShow = btn.querySelector(".icon-eye-show");
+        const eyeHide = btn.querySelector(".icon-eye-hide");
+        if (eyeShow && eyeHide) {
+          eyeShow.style.display = isPassword ? "none" : "block";
+          eyeHide.style.display = isPassword ? "block" : "none";
+        }
+        input.focus();
+      });
+    });
   };
 
   document.addEventListener("DOMContentLoaded", init);
