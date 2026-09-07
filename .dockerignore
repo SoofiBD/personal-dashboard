@@ -41,3 +41,6 @@
 .env.nas*
 *.pem
 *.pem.bak
+
+# Built independently as the ChartDB service
+/modules/chartdb/

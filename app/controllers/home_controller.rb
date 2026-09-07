@@ -38,6 +38,11 @@ class HomeController < ApplicationController
         icon: "document"
       }
     ]
+    @modules << {
+      key: "database_tools", title_key: "database_tools.title", default_title: "ChartDB",
+      description_key: "database_tools.subtitle", default_description: "Veritabanı şeması tasarımı",
+      path: database_tools_path, badge_key: "database_tools.badge", default_badge: "SQL", icon: "vault"
+    }
     if current_user.owner?
       @modules << {
         key: "nas", title_key: "home.modules.nas.title", default_title: "NAS Dosyaları",

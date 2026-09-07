@@ -107,6 +107,22 @@ services:
       retries: 12
       start_period: 30s
 
+  chartdb:
+    build:
+      context: ./modules/chartdb
+    expose:
+      - "80"
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   gateway:
     image: caddy:2.8-alpine
     ports:
@@ -119,6 +135,8 @@ services:
       web:
         condition: service_started
       stirling-pdf:
+        condition: service_healthy
+      chartdb:
         condition: service_healthy
 
   db:

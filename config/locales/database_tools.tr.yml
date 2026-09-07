@@ -1,0 +1,25 @@
+{
+  "tr": {
+    "database_tools": {
+      "title": "Veritabanı Tasarımı",
+      "subtitle": "ChartDB ile tabloları ve ilişkileri tasarlayın, mevcut şemaları içe aktarın ve SQL üretin.",
+      "badge": "Şema & SQL",
+      "open": "Tasarımcıyı aç ↗",
+      "ready": "ChartDB hazır",
+      "unavailable": "ChartDB şu anda kullanılamıyor. Servis başladıktan sonra sayfayı yenileyin.",
+      "storage": "Tasarımlar bu tarayıcıda, dashboard hesabınıza göre saklanır. Başka cihazlara otomatik taşınmaz ve dashboard yedeğine dahil değildir. JSON olarak dışa aktararak yedekleyin. Ortak cihazlarda ayrı tarayıcı profilleri kullanın.",
+      "design": {
+        "title": "Görsel şema tasarımı",
+        "description": "Tabloları, sütunları ve ilişkileri görsel olarak düzenleyin."
+      },
+      "import": {
+        "title": "Şema içe aktarma",
+        "description": "SQL, DBML veya desteklenen veritabanlarının şema sorgusu sonuçlarıyla başlayın."
+      },
+      "export": {
+        "title": "SQL ve yedek dışa aktarma",
+        "description": "Şemanızdan SQL üretin, JSON yedeği alın veya diyagramı görsel olarak indirin. SQL çalıştırma ve sunucu oluşturma bu modülün kapsamı dışındadır."
+      }
+    }
+  }
+}
