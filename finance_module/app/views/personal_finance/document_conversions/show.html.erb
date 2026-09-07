@@ -11,7 +11,7 @@
 </header>
 
 <% if @document_conversion.completed? %>
-  <% asset_map = @document_conversion.assets.index_with { |asset| finance_document_conversion_asset_path(@document_conversion, asset) } %>
+  <% asset_map = @document_conversion.assets.to_h { |asset| [asset.filename, finance_document_conversion_asset_path(@document_conversion, asset)] } %>
   <section class="document-workspace workspace-view--split" data-document-workspace data-document-assets="<%= json_escape(asset_map.to_json) %>">
     <div class="document-workspace-toolbar">
       <div class="workspace-meta-group">
@@ -193,10 +193,13 @@
               <span><%= t("document_conversions.page_image", page: asset.page_number, default: "Sayfa #{asset.page_number}") %></span>
             <% end %>
             <button type="button" class="button button-secondary button-compact" data-insert-image data-image-filename="<%= asset.filename %>" data-image-alt="<%= t("document_conversions.page_image", page: asset.page_number, default: "Sayfa #{asset.page_number} görseli") %>"><%= t("document_conversions.insert_to_markdown", default: "Markdown’a ekle") %></button>
+            <button type="button" class="button button-secondary" data-crop-image data-asset-url="<%= finance_document_conversion_asset_path(@document_conversion, asset) %>" data-filename="<%= asset.filename %>">Görseli kırp / düzenle</button>
           </article>
         <% end %>
       </div>
     </section>
+    <%= render "image_editor" %>
+    <%= javascript_include_tag "document_image_editor", defer: true %>
   <% end %>
 <% else %>
   <section class="panel"><div class="empty-state" <%= "data-document-conversion-processing" if @document_conversion.processing? %>><p role="status"><%= @document_conversion.error_message.presence || t("document_conversions.processing_notice", default: "PDF dönüşümü işleniyor. Sonuç hazır olduğunda sayfa otomatik yenilenecek.") %></p></div></section>

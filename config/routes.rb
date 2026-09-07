@@ -39,7 +39,7 @@ Rails.application.routes.draw do
       post :export_zip, on: :member
       post :export_html, on: :member
       post :reprocess, on: :member
-      resources :assets, only: :show, controller: :document_assets
+      resources :assets, only: [:show, :update, :destroy], controller: :document_assets
     end
     resources :subscriptions, except: :show
     resources :debts, except: :show do
