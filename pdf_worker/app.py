@@ -15,6 +15,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
 from markitdown import MarkItDown
 from pydantic import BaseModel, Field
+from PIL import Image, UnidentifiedImageError
 
 MAX_FILE_SIZE = 25 * 1024 * 1024
 MAX_PAGE_COUNT = 250
@@ -48,6 +49,24 @@ class HtmlExport(ZipExport):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.post("/crop-image")
+async def crop_image(file: UploadFile = File(...), left: int = Form(...), top: int = Form(...), width: int = Form(...), height: int = Form(...)):
+    payload = await file.read(MAX_EXTRACTED_IMAGE_BYTES + 1)
+    if len(payload) > MAX_EXTRACTED_IMAGE_BYTES:
+        raise HTTPException(413, "Image is too large")
+    try:
+        with Image.open(io.BytesIO(payload)) as source:
+            if source.format not in {"PNG", "JPEG", "WEBP", "GIF"} or source.width * source.height > 40_000_000:
+                raise HTTPException(422, "Unsupported image")
+            if min(left, top) < 0 or min(width, height) < 1 or left + width > source.width or top + height > source.height:
+                raise HTTPException(422, "Crop is outside the image")
+            output = io.BytesIO()
+            source.crop((left, top, left + width, top + height)).save(output, format=source.format)
+            return Response(output.getvalue(), media_type=Image.MIME[source.format])
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
+        raise HTTPException(422, "Invalid image")
 
 
 @app.post("/convert")

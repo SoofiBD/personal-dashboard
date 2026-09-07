@@ -7,8 +7,9 @@ import base64
 import fitz
 from fastapi import HTTPException
 from fastapi import UploadFile
+from PIL import Image
 
-from app import HtmlExport, ZipExport, ZipImage, convert, export_html, export_zip, extract_layout_text, is_valid_table
+from app import HtmlExport, ZipExport, ZipImage, convert, crop_image, export_html, export_zip, extract_layout_text, is_valid_table
 
 
 def convert_pdf(document, annotation_mode="both", **options):
@@ -24,6 +25,34 @@ def convert_pdf(document, annotation_mode="both", **options):
 
 
 class PdfWorkerTest(unittest.TestCase):
+    def test_crop_preserves_selected_pixels_and_format(self):
+        for image_format in ("PNG", "WEBP", "JPEG", "GIF"):
+            with self.subTest(image_format=image_format):
+                source = Image.new("RGB", (200, 300), "white")
+                source.paste(Image.new("RGB", (80, 90), "red"), (40, 120))
+                data = io.BytesIO()
+                source.save(data, format=image_format)
+                data.seek(0)
+                result = asyncio.run(crop_image(UploadFile(filename="image", file=data), 40, 120, 80, 90))
+                with Image.open(io.BytesIO(result.body)) as cropped:
+                    self.assertEqual((80, 90), cropped.size)
+                    self.assertEqual(image_format, cropped.format)
+                    red, green, blue = cropped.convert("RGB").getpixel((40, 45))
+                    self.assertGreater(red, 240)
+                    self.assertLess(green, 15)
+                    self.assertLess(blue, 15)
+
+    def test_crop_rejects_invalid_bounds_and_non_images(self):
+        for bounds in [(-1, 0, 20, 20), (0, 0, 0, 20), (90, 0, 20, 20)]:
+            data = io.BytesIO()
+            Image.new("RGB", (100, 100)).save(data, format="PNG")
+            data.seek(0)
+            with self.assertRaises(HTTPException) as raised:
+                asyncio.run(crop_image(UploadFile(filename="image.png", file=data), *bounds))
+            self.assertEqual(422, raised.exception.status_code)
+        with self.assertRaises(HTTPException):
+            asyncio.run(crop_image(UploadFile(filename="image.png", file=io.BytesIO(b"invalid")), 0, 0, 1, 1))
+
     def test_removes_repeated_headers_and_footers(self):
         document = fitz.open()
         for page_number in range(1, 4):
