@@ -23,6 +23,8 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
   - [Option B: Local Machine Setup](#option-b-local-machine-setup)
 - [Running Tests](#-running-tests)
 - [PDF to Markdown](#-pdf-to-markdown)
+- [Database Design (ChartDB)](#database-design-chartdb)
+- [NAS Files](#nas-files)
 - [Environment Configuration](#-environment-configuration)
 - [Modular Architecture](#-modular-architecture)
 - [Contributing & Development](#-contributing--development)
@@ -39,8 +41,12 @@ personal-dashboard/
 ├── app/                  # Host application (shell layout, core settings, unified navigation)
 ├── finance_module/       # Finance domain engine (models, controllers, views, migrations)
 ├── db/                   # Database schemas and global migrations
-├── config/               # Rails routing, engines, and configuration
-└── compose.yaml          # Containerized development & production stack
+├── config/               # Rails routing and Caddy gateway configuration
+├── modules/chartdb/      # Database schema editor source and Docker build
+├── pdf_worker/           # PDF-to-Markdown conversion service
+├── nas_worker/           # NAS file service
+├── compose.yaml          # Local development stack
+└── compose.production.yaml # Production HTTPS stack
 ```
 
 ---
@@ -52,6 +58,18 @@ personal-dashboard/
 - **Budget Tracking & Management:** Set category budgets, monitor live progress with dynamic visual progress bars, and track remaining allowances.
 - **Transactions & Accounts:** Record and categorize expenses/incomes across bank accounts, cash, and credit cards.
 - **Category Analytics:** Clear insights into spending distribution and category breakdowns.
+
+### Database Design (ChartDB)
+- **Dashboard module:** Open Database Design from the workspace hub or module switcher.
+- **Schema workflows:** Create a diagram, import SQL/DBML, and export SQL through the three action cards. ChartDB also supports JSON backups and diagram image exports.
+- **Session-protected editor:** Caddy serves `/database-editor/` through dashboard authentication; ChartDB has no published host port.
+- **Browser storage:** Diagrams are stored in IndexedDB, scoped to the dashboard account, and must be backed up through ChartDB.
+- **Trimmed distribution:** Bundled examples, template galleries, datasets and preview images are removed. Editor icons, database logos and import help images remain.
+
+### PDF Editor (Stirling PDF)
+- **Integrated workspace:** Open PDF Editor from the hub or PDF module navigation.
+- **Local tools:** Edit, merge, split, reorder, convert and compress PDFs using the separate Stirling PDF service.
+- **Shared authentication:** The `/pdf-editor/` gateway route requires a dashboard session.
 
 ### 🎨 Interface & Experience
 - **Obsidian Luxe design system:** Shared color, spacing, typography, motion, and status tokens across the dashboard.
@@ -79,7 +97,7 @@ The project is evolving into an all-in-one personal workspace and life operating
 
 ### 📄 PDF Tools & Document Management
 - [x] In-browser PDF viewer for stored source documents (annotation tools remain planned).
-- [ ] PDF editing, splitting, merging, and page re-ordering.
+- [x] PDF editing, splitting, merging, and page re-ordering through Stirling PDF.
 - [ ] Receipt and invoice parsing from uploaded PDFs.
 
 ### 📝 Notes & Knowledge Base
@@ -93,6 +111,7 @@ The project is evolving into an all-in-one personal workspace and life operating
 - [ ] Optional email / webhook / push notifications for upcoming deadlines.
 
 ### 🛠️ Developer Tools & Database UI
+- [x] ChartDB schema designer with SQL/DBML import, SQL export and JSON backups.
 - [ ] Embedded Database UI / Query Inspector for managing records directly.
 - [ ] API playground and webhook management console.
 - [ ] System health metrics, log monitoring, and cache inspections.
@@ -136,19 +155,19 @@ Make sure you have one of the following setups installed on your machine:
 
 3. **Build and start the application:**
    ```bash
-   docker compose up --build
+   docker compose --env-file .env.local up --build
    ```
-   *(To run containers in the background as daemons, use `docker compose up --build -d`)*
+   *(To run containers in the background as daemons, use `docker compose --env-file .env.local up --build -d`)*
 
 4. **Provision or rotate the dashboard password:**
    ```bash
-   docker compose exec web ./bin/rails dashboard:credentials:set
+   docker compose --env-file .env.local exec web ./bin/rails dashboard:credentials:set
    ```
 
 5. **Access the dashboard:**
    Open your browser and navigate to:
    ```
-   http://localhost:3000/finance
+   http://localhost:3000/
    ```
    *Migrations and initial database setup run automatically upon container boot.*
 
@@ -171,13 +190,16 @@ Caddy obtains and renews TLS certificates for the configured domain. Do not expo
 
 6. **Stopping the containers:**
    ```bash
-   docker compose down
+   docker compose --env-file .env.local down
    ```
-   *(To reset everything including database volumes, run `docker compose down -v`)*
+   *(To reset everything including database volumes, run `docker compose --env-file .env.local down -v`)*
 
 ---
 
 ### Option B: Local Machine Setup
+
+This starts Rails only. ChartDB, Stirling PDF and document conversion require their
+separate services; use the Compose setup for the complete module system and authenticated gateway routes.
 
 1. **Clone and enter the directory:**
    ```bash
@@ -213,7 +235,7 @@ Caddy obtains and renews TLS certificates for the configured domain. Do not expo
    ```
 
 7. **Visit the app:**
-   Navigate to `http://localhost:3000/finance`.
+   Navigate to `http://localhost:3000/`.
 
 ---
 
@@ -223,9 +245,8 @@ Run the comprehensive test suite to ensure system integrity:
 
 ### Inside Docker:
 ```bash
-docker compose exec -T \
+docker compose --env-file .env.local exec -T \
   -e RAILS_ENV=test \
-  -e DATABASE_URL=postgresql://personal_dashboard:local-development-password@db:5432/personal_dashboard_test \
   web ./bin/rails test
 ```
 
@@ -240,12 +261,12 @@ Open **PDF Dokümanları** from the Finance navigation to upload a PDF (maximum 
 
 The upload and reprocess forms support image extraction (50–500 px threshold), header/footer removal, caption binding, annotation extraction mode, YAML frontmatter, line-wrap repair, and table detection. Conversion runs through Solid Queue so the web request returns immediately and queued work survives web-process restarts. The worker is intentionally not published on a host port.
 
-To review old conversion records without deleting anything, run `docker compose run --rm web bin/rails document_conversions:purge[90]`. The task is dry-run by default; add `CONFIRM=yes` only after reviewing the count to permanently remove those records, their source PDFs, and extracted assets.
+To review old conversion records without deleting anything, run `docker compose --env-file .env.local run --rm web bin/rails document_conversions:purge[90]`. The task is dry-run by default; add `CONFIRM=yes` only after reviewing the count to permanently remove those records, their source PDFs, and extracted assets.
 
 Run the worker’s deterministic tests with:
 
 ```bash
-docker compose build pdf-worker
+docker compose --env-file .env.local build pdf-worker
 docker run --rm personal-dashboard-pdf-worker python -m unittest discover -s tests -v
 ```
 
@@ -274,7 +295,8 @@ The following variables can be customized in `.env.local`:
 This project follows a clean **modular domain architecture**:
 - **Domain Decoupling:** New domain features (e.g., `notes_module/`, `tasks_module/`, `ai_module/`) can be added independently without cluttering core host logic.
 - **Isolated Migrations & Views:** Each module maintains its own controllers, views, data models, and migrations while sharing host layout and styling tokens.
-- **Data Privacy & Control:** 100% self-hosted with no external telemetry or proprietary locks on your personal data.
+- **Service modules:** ChartDB and Stirling PDF run as internal services behind the authenticated Caddy gateway; Rails supplies their dashboard landing pages and navigation.
+- **Storage boundaries:** Finance and document records use server storage. ChartDB diagrams use browser storage and require separate JSON backups. ChartDB analytics and cloud promotion are disabled.
 
 ---
 
@@ -291,15 +313,56 @@ Contributions, feature requests, and feedback are welcome!
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Third-party components retain their own licenses. The bundled ChartDB source includes
+its [GNU AGPL v3 license](modules/chartdb/LICENSE). No top-level `LICENSE` file is currently included in this repository.
 
-## NAS dosyaları
+## NAS Files
 
-Çalışma alanındaki NAS modülü yalnızca hesap sahibine açıktır. Kurulum, güvenli yerel yapılandırma ve işlem sınırları için [NAS rehberine](nas_worker/README.md) bakın. Gerçek şifreleri veya `.private/` içeriğini GitHub’a eklemeyin.
+The NAS module is available only to the account owner. See the [NAS guide](nas_worker/README.md)
+for setup, local configuration and operation limits.
 
-## Veritabanı Tasarımı (ChartDB)
+## Database Design (ChartDB)
 
-ChartDB, Stirling PDF gibi dashboard oturumuyla korunan ayrı bir modüldür.
-Ana ekrandaki **Veritabanı Tasarımı** kartından veya modül menüsünden açılır.
-Kaynak ve kurulum ayrıntıları: [modules/chartdb/README.md](modules/chartdb/README.md).
-Tasarımlar tarayıcıda saklanır; yedeklemek için ChartDB içinden JSON dışa aktarın.
+Open **Veritabanı Tasarımı / Database Design** from the hub or module menu, or visit
+`http://localhost:3000/database_tools`. The editor runs at `/database-editor/`.
+
+| Dashboard card | Action |
+| :--- | :--- |
+| Visual schema design | Opens the new-diagram dialog. |
+| Import schemas | Opens SQL/DBML import after a diagram is created or opened. |
+| Export SQL and backups | Opens SQL export after a diagram is created or opened. Use the editor menu for JSON backups and image exports. |
+
+ChartDB designs schemas and generates SQL. It does not execute SQL, manage live database
+records or provision database servers.
+
+### Storage and backups
+
+Diagrams stay in the current browser's IndexedDB, with separate namespaces for dashboard
+accounts. They do not automatically sync between devices and are **not included in dashboard
+or PostgreSQL backups**. Export JSON in ChartDB to back up or transfer your work. Clearing
+browser site data removes these local diagrams. Use separate browser profiles on shared devices;
+account namespaces prevent accidental mixing but are not a browser-storage security boundary.
+
+### Build and update
+
+Run from the dashboard root:
+
+```bash
+docker compose --env-file .env.local up -d --build chartdb gateway
+```
+
+Production uses the same module in `compose.production.yaml`:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yaml up -d --build chartdb gateway
+```
+
+The image build runs ESLint, TypeScript and Vite. The Node build step allows a 4 GB heap;
+ensure the build host has sufficient memory. The running ChartDB service has a separate
+256 MB memory limit.
+
+The distribution excludes the upstream example gallery, template gallery, sample datasets
+and associated preview images. Required editor assets are retained. Analytics and ChartDB
+Cloud promotion are disabled, and no shared AI API key is embedded.
+
+For implementation details, see [modules/chartdb/README.md](modules/chartdb/README.md).

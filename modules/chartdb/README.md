@@ -1,9 +1,12 @@
 # ChartDB dashboard module
 
-Based on ChartDB 1.20.1; upstream license is preserved in LICENSE.
+Based on ChartDB 1.20.1; the [GNU AGPL v3 license](LICENSE) is preserved.
 
 This React application runs as a separate internal Compose service, like Stirling PDF.
-Open Dashboard → Database Design → Open designer. Caddy authenticates every
+Open Dashboard → Database Design → Open designer (`/database_tools`).
+The action cards open new-diagram creation, SQL/DBML import, and SQL export.
+Import/export waits until a diagram is created or opened; JSON and image exports
+are available from the editor menu. Caddy authenticates every
 `/database-editor/*` request using the Rails session. No host port is exposed.
 `/database-editor/config.js` is served by Rails with no-store headers and provides
 the authenticated account ID for the browser IndexedDB namespace.
