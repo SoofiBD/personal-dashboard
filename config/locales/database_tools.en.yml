@@ -1,0 +1,25 @@
+{
+  "en": {
+    "database_tools": {
+      "title": "Database Design",
+      "subtitle": "Design tables and relationships, import existing schemas and generate SQL with ChartDB.",
+      "badge": "Schema & SQL",
+      "open": "Open designer ↗",
+      "ready": "ChartDB is ready",
+      "unavailable": "ChartDB is currently unavailable. Refresh this page after the service starts.",
+      "storage": "Diagrams are stored in this browser, scoped to your dashboard account. They do not sync across devices and are not included in dashboard backups. Export JSON backups. Use separate browser profiles on shared devices.",
+      "design": {
+        "title": "Visual schema design",
+        "description": "Edit tables, columns and relationships visually."
+      },
+      "import": {
+        "title": "Import schemas",
+        "description": "Start from SQL, DBML or schema query results from supported databases."
+      },
+      "export": {
+        "title": "Export SQL and backups",
+        "description": "Generate SQL, export JSON backups or download a diagram image. This module does not execute SQL or provision database servers."
+      }
+    }
+  }
+}

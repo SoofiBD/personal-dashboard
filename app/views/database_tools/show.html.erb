@@ -1,0 +1,17 @@
+<header class="page-header">
+  <div><p class="eyebrow">ChartDB</p><h1><%= t("database_tools.title") %></h1><p class="page-subtitle"><%= t("database_tools.subtitle") %></p></div>
+  <% if @available %><%= link_to t("database_tools.open"), "/database-editor/", class: "button button-primary", target: "_blank", rel: "noopener" %><% end %>
+</header>
+<section class="panel pdf-tools-hero" aria-live="polite">
+  <div><h2><%= t(@available ? "database_tools.ready" : "database_tools.unavailable") %></h2><p><%= t("database_tools.storage") %></p></div>
+</section>
+<section class="pdf-tools-grid" aria-label="<%= t("database_tools.title") %>">
+  <% %w[design import export].each do |tool| %>
+    <%= link_to "/database-editor/?action=#{tool}", class: "panel pdf-tool-card database-tool-card", target: "_blank", rel: "noopener" do %>
+      <div class="metric-badge-icon icon-cashflow-badge"><%= finance_svg_icon({"design" => "edit", "import" => "arrow-down-right", "export" => "arrow-up-right"}.fetch(tool), class: "icon-sm") %></div>
+      <h2><%= t("database_tools.#{tool}.title") %></h2>
+      <p><%= t("database_tools.#{tool}.description") %></p>
+      <span class="text-link"><%= t("database_tools.open") %></span>
+    <% end %>
+  <% end %>
+</section>
