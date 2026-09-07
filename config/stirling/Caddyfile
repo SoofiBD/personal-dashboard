@@ -20,6 +20,19 @@
     reverse_proxy stirling-pdf:8080
   }
 
+  handle /database-editor/config.js {
+    reverse_proxy web:3000
+  }
+
+  @database_editor path /database-editor /database-editor/*
+  handle @database_editor {
+    forward_auth web:3000 {
+      uri /internal/database_editor_authorization
+    }
+    redir /database-editor /database-editor/ 308
+    reverse_proxy chartdb:80
+  }
+
   handle {
     reverse_proxy web:3000
   }
