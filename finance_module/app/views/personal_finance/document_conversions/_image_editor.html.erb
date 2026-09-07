@@ -1,0 +1,28 @@
+<dialog class="image-crop-dialog" data-image-crop-dialog aria-labelledby="image-crop-title">
+  <div class="image-crop-header">
+    <h2 id="image-crop-title">Görseli kırp</h2>
+    <button type="button" class="button button-secondary" data-crop-close>Kapat</button>
+  </div>
+  <p>Görsel üzerinde sürükleyerek alan seçin veya piksel değerlerini girin. Orijinal görsel korunur.</p>
+  <div class="image-crop-layout">
+    <div class="image-crop-stage" data-crop-stage>
+      <img data-crop-source alt="Kırpılacak orijinal görsel" draggable="false">
+      <div class="image-crop-selection" data-crop-selection hidden></div>
+    </div>
+    <div class="image-crop-controls">
+      <fieldset data-crop-fields disabled>
+        <legend>Kırpma alanı (piksel)</legend>
+        <% {left: "Sol", top: "Üst", width: "Genişlik", height: "Yükseklik"}.each do |key, label| %>
+          <label><%= label %><input type="number" data-crop-field="<%= key %>" min="<%= [:width, :height].include?(key) ? 1 : 0 %>" step="1" required></label>
+        <% end %>
+      </fieldset>
+      <h3>Önizleme</h3>
+      <canvas data-crop-preview aria-label="Seçilen kırpma alanının önizlemesi" role="img"></canvas>
+      <button type="button" class="button button-secondary" data-crop-select-all disabled>Tümünü seç</button>
+      <button type="button" class="button button-primary" data-crop-save disabled>Kırpmayı kaydet</button>
+      <button type="button" class="button button-secondary" data-crop-restore disabled>Orijinale dön</button>
+      <p>Kaydedilen görsel önizleme, ZIP ve HTML çıktılarında kullanılır.</p>
+    </div>
+  </div>
+  <p data-crop-feedback role="status" aria-live="polite"></p>
+</dialog>

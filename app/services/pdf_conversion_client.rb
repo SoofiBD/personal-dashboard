@@ -81,6 +81,20 @@ class PdfConversionClient
     raise Error, "HTML dışa aktarma servisine bağlanılamadı."
   end
 
+  def crop_image(asset:, bounds:)
+    request = Net::HTTP::Post.new(endpoint("/crop-image"))
+    request.set_form([
+      ["file", StringIO.new(asset.file.download), {filename: asset.filename, content_type: asset.content_type}],
+      *bounds.map { |key, value| [key.to_s, value.to_s] }
+    ], "multipart/form-data")
+    response = http.request(request)
+    raise Error, "Görsel kırpılamadı. Seçimi kontrol edip tekrar deneyin." unless response.is_a?(Net::HTTPSuccess)
+
+    response.body
+  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED
+    raise Error, "Görsel servisine bağlanılamadı. Lütfen tekrar deneyin."
+  end
+
   private
 
   def validate_pdf!(pdf_data, filename)

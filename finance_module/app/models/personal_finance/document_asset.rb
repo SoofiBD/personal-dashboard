@@ -4,6 +4,7 @@ module PersonalFinance
 
     belongs_to :document_conversion, class_name: "PersonalFinance::DocumentConversion"
     has_one_attached :file
+    has_one_attached :cropped_file
 
     validates :filename, presence: true, length: {maximum: 255}, format: {with: /\A[a-zA-Z0-9][a-zA-Z0-9._-]*\z/}
     validates :content_type, inclusion: {in: %w[image/png image/jpeg image/gif image/webp]}
@@ -13,7 +14,7 @@ module PersonalFinance
     validate :data_size_matches_byte_size
 
     def binary_data
-      file.download
+      (cropped_file.attached? ? cropped_file : file).download
     end
 
     private
