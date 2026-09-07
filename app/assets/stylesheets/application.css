@@ -5483,3 +5483,7 @@ input[type="file"]::file-selector-button {
 .file-picker input:disabled { cursor: not-allowed; }
 .nas-workspace .nas-download { margin-top: 0; }
 #nas-upload, #nas-new-folder { scroll-margin-top: 32px; }
+
+.database-tool-card { text-decoration: none; }
+.database-tool-card .icon-sm { width: 24px; height: 24px; }
+.database-tool-card:focus-visible { outline: 2px solid var(--text-main); outline-offset: 4px; }

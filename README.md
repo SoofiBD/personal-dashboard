@@ -296,3 +296,10 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 ## NAS dosyaları
 
 Çalışma alanındaki NAS modülü yalnızca hesap sahibine açıktır. Kurulum, güvenli yerel yapılandırma ve işlem sınırları için [NAS rehberine](nas_worker/README.md) bakın. Gerçek şifreleri veya `.private/` içeriğini GitHub’a eklemeyin.
+
+## Veritabanı Tasarımı (ChartDB)
+
+ChartDB, Stirling PDF gibi dashboard oturumuyla korunan ayrı bir modüldür.
+Ana ekrandaki **Veritabanı Tasarımı** kartından veya modül menüsünden açılır.
+Kaynak ve kurulum ayrıntıları: [modules/chartdb/README.md](modules/chartdb/README.md).
+Tasarımlar tarayıcıda saklanır; yedeklemek için ChartDB içinden JSON dışa aktarın.
