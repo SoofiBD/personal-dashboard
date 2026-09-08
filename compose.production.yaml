@@ -9,8 +9,17 @@ services:
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
+      NAS_WORKER_URL: "${NAS_WORKER_URL:-}"
+      NAS_API_TOKEN: "${NAS_API_TOKEN:-}"
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "ruby", "-rnet/http", "-e", "exit(Net::HTTP.get_response(URI('http://127.0.0.1:3000/up')).code == '200' ? 0 : 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+      start_interval: 2s
     volumes:
       - storage_data:/rails/storage
     read_only: true
@@ -24,8 +33,9 @@ services:
       db:
         condition: service_healthy
       pdf-worker:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
+    networks: [edge, database, pdf, stirling, chartdb, nas]
 
   jobs:
     image: personal-dashboard:production
@@ -48,10 +58,11 @@ services:
       db:
         condition: service_healthy
       web:
-        condition: service_started
+        condition: service_healthy
       pdf-worker:
         condition: service_healthy
     restart: unless-stopped
+    networks: [database, pdf]
 
   pdf-worker:
     image: personal-dashboard-pdf-worker:production
@@ -74,7 +85,9 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+      start_interval: 2s
     restart: unless-stopped
+    networks: [pdf]
 
   stirling-pdf:
     image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:2.14.3
@@ -101,7 +114,9 @@ services:
       timeout: 5s
       retries: 12
       start_period: 30s
+      start_interval: 2s
     restart: unless-stopped
+    networks: [stirling]
 
   chartdb:
     build:
@@ -117,7 +132,10 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 15s
+      start_interval: 1s
     restart: unless-stopped
+    networks: [chartdb]
 
   gateway:
     image: caddy:2.8-alpine
@@ -132,12 +150,13 @@ services:
       - caddy_config:/config
     depends_on:
       web:
-        condition: service_started
+        condition: service_healthy
       stirling-pdf:
-        condition: service_healthy
+        condition: service_started
       chartdb:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
+    networks: [edge, stirling, chartdb]
 
   db:
     image: postgres:16-alpine
@@ -153,6 +172,21 @@ services:
       timeout: 5s
       retries: 10
     restart: unless-stopped
+    networks: [database]
+
+networks:
+  edge: {}
+  database:
+    internal: true
+  pdf:
+    internal: true
+  stirling:
+    internal: true
+  chartdb:
+    internal: true
+  nas:
+    internal: true
+  nas-egress: {}
 
 volumes:
   postgres_data:

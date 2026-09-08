@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_11_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -322,6 +322,30 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_11_000000) do
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
   end
 
+  create_table "note_links", force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "source_note_id", null: false
+    t.uuid "target_note_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_note_id", "target_note_id"], name: "index_note_links_on_source_note_id_and_target_note_id", unique: true
+    t.index ["source_note_id"], name: "index_note_links_on_source_note_id"
+    t.index ["target_note_id"], name: "index_note_links_on_target_note_id"
+    t.index ["user_id"], name: "index_note_links_on_user_id"
+  end
+
+  create_table "notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "title", limit: 160, null: false
+    t.text "body", default: "", null: false
+    t.text "tag_list", default: "", null: false
+    t.boolean "pinned", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "updated_at"], name: "index_notes_on_user_id_and_updated_at"
+    t.index ["user_id"], name: "index_notes_on_user_id"
+  end
+
   create_table "rate_limit_counters", force: :cascade do |t|
     t.string "key", null: false
     t.integer "attempts", default: 0, null: false
@@ -499,6 +523,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_11_000000) do
     t.text "mfa_secret"
     t.boolean "mfa_enabled", default: false, null: false
     t.datetime "mfa_confirmed_at"
+    t.string "ai_provider", default: "jan_local", null: false
+    t.string "ai_model"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["role"], name: "index_users_on_role"
   end
@@ -537,6 +563,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_11_000000) do
   add_foreign_key "finance_transactions", "financial_accounts"
   add_foreign_key "finance_transactions", "users"
   add_foreign_key "financial_accounts", "users"
+  add_foreign_key "note_links", "notes", column: "source_note_id"
+  add_foreign_key "note_links", "notes", column: "target_note_id"
+  add_foreign_key "note_links", "users"
+  add_foreign_key "notes", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
   add_foreign_key "solid_queue_batch_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

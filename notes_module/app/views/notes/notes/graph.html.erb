@@ -1,0 +1,32 @@
+<main id="main-content" class="page-content notes-page notes-graph-page">
+  <header class="page-header notes-page-header">
+    <div><%= link_to "← Tüm notlar", notes_root_path, class: "notes-back-link" %><p class="eyebrow">BAĞLANTI GRAFIĞİ</p><h1>Not bilgi grafiği</h1><p>Her düğüm bir notu, her çizgi <code>[[Not Başlığı]]</code> ile kurulmuş bir bağlantıyı gösterir.</p></div>
+  </header>
+  <% if @graph_nodes.any? %>
+    <section class="panel notes-graph-panel" data-notes-graph-shell>
+      <div class="notes-graph-toolbar">
+        <label class="notes-graph-search-label" for="notes-graph-search">Grafikte ara</label>
+        <input id="notes-graph-search" type="search" placeholder="Not başlığı ara" autocomplete="off" data-graph-search>
+        <label class="notes-graph-select-label" for="notes-graph-layout">Yerleşim</label>
+        <select id="notes-graph-layout" data-graph-layout><option value="radial">Dairesel</option><option value="grid">Izgara</option></select>
+        <label class="notes-graph-toggle"><input type="checkbox" data-graph-linked-only> Yalnızca bağlantılı notlar</label>
+        <label class="notes-graph-toggle"><input type="checkbox" data-graph-pinned-only> Yalnızca sabitlenenler</label>
+      </div>
+      <div class="notes-graph-workspace">
+        <aside class="notes-graph-sidebar" aria-label="Etiket filtreleri">
+          <div class="notes-graph-summary" data-graph-summary></div>
+          <div class="notes-graph-filter-header"><h2>Etiketler</h2><button type="button" class="notes-graph-text-button" data-graph-tags-reset>Tümünü seç</button></div>
+          <div class="notes-graph-tags" data-graph-tags></div>
+        </aside>
+        <div class="notes-graph-canvas-wrap">
+          <div class="notes-graph-canvas-tools" role="group" aria-label="Grafik görünüm kontrolleri"><button type="button" data-graph-zoom-out aria-label="Uzaklaştır">−</button><output data-graph-zoom-level aria-live="polite">100%</output><button type="button" data-graph-zoom-in aria-label="Yakınlaştır">+</button><button type="button" data-graph-reset>Görünümü sıfırla</button></div>
+          <svg class="notes-graph" viewBox="0 0 1000 620" role="img" aria-label="Notlar arası bağlantı grafiği" tabindex="0" data-notes-graph data-nodes="<%= @graph_nodes.to_json %>" data-links="<%= @graph_links.to_json %>"></svg>
+          <p class="notes-graph-help">Kaydırma tekerleğiyle yakınlaştırın; boş alanı sürükleyerek grafiği taşıyın. Bir düğümü seçerek ayrıntıları görün.</p>
+        </div>
+        <aside class="notes-graph-details panel" aria-live="polite" data-graph-details><h2>Not seçin</h2><p>İçeriğini ve bağlantılarını görmek için grafikte bir düğüm seçin.</p></aside>
+      </div>
+    </section>
+  <% else %>
+    <section class="notes-empty panel"><%= finance_svg_icon("notes", class: "notes-empty-icon", aria: {hidden: true}) %><h2>Grafik için not gerekli</h2><p>Not oluşturup içinden başka bir notu <code>[[Not Başlığı]]</code> olarak bağlayın.</p><% if current_user.can_manage_notes? %><%= link_to "Yeni not", new_notes_note_path, class: "btn btn-primary" %><% end %></section>
+  <% end %>
+</main>

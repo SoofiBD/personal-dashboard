@@ -18,6 +18,13 @@ services:
       - storage_data:/rails/storage
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "ruby", "-rnet/http", "-e", "exit(Net::HTTP.get_response(URI('http://127.0.0.1:3000/up')).code == '200' ? 0 : 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+      start_interval: 2s
     env_file:
       - .env.local
     environment:
@@ -28,17 +35,20 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
       TEST_DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${TEST_POSTGRES_DB:-personal_dashboard_test}"
       PDF_WORKER_URL: "http://pdf-worker:8000"
+      JAN_API_BASE_URL: "${JAN_API_BASE_URL:-http://host.docker.internal:1337}"
       STIRLING_PDF_STATUS_URL: "http://stirling-pdf:8080/pdf-editor/api/v1/info/status"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [default, nas]
     depends_on:
       db:
         condition: service_healthy
       pdf-worker:
-        condition: service_healthy
+        condition: service_started
 
   jobs:
     image: personal-dashboard-web
-    command: >-
-      sh -c './bin/rails db:prepare && exec ./bin/jobs'
+    command: ./bin/jobs
     volumes:
       - .:/rails
       - bundle_cache:/usr/local/bundle
@@ -53,12 +63,15 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
       TEST_DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${TEST_POSTGRES_DB:-personal_dashboard_test}"
       PDF_WORKER_URL: "http://pdf-worker:8000"
+      JAN_API_BASE_URL: "${JAN_API_BASE_URL:-http://host.docker.internal:1337}"
       STIRLING_PDF_STATUS_URL: "http://stirling-pdf:8080/pdf-editor/api/v1/info/status"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_healthy
       web:
-        condition: service_started
+        condition: service_healthy
 
   pdf-worker:
     build:
@@ -80,6 +93,7 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+      start_interval: 2s
 
   stirling-pdf:
     image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:2.14.3
@@ -106,6 +120,7 @@ services:
       timeout: 5s
       retries: 12
       start_period: 30s
+      start_interval: 2s
 
   chartdb:
     build:
@@ -121,6 +136,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 15s
+      start_interval: 1s
     restart: unless-stopped
 
   gateway:
@@ -133,11 +150,11 @@ services:
       - caddy_config:/config
     depends_on:
       web:
-        condition: service_started
+        condition: service_healthy
       stirling-pdf:
-        condition: service_healthy
+        condition: service_started
       chartdb:
-        condition: service_healthy
+        condition: service_started
 
   db:
     image: postgres:16-alpine
@@ -163,3 +180,8 @@ volumes:
   caddy_data:
   caddy_config:
   storage_data:
+
+networks:
+  nas:
+    internal: true
+  nas-egress: {}

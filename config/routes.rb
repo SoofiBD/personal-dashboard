@@ -9,6 +9,9 @@ Rails.application.routes.draw do
     post :verify
   end
   resource :profile, only: %i[show update]
+  resource :ai_settings, only: %i[show update] do
+    get :health
+  end
   resources :users, only: %i[index new create edit update]
 
   resource :nas, controller: "nas", only: %i[show destroy] do
@@ -18,6 +21,13 @@ Rails.application.routes.draw do
   end
 
   root to: "home#show"
+
+  scope :notes, module: :notes, as: :notes do
+    root to: "notes#index"
+    resources :notes do
+      get :graph, on: :collection
+    end
+  end
 
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"

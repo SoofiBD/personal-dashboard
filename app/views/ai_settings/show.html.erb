@@ -1,0 +1,32 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">YEREL YAPAY ZEKÂ</p>
+    <h1>Jan bağlantısı</h1>
+    <p class="page-subtitle">Finans ve doküman araçları için model tercihinizi yönetin. İstekler dashboardun denetim katmanından geçer.</p>
+  </div>
+</header>
+
+<div class="ai-settings-grid">
+  <section class="panel">
+    <div class="panel-header"><div><h2>Model tercihi</h2><p>Bu tercih yalnızca hesabınıza uygulanır. Model listesi doğrudan yerel Jan sunucusundan alınır.</p></div></div>
+    <%= form_with model: @user, url: ai_settings_path, method: :patch do |form| %>
+      <% if @user.errors.any? %><div class="form-errors" role="alert" tabindex="-1"><%= @user.errors.full_messages.to_sentence %></div><% end %>
+      <div class="form-group">
+        <%= form.label :ai_model, "Kullanılacak model" %>
+        <%= form.select :ai_model, options_for_select([["Otomatik seç", ""]] + @health[:models].map { |model| [model, model] }, @user.ai_model), {}, disabled: !@health[:connected] %>
+        <small>Modeli Jan uygulamasından indirip yükledikten sonra bu sayfayı yenileyin.</small>
+      </div>
+      <div class="form-actions"><%= form.submit "Model tercihini kaydet", class: "button button-primary", disabled: !@health[:connected] %></div>
+    <% end %>
+  </section>
+
+  <aside class="panel ai-connection-panel" aria-labelledby="jan-status-title">
+    <div class="panel-header"><div><h2 id="jan-status-title">Bağlantı durumu</h2><p>Yerel API: <code><%= @jan&.base_url || ENV.fetch("JAN_API_BASE_URL", Ai::JanClient::DEFAULT_BASE_URL) %></code></p></div></div>
+    <p class="security-status <%= "is-enabled" if @health[:connected] %>" role="status" aria-atomic="true"><%= @health[:connected] ? "Bağlı · #{@health[:models].size} model bulundu" : "Bağlantı kurulamadı" %></p>
+    <% unless @health[:connected] %>
+      <p class="ai-status-note"><%= @health[:error] %></p>
+      <p class="ai-status-note">Jan’ı açın, Local API Server’ı başlatın ve sunucu adresinin <code>JAN_API_BASE_URL</code> ile eşleştiğini doğrulayın.</p>
+    <% end %>
+    <%= link_to "Bağlantıyı yeniden denetle", ai_settings_path, class: "button button-secondary ai-health-link", data: {turbo: false} %>
+  </aside>
+</div>

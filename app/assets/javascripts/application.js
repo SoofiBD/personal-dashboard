@@ -1565,6 +1565,8 @@
     initDocumentWorkspace();
     initDocumentConversionPolling();
     initPasswordToggle();
+    initNotesEditor();
+    initNotesGraph();
     registerServiceWorker();
   };
 
@@ -1588,6 +1590,123 @@
         input.focus();
       });
     });
+  };
+
+  const initNotesEditor = () => {
+    const editor = document.querySelector("[data-notes-editor]");
+    if (!editor || editor.dataset.notesEditorBound) return;
+    editor.dataset.notesEditorBound = "true";
+
+    document.querySelectorAll("[data-notes-wrap], [data-notes-prefix]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const selected = editor.value.slice(start, end) || "metin";
+        const prefix = button.dataset.notesPrefix || button.dataset.notesWrap || "";
+        const suffix = button.dataset.notesSuffix || "";
+        editor.setRangeText(`${prefix}${selected}${suffix}`, start, end, "select");
+        editor.focus();
+      });
+    });
+  };
+
+  const initNotesGraph = () => {
+    const svg = document.querySelector("[data-notes-graph]");
+    if (!svg || svg.dataset.notesGraphBound) return;
+    svg.dataset.notesGraphBound = "true";
+
+    let nodes;
+    let links;
+    try {
+      nodes = JSON.parse(svg.dataset.nodes || "[]");
+      links = JSON.parse(svg.dataset.links || "[]");
+    } catch (_) {
+      return;
+    }
+    if (!nodes.length) return;
+
+    const shell = svg.closest("[data-notes-graph-shell]");
+    const namespace = "http://www.w3.org/2000/svg";
+    const width = 1000;
+    const height = 620;
+    const search = shell.querySelector("[data-graph-search]");
+    const layout = shell.querySelector("[data-graph-layout]");
+    const linkedOnly = shell.querySelector("[data-graph-linked-only]");
+    const pinnedOnly = shell.querySelector("[data-graph-pinned-only]");
+    const tagsEl = shell.querySelector("[data-graph-tags]");
+    const summary = shell.querySelector("[data-graph-summary]");
+    const details = shell.querySelector("[data-graph-details]");
+    const zoomLevel = shell.querySelector("[data-graph-zoom-level]");
+    const selectedTags = new Set(nodes.flatMap((node) => node.tags));
+    const degrees = new Map(nodes.map((node) => [node.id, 0]));
+    links.forEach((link) => { degrees.set(link.source, (degrees.get(link.source) || 0) + 1); degrees.set(link.target, (degrees.get(link.target) || 0) + 1); });
+    let selectedId = null;
+    let zoom = 1;
+    let pan = {x: 0, y: 0};
+    let dragging = null;
+    const el = (name, attributes = {}) => {
+      const element = document.createElementNS(namespace, name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+      return element;
+    };
+    const html = (name, text) => { const element = document.createElement(name); element.textContent = text; return element; };
+    const positionNodes = (visible) => {
+      const positions = new Map();
+      if (layout.value === "grid") {
+        const columns = Math.max(1, Math.ceil(Math.sqrt(visible.length)));
+        visible.forEach((node, index) => positions.set(node.id, {x: 150 + (index % columns) * ((width - 300) / Math.max(columns - 1, 1)), y: 130 + Math.floor(index / columns) * 130}));
+      } else {
+        const radius = Math.min(width, height) * (visible.length === 1 ? 0 : 0.35);
+        visible.forEach((node, index) => { const angle = (Math.PI * 2 * index / visible.length) - Math.PI / 2; positions.set(node.id, {x: width / 2 + radius * Math.cos(angle), y: height / 2 + radius * Math.sin(angle)}); });
+      }
+      return positions;
+    };
+    const showDetails = (node, visibleLinks) => {
+      selectedId = node.id;
+      details.replaceChildren(html("h2", node.title));
+      details.appendChild(html("p", node.excerpt || "Bu not için önizleme yok."));
+      const meta = html("p", `Son düzenleme: ${node.updated_at} · ${degrees.get(node.id) || 0} bağlantı`); meta.className = "notes-graph-detail-meta"; details.appendChild(meta);
+      if (node.tags.length) { const tags = html("p", `Etiketler: ${node.tags.map((tag) => `#${tag}`).join(" ")}`); tags.className = "notes-graph-detail-tags"; details.appendChild(tags); }
+      const neighbors = visibleLinks.filter((link) => link.source === node.id || link.target === node.id).map((link) => nodes.find((candidate) => candidate.id === (link.source === node.id ? link.target : link.source))).filter(Boolean);
+      if (neighbors.length) details.appendChild(html("p", `Bağlı notlar: ${neighbors.map((neighbor) => neighbor.title).join(", ")}`));
+      const open = document.createElement("a"); open.href = node.url; open.className = "btn btn-primary"; open.textContent = "Notu aç"; details.appendChild(open);
+    };
+    const activeNodes = () => {
+      const query = search.value.trim().toLocaleLowerCase("tr");
+      return nodes.filter((node) => (!query || node.title.toLocaleLowerCase("tr").includes(query) || node.tags.some((tag) => tag.includes(query))) && (!pinnedOnly.checked || node.pinned) && (!selectedTags.size || node.tags.some((tag) => selectedTags.has(tag))) && (!linkedOnly.checked || (degrees.get(node.id) || 0) > 0));
+    };
+    const render = () => {
+      const visible = activeNodes();
+      const visibleIds = new Set(visible.map((node) => node.id));
+      const visibleLinks = links.filter((link) => visibleIds.has(link.source) && visibleIds.has(link.target));
+      const positions = positionNodes(visible);
+      const group = el("g", {transform: `translate(${pan.x} ${pan.y}) scale(${zoom})`});
+      svg.replaceChildren(group);
+      visibleLinks.forEach((link) => { const source = positions.get(link.source); const target = positions.get(link.target); const isRelated = selectedId && (link.source === selectedId || link.target === selectedId); group.appendChild(el("line", {x1: source.x, y1: source.y, x2: target.x, y2: target.y, class: `notes-graph-edge${isRelated ? " is-related" : ""}`})); });
+      visible.forEach((node) => {
+        const position = positions.get(node.id); const isSelected = node.id === selectedId; const isNeighbor = selectedId && visibleLinks.some((link) => (link.source === selectedId && link.target === node.id) || (link.target === selectedId && link.source === node.id));
+        const groupNode = el("g", {class: `notes-graph-node${isSelected ? " is-selected" : ""}${isNeighbor ? " is-neighbor" : ""}`, tabindex: "0", role: "button", "aria-label": `${node.title} not ayrıntılarını göster`});
+        const nodeRadius = 12 + Math.min(16, (degrees.get(node.id) || 0) * 3) + (node.pinned ? 3 : 0);
+        groupNode.appendChild(el("circle", {cx: position.x, cy: position.y, r: nodeRadius, class: `notes-graph-circle${node.pinned ? " is-pinned" : ""}`}));
+        const label = el("text", {x: position.x, y: position.y + nodeRadius + 19, class: "notes-graph-label", "text-anchor": "middle"}); label.textContent = node.title.length > 24 ? `${node.title.slice(0, 23)}…` : node.title; groupNode.appendChild(label);
+        const select = () => { showDetails(node, visibleLinks); render(); }; groupNode.addEventListener("click", select); groupNode.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(); } }); group.appendChild(groupNode);
+      });
+      summary.textContent = `${visible.length} not · ${visibleLinks.length} bağlantı`;
+      zoomLevel.value = `${Math.round(zoom * 100)}%`;
+      if (selectedId && !visibleIds.has(selectedId)) { selectedId = null; details.replaceChildren(html("h2", "Not seçin"), html("p", "Seçili not geçerli filtrede görünmüyor.")); }
+    };
+    const renderTags = () => {
+      const tags = nodes.flatMap((node) => node.tags).filter((tag, index, all) => all.indexOf(tag) === index).sort();
+      tags.forEach((tag) => { const button = document.createElement("button"); button.type = "button"; button.className = "notes-graph-tag is-selected"; button.dataset.tag = tag; button.setAttribute("aria-pressed", "true"); button.textContent = `#${tag}`; button.addEventListener("click", () => { if (selectedTags.has(tag)) selectedTags.delete(tag); else selectedTags.add(tag); button.classList.toggle("is-selected", selectedTags.has(tag)); button.setAttribute("aria-pressed", String(selectedTags.has(tag))); render(); }); tagsEl.appendChild(button); });
+    };
+    const change = () => render();
+    [search, layout, linkedOnly, pinnedOnly].forEach((control) => control.addEventListener(control === search ? "input" : "change", change));
+    shell.querySelector("[data-graph-tags-reset]").addEventListener("click", () => { selectedTags.clear(); nodes.flatMap((node) => node.tags).forEach((tag) => selectedTags.add(tag)); tagsEl.querySelectorAll("button").forEach((button) => { button.classList.add("is-selected"); button.setAttribute("aria-pressed", "true"); }); render(); });
+    const setZoom = (next) => { zoom = Math.max(0.55, Math.min(2.4, next)); render(); };
+    shell.querySelector("[data-graph-zoom-in]").addEventListener("click", () => setZoom(zoom + 0.15)); shell.querySelector("[data-graph-zoom-out]").addEventListener("click", () => setZoom(zoom - 0.15)); shell.querySelector("[data-graph-reset]").addEventListener("click", () => { zoom = 1; pan = {x: 0, y: 0}; render(); });
+    svg.addEventListener("wheel", (event) => { event.preventDefault(); setZoom(zoom + (event.deltaY < 0 ? 0.1 : -0.1)); }, {passive: false});
+    svg.addEventListener("pointerdown", (event) => { if (event.target === svg) { dragging = {x: event.clientX - pan.x, y: event.clientY - pan.y}; svg.setPointerCapture(event.pointerId); } }); svg.addEventListener("pointermove", (event) => { if (dragging) { pan = {x: event.clientX - dragging.x, y: event.clientY - dragging.y}; render(); } }); svg.addEventListener("pointerup", () => { dragging = null; });
+    renderTags(); render();
   };
 
   document.addEventListener("DOMContentLoaded", init);

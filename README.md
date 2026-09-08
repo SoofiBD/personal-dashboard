@@ -40,6 +40,7 @@ The application is engineered as a modular dashboard hub. While the initial focu
 personal-dashboard/
 ├── app/                  # Host application (shell layout, core settings, unified navigation)
 ├── finance_module/       # Finance domain engine (models, controllers, views, migrations)
+├── notes_module/         # Lightweight Markdown notes, tags, and note links
 ├── db/                   # Database schemas and global migrations
 ├── config/               # Rails routing and Caddy gateway configuration
 ├── modules/chartdb/      # Database schema editor source and Docker build
@@ -83,6 +84,13 @@ personal-dashboard/
 - **Editable output:** Live Markdown preview, line numbers, find/replace, copy, persistent edits, and image insertion from the extracted asset gallery.
 - **Portable export:** The ZIP contains the current Markdown and an `images/` directory with matching relative links; a standalone HTML export embeds extracted images and sanitizes rendered content.
 
+### 📝 Notes & Knowledge Base
+- **Local Markdown notes:** Write and keep notes in PostgreSQL without a separate editor service or client-side database.
+- **Search and tags:** Search titles, content, and tags; pin important notes and filter by tag.
+- **Note graph:** Use `[[Another note title]]` in a note to create an outgoing link and automatic backlink after saving.
+- **Interactive visualization:** Open **Bağlantı grafiği** to inspect note nodes and their relationships without adding a visualization library. Search, tag filters, pinned/linked filters, radial/grid layouts, zoom/pan/reset, degree-aware node sizing, relationship highlighting, and a keyboard-accessible note detail panel are included.
+- **Per-user privacy:** Notes and links are scoped to the signed-in account; viewers may read but cannot change them.
+
 ---
 
 ## 🔮 Project Status & Roadmap
@@ -101,9 +109,10 @@ The project is evolving into an all-in-one personal workspace and life operating
 - [ ] Receipt and invoice parsing from uploaded PDFs.
 
 ### 📝 Notes & Knowledge Base
-- [ ] Rich Markdown note-taking workspace with tag support.
-- [ ] Fast search, categorization, and quick-capture notes modal.
-- [ ] Bi-directional linking between notes, budgets, and tasks.
+- [x] Markdown note-taking workspace with tag support.
+- [x] Fast title/content/tag search and pinning.
+- [x] Bi-directional links between notes.
+- [ ] Links between notes, budgets, and tasks.
 
 ### ⏰ Smart Reminder & Notification System
 - [ ] Scheduled recurring reminders for bill payments, subscriptions, and tasks.
@@ -178,6 +187,14 @@ Production uses a separate Compose definition so the local HTTP stack is never r
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
 ```
+
+To enable the optional NAS module in production, set `NAS_WORKER_URL=http://nas-worker:8000` and a 32+ character `NAS_API_TOKEN` in `.env.production`; configure the matching worker and SMB credentials in `.env.nas.local`, then add the NAS overlay:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yaml -f compose.nas.yaml up --build -d
+```
+
+The NAS worker is private to the Compose network. Allow only its required outbound LAN/VPN path to the NAS (SMB/TCP 445); never publish SMB or the worker to the internet.
 
 Caddy obtains and renews TLS certificates for the configured domain. Do not expose the development `compose.yaml` stack beyond `127.0.0.1`.
 
@@ -287,6 +304,11 @@ The following variables can be customized in `.env.local`:
 | `POSTGRES_DB` | PostgreSQL database name | `personal_dashboard_development` |
 | `POSTGRES_USER` | PostgreSQL username | `personal_dashboard` |
 | `POSTGRES_PASSWORD` | PostgreSQL password; required and never defaulted | None; generate a random value |
+| `JAN_API_BASE_URL` | Jan'ın OpenAI uyumlu yerel API adresi | Docker: `http://host.docker.internal:1337`; native Rails: `http://127.0.0.1:1337` |
+
+### Local AI (Jan)
+
+Start Jan's Local API Server, then open **Yerel Yapay Zekâ** under shared settings. The dashboard checks `/v1/models` and lets each user choose only from models currently served by Jan. Docker Compose reaches a Jan instance running on the host through `host.docker.internal`; change `JAN_API_BASE_URL` only if Jan runs at a different private address.
 
 ---
 
@@ -297,6 +319,7 @@ This project follows a clean **modular domain architecture**:
 - **Isolated Migrations & Views:** Each module maintains its own controllers, views, data models, and migrations while sharing host layout and styling tokens.
 - **Service modules:** ChartDB and Stirling PDF run as internal services behind the authenticated Caddy gateway; Rails supplies their dashboard landing pages and navigation.
 - **Storage boundaries:** Finance and document records use server storage. ChartDB diagrams use browser storage and require separate JSON backups. ChartDB analytics and cloud promotion are disabled.
+- **Knowledge-graph tooling:** Graphify is an optional, local developer tool; it is not bundled in the runtime image. See [Graphify development guide](docs/graphify.md).
 
 ---
 

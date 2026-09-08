@@ -850,6 +850,10 @@ tr:
     title: İçerik Merkeziniz
     subtitle: Finans ve belge işleme modülleri ayrı ayrı açılır. Gelişen bölüm eklemeleri için aynı akış korunur.
     modules:
+      notes:
+        title: Notlar
+        description: Markdown notları, etiketler, arama ve notlar arası bağlantılar için kişisel bilgi alanı.
+        badge: Bilgi Alanı
       finance:
         title: Finance
         description: Gelir-gider takibi, bütçeler, borçlar, hedefler ve akış analizi tek panelde.
@@ -863,6 +867,11 @@ tr:
         description: PDF birleştirme, bölme, dönüştürme ve düzenleme araçlarını yerelde kullanın.
         badge: PDF Araçları
     logout: Oturumu Kapat
+  notes:
+    module: Notlar
+    module_description: Markdown, etiketler ve bağlantılar
+    all: Tüm notlar
+    new: Yeni not
   document_conversions:
     eyebrow: DOKÜMAN ARAÇLARI
     title: PDF’den Markdown’a
