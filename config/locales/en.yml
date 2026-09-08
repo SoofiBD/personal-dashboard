@@ -845,6 +845,10 @@ en:
     title: Content Hub
     subtitle: Finance and document processing modules open independently. The same flow is preserved for upcoming sections.
     modules:
+      notes:
+        title: Notes
+        description: A personal knowledge space for Markdown notes, tags, search, and links between notes.
+        badge: Knowledge
       finance:
         title: Finance
         description: Income-expense tracking, budgets, debts, goals, and cash flow analysis in a single panel.
@@ -858,6 +862,11 @@ en:
         description: Use local tools to merge, split, convert, and edit PDFs.
         badge: PDF Tools
     logout: Sign Out
+  notes:
+    module: Notes
+    module_description: Markdown, tags, and links
+    all: All notes
+    new: New note
   document_conversions:
     eyebrow: DOCUMENT TOOLS
     title: PDF to Markdown

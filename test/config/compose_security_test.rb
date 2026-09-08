@@ -2,6 +2,19 @@ require "test_helper"
 require "yaml"
 
 class ComposeSecurityTest < ActiveSupport::TestCase
+  test "startup gates jobs on Rails readiness without blocking the hub on editors" do
+    %w[compose.yaml compose.production.yaml].each do |file|
+      services = YAML.safe_load(Rails.root.join(file).read, aliases: true).fetch("services")
+      assert_equal "service_healthy", services.dig("jobs", "depends_on", "web", "condition")
+      assert_equal "service_healthy", services.dig("gateway", "depends_on", "web", "condition")
+      %w[stirling-pdf chartdb].each do |editor|
+        assert_equal "service_started", services.dig("gateway", "depends_on", editor, "condition")
+      end
+      assert services.dig("web", "healthcheck", "test")
+      assert_not_includes services.dig("jobs", "command"), "db:prepare"
+    end
+  end
+
   test "compose requires database credentials and keeps postgres internal" do
     source = Rails.root.join("compose.yaml").read
     compose = YAML.safe_load(source, aliases: true)

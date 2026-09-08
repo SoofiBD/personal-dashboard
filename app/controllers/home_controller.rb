@@ -5,6 +5,17 @@ class HomeController < ApplicationController
     @hide_sidebar = true
     @modules = [
       {
+        key: "notes",
+        title_key: "home.modules.notes.title",
+        default_title: "Notlar",
+        description_key: "home.modules.notes.description",
+        default_description: "Markdown notları, etiketler, arama ve notlar arası bağlantılar için kişisel bilgi alanı.",
+        path: notes_root_path,
+        badge_key: "home.modules.notes.badge",
+        default_badge: "Knowledge",
+        icon: "notes"
+      },
+      {
         key: "finance",
         title_key: "home.modules.finance.title",
         default_title: "Finance",

@@ -13,12 +13,13 @@ module ApplicationHelper
   end
 
   def active_app_module
+    return :notes if controller_path.start_with?("notes/")
     return :database_tools if controller_name == "database_tools"
     return :nas if controller_name == "nas"
 
     if controller_name.in?(%w[pdf_tools document_conversions document_assets]) || @current_module == :pdf_tools || @current_module == :markitdown
       :pdf_tools
-    elsif controller_name.in?(%w[profiles users mfa]) || @current_module == :settings
+    elsif controller_name.in?(%w[profiles ai_settings users mfa]) || @current_module == :settings
       :settings
     else
       :finance
@@ -114,6 +115,13 @@ module ApplicationHelper
           tag.polyline(points: "14 2 14 8 20 8") +
           tag.line(x1: "8", x2: "16", y1: "13", y2: "13") +
           tag.line(x1: "8", x2: "16", y1: "17", y2: "17")
+      end
+    when "notes", "notebook"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "M4 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z") +
+          tag.line(x1: "8", x2: "16", y1: "8", y2: "8") +
+          tag.line(x1: "8", x2: "16", y1: "12", y2: "12") +
+          tag.line(x1: "8", x2: "13", y1: "16", y2: "16")
       end
     when "arrow-up-right", "income"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
