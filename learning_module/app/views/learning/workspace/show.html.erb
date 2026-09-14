@@ -1,0 +1,14 @@
+<div class="learning-shell"><%= render "header" %><section class="learning-panel"><h2><%= @item.display_title %></h2>
+<% if @item.source_key&.start_with?("roadmap:") %><p><%= t("learning.seeds.#{@item.source_key.delete_prefix('roadmap:')}.hint") %></p><% end %>
+<% if @item.resource_key && Learning::Catalog.resource(@item.resource_key) %><%= link_to t("learning.source"), learning_resource_path(@item.resource_key), class: "btn btn-secondary" %><% end %>
+<% if @item.source_key&.start_with?("question:") && (question = Learning::Catalog.questions.find { |q| "question:#{q['slug']}" == @item.source_key }) %><%= link_to t("learning.open_question"), question.fetch("url"), target: "_blank", rel: "noopener noreferrer", class: "btn btn-secondary" %><% end %>
+<%= render "form" %></section>
+<section class="learning-panel"><h2><%= t("learning.practice") %></h2><p><%= t("learning.review_hint") %></p>
+<% if @attempt.errors.any? %><div role="alert"><%= t("learning.errors") %><ul><% @attempt.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
+<%= form_with model: @attempt, scope: :attempt, url: practice_learning_item_path(@item), class: "learning-form" do |f| %>
+<div><%= f.label :outcome, t("learning.fields.outcome") %><%= f.select :outcome, Learning::Attempt::OUTCOMES.map { |v| [t("learning.outcomes.#{v}"), v] } %></div>
+<div><%= f.label :minutes, t("learning.fields.minutes") %><%= f.number_field :minutes, min: 1, max: 1440, required: true %></div>
+<div><%= f.label :confidence, t("learning.fields.confidence") %><%= f.number_field :confidence, min: 0, max: 5, required: true %></div>
+<div class="learning-wide"><%= f.label :reflection, t("learning.fields.reflection") %><p id="reflection-help"><%= t("learning.reflection_hint") %></p><%= f.text_area :reflection, rows: 5, maxlength: 20000, aria: {describedby: "reflection-help"} %></div><div><%= f.submit t("learning.save"), class: "btn btn-primary" %></div><% end %></section>
+<section class="learning-panel"><h2><%= t("learning.history") %></h2><% if @history.empty? %><p><%= t("learning.no_history") %></p><% end %><% @history.each do |attempt| %><article class="learning-history"><strong><%= l(attempt.created_at, format: :short) %> · <%= t("learning.outcomes.#{attempt.outcome}") %> · <%= attempt.minutes %> <%= t("learning.minute") %> · <%= attempt.confidence %>/5</strong><%= simple_format(attempt.reflection) %></article><% end %></section>
+<details class="learning-panel"><summary><%= t("learning.delete") %></summary><p><%= t("learning.delete_hint") %></p><%= button_to t("learning.delete"), learning_item_path(@item), method: :delete, class: "btn btn-danger" %></details></div>

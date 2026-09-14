@@ -1,0 +1,164 @@
+{
+  "tr": {
+    "learning": {
+      "title": "Gelişim Atölyesi",
+      "subtitle": "Mülakata hazırlan, öğrendiklerini uygula ve gelişimini takip et.",
+      "badge": "Öğrenme ve mülakat",
+      "roadmap": "Yol haritası",
+      "library": "Kaynak ve soru kütüphanesi",
+      "new": "Yeni çalışma ekle",
+      "saved": "Kaydedildi.",
+      "deleted": "Çalışma silindi.",
+      "practice_saved": "Çalışma kaydedildi ve tekrar tarihi planlandı.",
+      "starter": "Başlangıç yol haritasını ekle",
+      "empty": "İlk adımını planla",
+      "empty_hint": "8 adımlık mülakat rotasıyla başla veya kendi konunu ekle.",
+      "next": "Sıradaki çalışma",
+      "next_hint": "Önce zamanı gelen tekrarlar, sonra devam eden çalışmalar, ardından planlananlar önerilir.",
+      "caught_up": "Planlanan çalışma kalmadı. Kütüphaneden yeni bir soru seçebilirsin.",
+      "weekly": "Bu hafta (dakika)",
+      "due": "Tekrar zamanı gelen",
+      "completed": "Tamamlanan",
+      "total": "Toplam çalışma",
+      "search": "Ara",
+      "all": "Tümü",
+      "filter": "Filtrele",
+      "no_results": "Eşleşen kayıt yok.",
+      "export": "Öğrenme verilerini indir (JSON)",
+      "ai_hint": "AI hazırlığı: İndirme; notlarını ve çalışma geçmişini içerir. Otomatik AI değerlendirmesi henüz bağlı değil. Tavsiyeler kayıtlarına dayanan basit kurallarla üretilir.",
+      "save": "Kaydet",
+      "delete": "Bu çalışmayı ve geçmişini sil",
+      "delete_hint": "Silme işlemi bu çalışmanın tüm denemelerini de kaldırır.",
+      "practice": "Çalışma kaydı",
+      "history": "Çalışma geçmişi",
+      "no_history": "Henüz çalışma kaydı yok.",
+      "reflection_hint": "Nerede zorlandın? Hangi yaklaşımı denedin? Bir sonraki denemede neyi değiştireceksin?",
+      "review_hint": "Her deneme tekrar durumuna alınır. Takıldı/kısmen: 1 gün; çözüldü: güven puanına göre 1–14 gün. Tamamlandı durumunu kendin seçebilirsin.",
+      "source": "Kaynağı oku",
+      "original": "Özgün İngilizce kaynak",
+      "source_hint": "Kaynak metinleri İngilizcedir; arayüz, başlangıç rotası ve çalışma yönlendirmeleri iki dillidir. Özgün soru adları korunur.",
+      "add": "Planıma ekle",
+      "added": "Planına eklendi",
+      "open_question": "Soruyu aç",
+      "questions": "Pratik soruları",
+      "resources": "Okuma kütüphanesi",
+      "minute": "dk",
+      "tips": "Çalışma yöntemi",
+      "tip_text": "Önce çözümü görmeden dene. Yaklaşımını sesli açıkla, zaman/alan karmaşıklığını yaz, uç durumları test et. Sonra hatanı ve bir sonraki adımını kaydet.",
+      "errors": "Lütfen alanları kontrol et.",
+      "fields": {
+        "title": "Başlık",
+        "track": "Alan",
+        "kind": "Çalışma türü",
+        "status": "Durum",
+        "difficulty": "Zorluk",
+        "position": "Sıra",
+        "confidence": "Güven düzeyi (0–5)",
+        "estimated_minutes": "Hedef süre (dakika)",
+        "target_on": "Hedef tarih",
+        "review_on": "Tekrar tarihi",
+        "notes": "Öğrenme notları ve hedefler",
+        "outcome": "Sonuç",
+        "minutes": "Harcanan dakika",
+        "reflection": "Değerlendirme"
+      },
+      "tracks": {
+        "interview": "Teknik mülakat",
+        "algorithms": "Algoritmalar",
+        "system_engineering": "Sistem mühendisliği"
+      },
+      "kinds": {
+        "topic": "Konu",
+        "question": "Soru",
+        "project": "Proje / laboratuvar",
+        "mock": "Deneme mülakatı"
+      },
+      "statuses": {
+        "planned": "Planlandı",
+        "active": "Devam ediyor",
+        "review": "Tekrar",
+        "completed": "Tamamlandı"
+      },
+      "difficulties": {
+        "easy": "Kolay",
+        "medium": "Orta",
+        "hard": "Zor"
+      },
+      "outcomes": {
+        "stuck": "Takıldım",
+        "partial": "Kısmen çözdüm",
+        "solved": "Çözdüm"
+      },
+      "seeds": {
+        "plan": {
+          "title": "Hedefini ve çalışma düzenini belirle",
+          "hint": "Hedef rolünü, görüşme tarihini ve haftalık ayırabileceğin süreyi not et. Bir başlangıç sorusu çözerek seviyeni ölç."
+        },
+        "arrays": {
+          "title": "Diziler, string ve iki işaretçi",
+          "hint": "Dizi erişimi ve arama maliyetlerini karşılaştır. Two Sum sorusunu kaba kuvvet ve hash tablosuyla çöz."
+        },
+        "structures": {
+          "title": "Hash, stack ve linked list",
+          "hint": "Her yapı için ekleme, silme ve arama maliyetlerini yaz. Boş giriş ve tek eleman durumlarını test et."
+        },
+        "trees": {
+          "title": "Ağaçlar ve graflar",
+          "hint": "BFS ve DFS uygula. Ziyaret edilen düğümleri nasıl tuttuğunu ve çevrimleri nasıl önlediğini açıkla."
+        },
+        "dynamic": {
+          "title": "Özyineleme ve dinamik programlama",
+          "hint": "Durumu, geçişi ve temel durumu tanımla. Önce özyinelemeli çöz, sonra memoization ekle."
+        },
+        "behavioral": {
+          "title": "Davranışsal mülakat hikâyeleri",
+          "hint": "Çatışma, başarısızlık ve liderlik için STAR hikâyeleri yaz. Kendi katkını ve ölçülebilir sonucu belirt."
+        },
+        "design": {
+          "title": "Sistem tasarımına giriş",
+          "hint": "Gereksinimleri netleştir; API, veri modeli, kapasite ve hata durumlarını çiz. Tercihlerinin bedellerini açıkla."
+        },
+        "mock": {
+          "title": "Deneme mülakatı ve değerlendirme",
+          "hint": "45 dakikalık bir deneme yap. Açıklama, doğruluk, testler ve süre yönetimini değerlendir; zayıf konuları tekrar planla."
+        }
+      }
+    },
+    "activerecord": {
+      "attributes": {
+        "learning/item": {
+          "title": "Başlık",
+          "track": "Alan",
+          "kind": "Çalışma türü",
+          "status": "Durum",
+          "difficulty": "Zorluk",
+          "position": "Sıra",
+          "confidence": "Güven düzeyi (0–5)",
+          "estimated_minutes": "Hedef süre (dakika)",
+          "target_on": "Hedef tarih",
+          "review_on": "Tekrar tarihi",
+          "notes": "Öğrenme notları ve hedefler",
+          "outcome": "Sonuç",
+          "minutes": "Harcanan dakika",
+          "reflection": "Değerlendirme"
+        },
+        "learning/attempt": {
+          "title": "Başlık",
+          "track": "Alan",
+          "kind": "Çalışma türü",
+          "status": "Durum",
+          "difficulty": "Zorluk",
+          "position": "Sıra",
+          "confidence": "Güven düzeyi (0–5)",
+          "estimated_minutes": "Hedef süre (dakika)",
+          "target_on": "Hedef tarih",
+          "review_on": "Tekrar tarihi",
+          "notes": "Öğrenme notları ve hedefler",
+          "outcome": "Sonuç",
+          "minutes": "Harcanan dakika",
+          "reflection": "Değerlendirme"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+<% if @item.errors.any? %><div role="alert"><p><%= t("learning.errors") %></p><ul><% @item.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
+<%= form_with model: @item, url: @item.persisted? ? learning_item_path(@item) : learning_items_path, class: "learning-form" do |f| %>
+<div class="learning-wide"><%= f.label :title, t("learning.fields.title") %><%= f.text_field :title, required: true, maxlength: 200 %></div>
+<% {track: [Learning::Item::TRACKS, 'tracks'], kind: [Learning::Item::KINDS, 'kinds'], status: [Learning::Item::STATUSES, 'statuses'], difficulty: [Learning::Item::DIFFICULTIES, 'difficulties']}.each do |field, (values, group)| %><div><%= f.label field, t("learning.fields.#{field}") %><%= f.select field, values.map { |value| [t("learning.#{group}.#{value}"), value] } %></div><% end %>
+<% {position: [0, 10000], confidence: [0, 5], estimated_minutes: [1, 1440]}.each do |field, (min, max)| %><div><%= f.label field, t("learning.fields.#{field}") %><%= f.number_field field, min: min, max: max, required: true %></div><% end %>
+<% [:target_on, :review_on].each do |field| %><div><%= f.label field, t("learning.fields.#{field}") %><%= f.date_field field %></div><% end %>
+<div class="learning-wide"><%= f.label :notes, t("learning.fields.notes") %><%= f.text_area :notes, rows: 8, maxlength: 50000 %></div><div><%= f.submit t("learning.save"), class: "btn btn-primary" %></div><% end %>
