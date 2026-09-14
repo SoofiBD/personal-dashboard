@@ -1,0 +1,164 @@
+{
+  "en": {
+    "learning": {
+      "title": "Learning Studio",
+      "subtitle": "Prepare for interviews, apply your knowledge and track your growth.",
+      "badge": "Learning & interviews",
+      "roadmap": "Roadmap",
+      "library": "Resources & questions",
+      "new": "Add learning item",
+      "saved": "Saved.",
+      "deleted": "Item deleted.",
+      "practice_saved": "Practice recorded and next review scheduled.",
+      "starter": "Add starter roadmap",
+      "empty": "Plan your first step",
+      "empty_hint": "Start with an eight-step interview roadmap or add your own topic.",
+      "next": "Next learning session",
+      "next_hint": "Due reviews come first, followed by active work and then planned items.",
+      "caught_up": "No pending items. Choose a new question from the library.",
+      "weekly": "This week (minutes)",
+      "due": "Reviews due",
+      "completed": "Completed",
+      "total": "Total items",
+      "search": "Search",
+      "all": "All",
+      "filter": "Filter",
+      "no_results": "No matching items.",
+      "export": "Download learning data (JSON)",
+      "ai_hint": "AI preparation: the download includes your notes and practice history. Automated AI assessment is not connected yet. Suggestions use simple rules based on your records.",
+      "save": "Save",
+      "delete": "Delete this item and its history",
+      "delete_hint": "Deleting also removes all attempts for this item.",
+      "practice": "Record practice",
+      "history": "Practice history",
+      "no_history": "No practice recorded yet.",
+      "reflection_hint": "Where did you get stuck? What approach did you try? What will you change next time?",
+      "review_hint": "Each attempt enters review. Stuck/partial: 1 day; solved: 1–14 days based on confidence. Mark completed yourself when ready.",
+      "source": "Read source",
+      "original": "Original English source",
+      "source_hint": "Source texts are in English; the interface, starter roadmap and learning guidance are bilingual. Original question titles are preserved.",
+      "add": "Add to my plan",
+      "added": "Added to your plan",
+      "open_question": "Open problem",
+      "questions": "Practice questions",
+      "resources": "Reading library",
+      "minute": "min",
+      "tips": "Study approach",
+      "tip_text": "Try before reading a solution. Explain your approach aloud, write time/space complexity and test edge cases. Then record your mistake and next step.",
+      "errors": "Please check the fields.",
+      "fields": {
+        "title": "Title",
+        "track": "Track",
+        "kind": "Item type",
+        "status": "Status",
+        "difficulty": "Difficulty",
+        "position": "Order",
+        "confidence": "Confidence (0–5)",
+        "estimated_minutes": "Target duration (minutes)",
+        "target_on": "Target date",
+        "review_on": "Review date",
+        "notes": "Learning notes & goals",
+        "outcome": "Outcome",
+        "minutes": "Minutes spent",
+        "reflection": "Reflection"
+      },
+      "tracks": {
+        "interview": "Technical interview",
+        "algorithms": "Algorithms",
+        "system_engineering": "System engineering"
+      },
+      "kinds": {
+        "topic": "Topic",
+        "question": "Question",
+        "project": "Project / lab",
+        "mock": "Mock interview"
+      },
+      "statuses": {
+        "planned": "Planned",
+        "active": "In progress",
+        "review": "Review",
+        "completed": "Completed"
+      },
+      "difficulties": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "outcomes": {
+        "stuck": "Stuck",
+        "partial": "Partial",
+        "solved": "Solved"
+      },
+      "seeds": {
+        "plan": {
+          "title": "Define your goal and study routine",
+          "hint": "Note your target role, interview date and weekly availability. Solve a baseline question to assess your starting point."
+        },
+        "arrays": {
+          "title": "Arrays, strings and two pointers",
+          "hint": "Compare array access and search costs. Solve Two Sum using brute force and a hash table."
+        },
+        "structures": {
+          "title": "Hash tables, stacks and linked lists",
+          "hint": "Write insertion, deletion and search costs for each structure. Test empty and single-element inputs."
+        },
+        "trees": {
+          "title": "Trees and graphs",
+          "hint": "Implement BFS and DFS. Explain visited-node tracking and cycle prevention."
+        },
+        "dynamic": {
+          "title": "Recursion and dynamic programming",
+          "hint": "Define state, transition and base cases. Start recursively, then add memoization."
+        },
+        "behavioral": {
+          "title": "Behavioral interview stories",
+          "hint": "Write STAR stories for conflict, failure and leadership. State your contribution and measurable results."
+        },
+        "design": {
+          "title": "Introduction to system design",
+          "hint": "Clarify requirements; sketch APIs, data model, capacity and failure modes. Explain tradeoffs."
+        },
+        "mock": {
+          "title": "Mock interview and reflection",
+          "hint": "Run a 45-minute mock. Review explanation, correctness, tests and time management; schedule weak topics again."
+        }
+      }
+    },
+    "activerecord": {
+      "attributes": {
+        "learning/item": {
+          "title": "Title",
+          "track": "Track",
+          "kind": "Item type",
+          "status": "Status",
+          "difficulty": "Difficulty",
+          "position": "Order",
+          "confidence": "Confidence (0–5)",
+          "estimated_minutes": "Target duration (minutes)",
+          "target_on": "Target date",
+          "review_on": "Review date",
+          "notes": "Learning notes & goals",
+          "outcome": "Outcome",
+          "minutes": "Minutes spent",
+          "reflection": "Reflection"
+        },
+        "learning/attempt": {
+          "title": "Title",
+          "track": "Track",
+          "kind": "Item type",
+          "status": "Status",
+          "difficulty": "Difficulty",
+          "position": "Order",
+          "confidence": "Confidence (0–5)",
+          "estimated_minutes": "Target duration (minutes)",
+          "target_on": "Target date",
+          "review_on": "Review date",
+          "notes": "Learning notes & goals",
+          "outcome": "Outcome",
+          "minutes": "Minutes spent",
+          "reflection": "Reflection"
+        }
+      }
+    }
+  }
+}
