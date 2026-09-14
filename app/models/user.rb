@@ -29,6 +29,8 @@ class User < ApplicationRecord
   has_many :document_conversions, class_name: "PersonalFinance::DocumentConversion", dependent: :destroy
   has_many :notes, class_name: "Notes::Note", dependent: :destroy
   has_many :note_links, class_name: "Notes::NoteLink", dependent: :destroy
+  has_many :learning_items, class_name: "Learning::Item", dependent: :destroy
+  has_many :learning_attempts, class_name: "Learning::Attempt", dependent: :destroy
 
   def onboarded?
     onboarded_at.present? || financial_accounts.exists? || finance_categories.exists? || finance_transactions.exists?

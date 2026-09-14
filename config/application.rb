@@ -16,7 +16,7 @@ module Workspace
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    %w[finance_module notes_module].each do |component|
+    %w[finance_module notes_module learning_module].each do |component|
       %w[models controllers services].each do |directory|
         path = Rails.root.join(component, "app", directory)
         config.autoload_paths << path
@@ -28,7 +28,9 @@ module Workspace
     config.paths["db/migrate"] << Rails.root.join("finance_module/db/migrate")
     config.paths["app/views"] << Rails.root.join("finance_module/app/views")
     config.paths["app/views"] << Rails.root.join("notes_module/app/views")
+    config.paths["app/views"] << Rails.root.join("learning_module/app/views")
     config.paths["db/migrate"] << Rails.root.join("notes_module/db/migrate")
+    config.paths["db/migrate"] << Rails.root.join("learning_module/db/migrate")
     config.time_zone = ENV.fetch("DASHBOARD_TIME_ZONE", "Europe/Istanbul")
 
     config.i18n.available_locales = %i[tr en]

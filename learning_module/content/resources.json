@@ -1,0 +1,194 @@
+[
+  {
+    "id": "algorithms--array",
+    "title": "Array cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--binary",
+    "title": "Binary cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--dynamic-programming",
+    "title": "Dynamic programming cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--geometry",
+    "title": "Geometry cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--graph",
+    "title": "Graph cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--hash-table",
+    "title": "Hash table cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--heap",
+    "title": "Heap cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--interval",
+    "title": "Interval cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--linked-list",
+    "title": "Linked list cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--math",
+    "title": "Math cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--matrix",
+    "title": "Matrix cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--oop",
+    "title": "Object-oriented programming"
+  },
+  {
+    "id": "algorithms--queue",
+    "title": "Queue cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--recursion",
+    "title": "Recursion cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--sorting-searching",
+    "title": "Sorting and searching cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--stack",
+    "title": "Stack cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--string",
+    "title": "String cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--study-cheatsheet",
+    "title": "Data structures and algorithms study cheatsheets for coding interviews"
+  },
+  {
+    "id": "algorithms--tree",
+    "title": "Tree cheatsheet for coding interviews"
+  },
+  {
+    "id": "algorithms--trie",
+    "title": "Trie cheatsheet for coding interviews"
+  },
+  {
+    "id": "behavioral-interview-questions",
+    "title": "The 30 most common Software Engineer behavioral interview questions"
+  },
+  {
+    "id": "behavioral-interview-rubrics",
+    "title": "How candidates are evaluated in behavioral interviews at top tech companies"
+  },
+  {
+    "id": "behavioral-interview-senior-candidates",
+    "title": "'Behavioral interviews for senior candidates'"
+  },
+  {
+    "id": "behavioral-interview",
+    "title": "'Behavioral interviews for Software Engineers: How to prepare'"
+  },
+  {
+    "id": "best-coding-interview-courses",
+    "title": "Best coding interview courses"
+  },
+  {
+    "id": "best-practice-questions",
+    "title": "Best practice questions"
+  },
+  {
+    "id": "career-growth",
+    "title": "📈 Career growth"
+  },
+  {
+    "id": "choosing-between-companies",
+    "title": "Choosing between companies"
+  },
+  {
+    "id": "coding-interview-cheatsheet",
+    "title": "'Coding interview cheatsheet: Best practices before, during and after'"
+  },
+  {
+    "id": "coding-interview-prep",
+    "title": "'Coding interviews: Everything you need to prepare'"
+  },
+  {
+    "id": "coding-interview-rubrics",
+    "title": "How candidates are evaluated in coding interviews at top tech companies"
+  },
+  {
+    "id": "coding-interview-study-plan",
+    "title": "Coding interview study plan - what to study and practice based on time left"
+  },
+  {
+    "id": "coding-interview-techniques",
+    "title": "Top techniques to approach and solve coding interview questions"
+  },
+  {
+    "id": "engineering-levels",
+    "title": "🎚 Engineering levels"
+  },
+  {
+    "id": "final-questions",
+    "title": "'Software Engineer interviews: Best end of interview questions to ask'"
+  },
+  {
+    "id": "interview-formats-top-companies",
+    "title": "Interview format at top companies"
+  },
+  {
+    "id": "interviewer-cheatsheet",
+    "title": "👩‍💻 Cheatsheet (Interviewer)"
+  },
+  {
+    "id": "landscape",
+    "title": "🏔 Landscape"
+  },
+  {
+    "id": "mock-interviews",
+    "title": "Best mock coding interview platforms for Software Engineers"
+  },
+  {
+    "id": "negotiation-rules",
+    "title": "Ten rules of negotiation"
+  },
+  {
+    "id": "negotiation",
+    "title": "Negotiation"
+  },
+  {
+    "id": "programming-languages-for-coding-interviews",
+    "title": "Which programming language to use for coding interviews"
+  },
+  {
+    "id": "resume-old",
+    "title": "Resume overview"
+  },
+  {
+    "id": "resume",
+    "title": "Practical guide to writing FAANG-ready software engineer resumes"
+  },
+  {
+    "id": "self-introduction",
+    "title": "'Software Engineer interviews: Crafting the perfect self introduction'"
+  },
+  {
+    "id": "software-engineering-interview-guide",
+    "title": "'Software Engineer interviews: Everything you need to prepare'"
+  },
+  {
+    "id": "system-design",
+    "title": "System design interview guide for Software Engineers"
+  },
+  {
+    "id": "understanding-compensation",
+    "title": "Understanding compensation"
+  }
+]
