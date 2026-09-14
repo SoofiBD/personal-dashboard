@@ -29,6 +29,16 @@ Rails.application.routes.draw do
     end
   end
 
+  scope :learning, module: :learning, as: :learning do
+    root to: "workspace#index"
+    get "library", to: "workspace#library"
+    get "resource/:id", to: "workspace#resource", as: :resource
+    get "export", to: "workspace#export", as: :export
+    resources :items, controller: :workspace, only: %i[new create show update destroy] do
+      post :practice, on: :member
+    end
+  end
+
   scope :finance, module: :personal_finance, as: :finance do
     root to: "dashboard#show"
     resource :dashboard, only: :show

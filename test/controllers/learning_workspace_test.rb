@@ -99,7 +99,7 @@ class LearningWorkspaceTest < PersonalFinance::IntegrationTest
       assert (1..1440).cover?(question.fetch("duration"))
     end
     Learning::Catalog.resources.each do |resource|
-      assert Learning::Catalog::ROOT.join("#{resource.fetch('id')}.md").file?
+      assert Learning::Catalog::ROOT.join("#{resource.fetch("id")}.md").file?
     end
   end
 

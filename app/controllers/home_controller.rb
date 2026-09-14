@@ -16,6 +16,17 @@ class HomeController < ApplicationController
         icon: "notes"
       },
       {
+        key: "learning",
+        title_key: "learning.title",
+        default_title: "Learning Studio",
+        description_key: "learning.subtitle",
+        default_description: "Interview preparation, study plans and practice tracking.",
+        path: learning_root_path,
+        badge_key: "learning.badge",
+        default_badge: "Learning",
+        icon: "notes"
+      },
+      {
         key: "finance",
         title_key: "home.modules.finance.title",
         default_title: "Finance",

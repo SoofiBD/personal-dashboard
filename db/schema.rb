@@ -322,6 +322,41 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_13_000000) do
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
   end
 
+  create_table "learning_attempts", force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.bigint "item_id", null: false
+    t.string "outcome", null: false
+    t.integer "minutes", null: false
+    t.integer "confidence", null: false
+    t.text "reflection"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["item_id"], name: "index_learning_attempts_on_item_id"
+    t.index ["user_id"], name: "index_learning_attempts_on_user_id"
+  end
+
+  create_table "learning_items", force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "title", null: false
+    t.string "track", default: "interview", null: false
+    t.string "kind", default: "topic", null: false
+    t.string "status", default: "planned", null: false
+    t.string "source_key"
+    t.string "resource_key"
+    t.string "difficulty", default: "medium", null: false
+    t.integer "position", default: 0, null: false
+    t.integer "confidence", default: 0, null: false
+    t.integer "estimated_minutes", default: 30, null: false
+    t.date "target_on"
+    t.date "review_on"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "source_key"], name: "index_learning_items_on_user_id_and_source_key", unique: true
+    t.index ["user_id", "track", "status"], name: "index_learning_items_on_user_id_and_track_and_status"
+    t.index ["user_id"], name: "index_learning_items_on_user_id"
+  end
+
   create_table "note_links", force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "source_note_id", null: false
@@ -563,6 +598,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_13_000000) do
   add_foreign_key "finance_transactions", "financial_accounts"
   add_foreign_key "finance_transactions", "users"
   add_foreign_key "financial_accounts", "users"
+  add_foreign_key "learning_attempts", "learning_items", column: "item_id"
+  add_foreign_key "learning_attempts", "users"
+  add_foreign_key "learning_items", "users"
   add_foreign_key "note_links", "notes", column: "source_note_id"
   add_foreign_key "note_links", "notes", column: "target_note_id"
   add_foreign_key "note_links", "users"

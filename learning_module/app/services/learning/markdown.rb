@@ -1,3 +1,5 @@
+require "redcarpet"
+
 module Learning
   class Markdown
     TAGS = %w[h1 h2 h3 h4 h5 h6 p br hr strong em del ul ol li blockquote pre code table thead tbody tr th td a].freeze
