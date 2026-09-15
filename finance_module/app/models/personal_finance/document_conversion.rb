@@ -3,6 +3,7 @@ module PersonalFinance
     self.table_name = "document_conversions"
 
     belongs_to :user, class_name: "::User"
+    has_one :invoice_parse, class_name: "PersonalFinance::InvoiceParse", foreign_key: :document_conversion_id, dependent: :destroy
     has_many :assets, class_name: "PersonalFinance::DocumentAsset", foreign_key: :document_conversion_id, dependent: :destroy
     has_one_attached :source_pdf
 
