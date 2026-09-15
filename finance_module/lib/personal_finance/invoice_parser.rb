@@ -1,6 +1,6 @@
 module PersonalFinance
   class InvoiceParser
-    # Returns a hash with keys: :vendor, :invoice_date (Date), :amount (BigDecimal), :currency (String), :raw_json (Hash)
+    # Returns parsed invoice fields, or nil when parsing is unavailable.
     # If parsing fails, returns nil.
     def self.parse(markdown_content)
       # TODO: Replace with AI/OCR later.

@@ -32,7 +32,7 @@ module PersonalFinance
           document_asset.save!
         end
         conversion.complete!(markdown_content: result.fetch(:markdown_content), processing_stats: result.fetch(:processing_stats))
-        # Attempt invoice parsing (non‑blocking)
+        # Attempt invoice parsing without blocking conversion completion.
         parsed = PersonalFinance::InvoiceParser.parse(conversion.markdown_content)
         if parsed.present?
           PersonalFinance::InvoiceParse.create!(
