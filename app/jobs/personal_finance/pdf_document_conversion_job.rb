@@ -40,7 +40,7 @@ module PersonalFinance
             vendor: parsed[:vendor],
             invoice_date: parsed[:invoice_date],
             amount: parsed[:amount],
-            currency: parsed[:currency] || 'TRY',
+            currency: parsed[:currency] || "TRY",
             raw_json: parsed[:raw_json] || {}
           )
         end

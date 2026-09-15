@@ -9,7 +9,7 @@ class CreateInvoiceParses < ActiveRecord::Migration[7.2]
       t.string :vendor
       t.date :invoice_date
       t.decimal :amount, precision: 10, scale: 2
-      t.string :currency, default: -> { "TRY" }
+      t.string :currency, default: "TRY"
       t.jsonb :raw_json, null: false, default: {}
       t.timestamps
     end
