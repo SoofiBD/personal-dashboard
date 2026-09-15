@@ -106,7 +106,7 @@ The project is evolving into an all-in-one personal workspace and life operating
 ### 📄 PDF Tools & Document Management
 - [x] In-browser PDF viewer for stored source documents (annotation tools remain planned).
 - [x] PDF editing, splitting, merging, and page re-ordering through Stirling PDF.
-- [ ] Receipt and invoice parsing from uploaded PDFs.
+- [x] Receipt and invoice parsing from uploaded PDFs.
 
 ### 📝 Notes & Knowledge Base
 - [x] Markdown note-taking workspace with tag support.
