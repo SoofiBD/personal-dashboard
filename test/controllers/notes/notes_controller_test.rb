@@ -9,6 +9,8 @@ class Notes::NotesControllerTest < PersonalFinance::IntegrationTest
     get new_notes_note_path
     assert_response :success
     assert_select "input[name='note[title]']"
+    assert_select "[data-md-editor='notes']"
+    assert_select "textarea[data-notes-editor]"
 
     assert_difference("Notes::Note.count", 1) do
       post notes_notes_path, params: {note: {title: "Haftalık plan", body: "Öncelikler", tag_list: "plan, iş", pinned: "1"}}

@@ -27,3 +27,12 @@ pdf_worker/*.ses
 .env.nas*
 *.pem
 *.pem.bak
+
+# Frontend node_modules
+frontend/md-editor/node_modules/
+
+# ChartDB - built in Docker, no need for node_modules locally
+modules/chartdb/node_modules/
+
+# Vendor assets - generated/bundled, not source
+vendor/assets/javascripts/md-editor/

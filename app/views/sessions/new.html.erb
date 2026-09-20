@@ -43,9 +43,14 @@
       </div>
     </div>
 
-    <div class="auth-actions">
+<div class="auth-actions">
       <%= form.submit t("auth.submit", default: "Kasaya Giriş Yap"), class: "button button-primary auth-submit-btn" %>
     </div>
   <% end %>
 
+  <% if User.count.zero? %>
+    <div class="auth-footer">
+      <%= link_to t("auth.no_account_link", default: "Henüz hesap yok mu? İlk hesabı oluşturun"), new_signup_path, class: "auth-footer-link" %>
+    </div>
+  <% end %>
 </section>

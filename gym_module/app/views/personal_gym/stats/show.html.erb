@@ -1,0 +1,52 @@
+<% content_for :module_js do %>
+  <%= javascript_include_tag "gym", defer: true %>
+<% end %>
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("gym.stats.eyebrow", default: "Antrenman İstatistikleri") %></p>
+    <h1><%= t("gym.stats.title", default: "İstatistikler") %></h1>
+    <p class="page-subtitle"><%= t("gym.stats.subtitle", default: "Haftalık hacim, tonaj ve en çok çalışılan egzersizler.") %></p>
+  </div>
+  <%= link_to gym_root_path, class: "button button-secondary" do %>
+    <span><%= t("gym.back", default: "Geri") %></span>
+  <% end %>
+</header>
+
+<section class="gym-stats">
+  <article class="panel gym-stat"><span><%= t("gym.stats.sessions", default: "Toplam Seans") %></span><strong><%= @totals[:sessions] %></strong></article>
+  <article class="panel gym-stat"><span><%= t("gym.stats.tonnage", default: "Toplam Tonaj") %></span><strong><%= number_with_delimiter(@totals[:tonnage].to_i) %> kg</strong></article>
+  <article class="panel gym-stat"><span><%= t("gym.stats.sets_done", default: "Tamamlanan Set") %></span><strong><%= number_with_delimiter(@totals[:sets_done]) %></strong></article>
+  <article class="panel gym-stat"><span><%= t("gym.streak", default: "Hafta Serisi") %></span><strong><%= @streak %></strong></article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.stats.weekly_volume", default: "Haftalık Hacim") %></h2>
+      <p><%= t("gym.stats.weekly_volume_desc", default: "Son 8 haftanın tonaj (ağırlık × tekrar).") %></p>
+    </div>
+  </div>
+  <div class="gym-chart-wrap">
+    <canvas id="gym-volume-chart" data-label-volume="<%= t('gym.session.tonnage', default: 'Tonaj') %>"></canvas>
+    <script type="application/json" data-gym-volume-data><%= raw @weekly_volume.map { |row| {label: row[:label], tonnage: row[:tonnage]} }.to_json %></script>
+  </div>
+</section>
+
+<% if @top_exercises.any? %>
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("gym.stats.top_exercises", default: "En Çok Çalışılanlar") %></h2>
+        <p><%= t("gym.stats.top_exercises_desc", default: "Son 30 günün tonajına göre.") %></p>
+      </div>
+    </div>
+    <div class="finance-list">
+      <% @top_exercises.each do |row| %>
+        <article class="finance-item-row">
+          <div><strong><%= row[:name] %></strong></div>
+          <span class="badge-pill badge-pill-subtle"><%= number_with_delimiter(row[:tonnage].to_i) %> kg</span>
+        </article>
+      <% end %>
+    </div>
+  </section>
+<% end %>

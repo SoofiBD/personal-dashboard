@@ -1,0 +1,44 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("gym.library.eyebrow", default: "Egzersiz Kataloğu") %></p>
+    <h1><%= t("gym.library.title", default: "Egzersizler") %></h1>
+    <p class="page-subtitle"><%= t("gym.library.subtitle", default: "Kas grubuna göre filtrele, detay ve geçmişi gör.") %></p>
+  </div>
+  <div class="gym-header-actions">
+    <%= link_to gym_root_path, class: "button button-secondary" do %>
+      <span><%= t("gym.back", default: "Geri") %></span>
+    <% end %>
+    <%= link_to new_gym_exercise_path, class: "button button-primary" do %>
+      <span><%= t("gym.new_exercise", default: "Yeni Egzersiz") %></span>
+    <% end %>
+  </div>
+</header>
+
+<%= form_with url: gym_exercises_path, method: :get, class: "gym-filters" do |form| %>
+  <div><%= form.label :q, t("gym.search", default: "Ara") %><%= form.search_field :q, value: params[:q] %></div>
+  <div><%= form.label :muscle, t("gym.muscle_group", default: "Kas grubu") %><%= form.select :muscle, PersonalGym::Exercise.distinct.pluck(:muscle_group).compact.sort.map { |g| [g.humanize, g] }, {include_blank: t("gym.all", default: "Tümü"), selected: params[:muscle]} %></div>
+  <%= form.submit t("gym.filter", default: "Filtrele"), class: "button button-secondary" %>
+<% end %>
+
+<section class="finance-list">
+  <% @exercises.each do |exercise| %>
+    <article class="finance-item-row">
+      <div>
+        <strong><%= link_to exercise.name, gym_exercise_path(exercise) %></strong>
+        <span class="transaction-category"><%= exercise.muscle_group&.humanize %> · <%= exercise.equipment&.humanize %></span>
+      </div>
+      <div class="gym-row-actions">
+        <span class="badge-pill badge-pill-subtle"><%= t("gym.modes.#{exercise.logging_mode}", default: exercise.logging_mode) %></span>
+        <% if PersonalGym::Workout.active_for(current_user).nil? %>
+          <%= button_to t("gym.start", default: "Başlat"), gym_workouts_path, params: {exercise_id: exercise.id, sets: 3}, class: "badge-pill gym-day-start", form_class: "gym-inline-form", title: t("gym.start_free", default: "Serbest seans başlat") %>
+        <% end %>
+      </div>
+    </article>
+  <% end %>
+</section>
+
+<% if @exercises.empty? %>
+  <div class="empty-state">
+    <p><%= t("gym.no_exercises", default: "Sonuç bulunamadı.") %></p>
+  </div>
+<% end %>

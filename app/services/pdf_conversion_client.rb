@@ -9,8 +9,9 @@ class PdfConversionClient
   MAX_PDF_SIZE = 25.megabytes
   MAX_MARKDOWN_SIZE = 10.megabytes
 
-  def initialize(base_url: ENV.fetch("PDF_WORKER_URL", "http://pdf-worker:8000"))
+  def initialize(base_url: ENV.fetch("PDF_WORKER_URL", "http://pdf-worker:8000"), api_key: ENV.fetch("PDF_WORKER_API_KEY", nil))
     @base_uri = URI(base_url)
+    @api_key = api_key
   end
 
   def convert(pdf_data:, filename:, custom_notes:, annotation_mode:, conversion_options: {})
@@ -18,6 +19,7 @@ class PdfConversionClient
     raise Error, "Geçersiz anotasyon modu." unless %w[section inline both].include?(annotation_mode)
 
     request = Net::HTTP::Post.new(endpoint("/convert"))
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key
     request.set_form(
       [
         ["file", StringIO.new(pdf_data), {filename: safe_filename(filename), content_type: "application/pdf"}],
@@ -50,6 +52,7 @@ class PdfConversionClient
 
     request = Net::HTTP::Post.new(endpoint("/export-zip"))
     request["Content-Type"] = "application/json"
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key
     request.body = JSON.generate(
       markdown_content: markdown_content,
       source_filename: safe_filename(source_filename),
@@ -68,6 +71,7 @@ class PdfConversionClient
 
     request = Net::HTTP::Post.new(endpoint("/export-html"))
     request["Content-Type"] = "application/json"
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key
     request.body = JSON.generate(
       markdown_content: markdown_content,
       source_filename: safe_filename(source_filename),
@@ -83,6 +87,7 @@ class PdfConversionClient
 
   def crop_image(asset:, bounds:)
     request = Net::HTTP::Post.new(endpoint("/crop-image"))
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key
     request.set_form([
       ["file", StringIO.new(asset.file.download), {filename: asset.filename, content_type: asset.content_type}],
       *bounds.map { |key, value| [key.to_s, value.to_s] }

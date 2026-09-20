@@ -7,10 +7,10 @@ services:
     environment:
       RAILS_ENV: production
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
-      RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
       NAS_WORKER_URL: "${NAS_WORKER_URL:-}"
-      NAS_API_TOKEN: "${NAS_API_TOKEN:-}"
+      NAS_API_TOKEN_FILE: /run/secrets/nas_api_token
+      PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     expose:
       - "3000"
     healthcheck:
@@ -36,6 +36,10 @@ services:
         condition: service_started
     restart: unless-stopped
     networks: [edge, database, pdf, stirling, chartdb, nas]
+    secrets:
+      - rails_master_key
+      - nas_api_token
+      - pdf_worker_api_key
 
   jobs:
     image: personal-dashboard:production
@@ -43,8 +47,8 @@ services:
     environment:
       RAILS_ENV: production
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
-      RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:?Set RAILS_MASTER_KEY in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
+      PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     volumes:
       - storage_data:/rails/storage
     read_only: true
@@ -63,6 +67,9 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks: [database, pdf]
+    secrets:
+      - rails_master_key
+      - pdf_worker_api_key
 
   pdf-worker:
     image: personal-dashboard-pdf-worker:production
@@ -79,6 +86,8 @@ services:
       - /tmp
     mem_limit: 768m
     cpus: 1.0
+    environment:
+      PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
       interval: 10s
@@ -88,16 +97,20 @@ services:
       start_interval: 2s
     restart: unless-stopped
     networks: [pdf]
+    secrets:
+      - pdf_worker_api_key
 
   stirling-pdf:
-    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:2.14.3
+    image: docker.stirlingtools/stirling-pdf:2.14.3
     expose:
       - "8080"
     environment:
       SYSTEM_ROOTURIPATH: "/pdf-editor"
       SYSTEM_DEFAULTLOCALE: "tr-TR"
       SYSTEM_MAXFILESIZE: "25"
-      SECURITY_ENABLELOGIN: "false"
+      SECURITY_ENABLELOGIN: "true"
+      SECURITY_INITIALLOGIN_USERNAME: "stirling"
+      SECURITY_INITIALLOGIN_PASSWORD_FILE: /run/secrets/stirling_pdf_password
       DISABLE_ADDITIONAL_FEATURES: "true"
       METRICS_ENABLED: "false"
       SHOW_SURVEY: "false"
@@ -117,6 +130,8 @@ services:
       start_interval: 2s
     restart: unless-stopped
     networks: [stirling]
+    secrets:
+      - stirling_pdf_password
 
   chartdb:
     build:
@@ -163,7 +178,7 @@ services:
     environment:
       POSTGRES_DB: "${POSTGRES_DB:?Set POSTGRES_DB in .env.production}"
       POSTGRES_USER: "${POSTGRES_USER:?Set POSTGRES_USER in .env.production}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.production}"
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -173,6 +188,8 @@ services:
       retries: 10
     restart: unless-stopped
     networks: [database]
+    secrets:
+      - postgres_password
 
 networks:
   edge: {}
@@ -195,3 +212,15 @@ volumes:
   stirling_tessdata:
   caddy_data:
   caddy_config:
+
+secrets:
+  rails_master_key:
+    file: ./secrets/rails_master_key.txt
+  nas_api_token:
+    file: ./secrets/nas_api_token.txt
+  pdf_worker_api_key:
+    file: ./secrets/pdf_worker_api_key.txt
+  stirling_pdf_password:
+    file: ./secrets/stirling_pdf_password.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt

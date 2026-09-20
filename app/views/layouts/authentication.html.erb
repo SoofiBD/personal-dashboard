@@ -14,9 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous" %>
-    <%= javascript_include_tag "application", defer: true %>
+    <%= stylesheet_link_tag "application", nonce: csp_nonce %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous", nonce: csp_nonce %>
+    <%= javascript_include_tag "application", defer: true, nonce: csp_nonce %>
   </head>
   <body class="auth-body">
     <div class="auth-shell">

@@ -22,9 +22,7 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
   - [Option A: Docker Compose (Recommended)](#option-a-docker-compose-recommended)
   - [Option B: Local Machine Setup](#option-b-local-machine-setup)
 - [Running Tests](#-running-tests)
-- [PDF to Markdown](#-pdf-to-markdown)
 - [Database Design (ChartDB)](#database-design-chartdb)
-- [NAS Files](#nas-files)
 - [Environment Configuration](#-environment-configuration)
 - [Modular Architecture](#-modular-architecture)
 - [Contributing & Development](#-contributing--development)
@@ -34,7 +32,7 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
 
 ## 💡 Overview & Architecture
 
-The application is engineered as a modular dashboard hub. While the initial focus is **Personal Finance Management**, the core host application is designed to easily plug in new domain modules (notes, reminders, developer tools, AI workflows, etc.) with clean domain boundaries.
+The application is engineered as a modular dashboard hub. While the initial focus is **Personal Finance Management**, the core host application is designed to easily plug in new domain modules (notes, developer tools, AI workflows, etc.) with clean domain boundaries.
 
 ```
 personal-dashboard/
@@ -44,8 +42,6 @@ personal-dashboard/
 ├── db/                   # Database schemas and global migrations
 ├── config/               # Rails routing and Caddy gateway configuration
 ├── modules/chartdb/      # Database schema editor source and Docker build
-├── pdf_worker/           # PDF-to-Markdown conversion service
-├── nas_worker/           # NAS file service
 ├── compose.yaml          # Local development stack
 └── compose.production.yaml # Production HTTPS stack
 ```
@@ -67,27 +63,10 @@ personal-dashboard/
 - **Browser storage:** Diagrams are stored in IndexedDB, scoped to the dashboard account, and must be backed up through ChartDB.
 - **Trimmed distribution:** Bundled examples, template galleries, datasets and preview images are removed. Editor icons, database logos and import help images remain.
 
-### PDF Editor (Stirling PDF)
-- **Integrated workspace:** Open PDF Editor from the hub or PDF module navigation.
-- **Local tools:** Edit, merge, split, reorder, convert and compress PDFs using the separate Stirling PDF service.
-- **Shared authentication:** The `/pdf-editor/` gateway route requires a dashboard session.
-
-### 🎨 Interface & Experience
-- **Obsidian Luxe design system:** Shared color, spacing, typography, motion, and status tokens across the dashboard.
-- **Responsive finance views:** Dashboard, transactions, budgets, reports, imports, and settings adapt to compact screens.
-- **Accessible interaction states:** Keyboard-friendly controls, focus treatment, reduced-motion support, and semantic labels.
-- **Localized UI:** Turkish and English copy share the same component and layout system.
-
-### 📄 PDF to Markdown Workspace
-- **Isolated converter:** A dedicated FastAPI worker uses Microsoft MarkItDown and PyMuPDF; it is only reachable from the Rails service network.
-- **Deterministic cleanup:** Repeated header/footer removal, line-wrap and hyphen repair, heading synthesis, image extraction, captions, annotations, and validated GFM table extraction.
-- **Editable output:** Live Markdown preview, line numbers, find/replace, copy, persistent edits, and image insertion from the extracted asset gallery.
-- **Portable export:** The ZIP contains the current Markdown and an `images/` directory with matching relative links; a standalone HTML export embeds extracted images and sanitizes rendered content.
-
 ### 📝 Notes & Knowledge Base
 - **Local Markdown notes:** Write and keep notes in PostgreSQL without a separate editor service or client-side database.
 - **Search and tags:** Search titles, content, and tags; pin important notes and filter by tag.
-- **Note graph:** Use `[[Another note title]]` in a note to create an outgoing link and automatic backlink after saving.
+- **Bi-directional links between notes:** Use `[[Another note title]]` in a note to create an outgoing link and automatic backlink after saving.
 - **Interactive visualization:** Open **Bağlantı grafiği** to inspect note nodes and their relationships without adding a visualization library. Search, tag filters, pinned/linked filters, radial/grid layouts, zoom/pan/reset, degree-aware node sizing, relationship highlighting, and a keyboard-accessible note detail panel are included.
 - **Per-user privacy:** Notes and links are scoped to the signed-in account; viewers may read but cannot change them.
 
@@ -103,27 +82,13 @@ The project is evolving into an all-in-one personal workspace and life operating
 - [x] Role-based access control for multiple users (owner, editor, viewer).
 - [x] User profile customizations and localized preferences.
 
-### 📄 PDF Tools & Document Management
-- [x] In-browser PDF viewer for stored source documents (annotation tools remain planned).
-- [x] PDF editing, splitting, merging, and page re-ordering through Stirling PDF.
-- [x] Receipt and invoice parsing from uploaded PDFs.
-
 ### 📝 Notes & Knowledge Base
 - [x] Markdown note-taking workspace with tag support.
 - [x] Fast title/content/tag search and pinning.
 - [x] Bi-directional links between notes.
-- [ ] Links between notes, budgets, and tasks.
-
-### ⏰ Smart Reminder & Notification System
-- [ ] Scheduled recurring reminders for bill payments, subscriptions, and tasks.
-- [ ] In-app notification center and badge alerts.
-- [ ] Optional email / webhook / push notifications for upcoming deadlines.
 
 ### 🛠️ Developer Tools & Database UI
 - [x] ChartDB schema designer with SQL/DBML import, SQL export and JSON backups.
-- [ ] Embedded Database UI / Query Inspector for managing records directly.
-- [ ] API playground and webhook management console.
-- [ ] System health metrics, log monitoring, and cache inspections.
 
 ### 🤖 Artificial Intelligence Integrations
 - [ ] **AI Financial Advisor:** Automated spending habits analysis, anomaly detection, and savings suggestions.
@@ -215,8 +180,7 @@ Caddy obtains and renews TLS certificates for the configured domain. Do not expo
 
 ### Option B: Local Machine Setup
 
-This starts Rails only. ChartDB, Stirling PDF and document conversion require their
-separate services; use the Compose setup for the complete module system and authenticated gateway routes.
+This starts Rails only. ChartDB requires its separate service; use the Compose setup for the complete module system and authenticated gateway routes.
 
 1. **Clone and enter the directory:**
    ```bash
@@ -272,21 +236,6 @@ docker compose --env-file .env.local exec -T \
 RAILS_ENV=test bin/rails test
 ```
 
-## 📄 PDF to Markdown
-
-Open **PDF Dokümanları** from the Finance navigation to upload a PDF (maximum 25 MB and 250 pages). The source PDF is retained in the owner-scoped conversion record so the same document can be reprocessed with different settings.
-
-The upload and reprocess forms support image extraction (50–500 px threshold), header/footer removal, caption binding, annotation extraction mode, YAML frontmatter, line-wrap repair, and table detection. Conversion runs through Solid Queue so the web request returns immediately and queued work survives web-process restarts. The worker is intentionally not published on a host port.
-
-To review old conversion records without deleting anything, run `docker compose --env-file .env.local run --rm web bin/rails document_conversions:purge[90]`. The task is dry-run by default; add `CONFIRM=yes` only after reviewing the count to permanently remove those records, their source PDFs, and extracted assets.
-
-Run the worker’s deterministic tests with:
-
-```bash
-docker compose --env-file .env.local build pdf-worker
-docker run --rm personal-dashboard-pdf-worker python -m unittest discover -s tests -v
-```
-
 ---
 
 ## ⚙️ Environment Configuration
@@ -317,7 +266,7 @@ Start Jan's Local API Server, then open **Yerel Yapay Zekâ** under shared setti
 This project follows a clean **modular domain architecture**:
 - **Domain Decoupling:** New domain features (e.g., `notes_module/`, `tasks_module/`, `ai_module/`) can be added independently without cluttering core host logic.
 - **Isolated Migrations & Views:** Each module maintains its own controllers, views, data models, and migrations while sharing host layout and styling tokens.
-- **Service modules:** ChartDB and Stirling PDF run as internal services behind the authenticated Caddy gateway; Rails supplies their dashboard landing pages and navigation.
+- **Service modules:** ChartDB runs as an internal service behind the authenticated Caddy gateway; Rails supplies its dashboard landing page and navigation.
 - **Storage boundaries:** Finance and document records use server storage. ChartDB diagrams use browser storage and require separate JSON backups. ChartDB analytics and cloud promotion are disabled.
 - **Knowledge-graph tooling:** Graphify is an optional, local developer tool; it is not bundled in the runtime image. See [Graphify development guide](docs/graphify.md).
 
@@ -337,12 +286,10 @@ Contributions, feature requests, and feedback are welcome!
 ## 📄 License
 
 Third-party components retain their own licenses. The bundled ChartDB source includes
-its [GNU AGPL v3 license](modules/chartdb/LICENSE). No top-level `LICENSE` file is currently included in this repository.
-
-## NAS Files
-
-The NAS module is available only to the account owner. See the [NAS guide](nas_worker/README.md)
-for setup, local configuration and operation limits.
+its [GNU AGPL v3 license](modules/chartdb/LICENSE). The Markdown editor bundle
+(`frontend/md-editor`, served from `vendor/assets/javascripts/md-editor/`) is derived from
+[Paperling](https://github.com/Razee4315/Paperling) (Apache-2.0); see
+[frontend/md-editor/NOTICE.md](frontend/md-editor/NOTICE.md). No top-level `LICENSE` file is currently included in this repository.
 
 ## Database Design (ChartDB)
 

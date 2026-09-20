@@ -1,0 +1,16 @@
+<div class="auth-form">
+  <h1 class="auth-title"><%= t("backend.passwords.check_email_title", default: "E-postanızı Kontrol Edin") %></h1>
+  <p class="auth-subtitle"><%= t("backend.passwords.check_email_subtitle", default: "E-posta adresiniz sistemimizde kayıtlıysa, parolayı sıfırlama bağlantısı gönderilmiştir.") %></p>
+
+  <div class="auth-info">
+    <svg class="auth-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 16v-4M12 8h.01"/>
+    </svg>
+    <p><%= t("backend.passwords.check_email_note", default: "Güvenlik nedeniyle, e-posta adresiniz kayıtlı değilse bile bu mesaj gösterilir.") %></p>
+  </div>
+
+  <div class="auth-footer">
+    <%= link_to t("backend.passwords.back_to_login", default: "Girişe Dön"), new_session_path %>
+  </div>
+</div>

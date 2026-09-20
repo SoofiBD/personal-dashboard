@@ -1,4 +1,5 @@
 import io
+import os
 import re
 import time
 import math
@@ -11,8 +12,9 @@ from datetime import datetime, timezone
 import fitz
 import bleach
 import markdown
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Depends, Header
 from fastapi.responses import Response
+from fastapi.security import APIKeyHeader
 from markitdown import MarkItDown
 from pydantic import BaseModel, Field
 from PIL import Image, UnidentifiedImageError
@@ -27,6 +29,26 @@ IMAGE_RENDER_PROFILES = {
     "high": {"dpi": 240, "format": "png", "content_type": "image/png"},
     "maximum": {"dpi": 300, "format": "png", "content_type": "image/png"},
 }
+
+PDF_WORKER_API_KEY = os.environ.get("PDF_WORKER_API_KEY", "")
+if not PDF_WORKER_API_KEY or len(PDF_WORKER_API_KEY) < 32:
+    raise RuntimeError("PDF_WORKER_API_KEY must be set and at least 32 characters")
+
+api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
+
+
+async def verify_api_key(authorization: str = Depends(api_key_header)):
+    if authorization is None:
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid Authorization header format")
+    token = authorization[7:]
+    if not token or len(token) < 32:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    import hmac
+    if not hmac.compare_digest(token, PDF_WORKER_API_KEY):
+        raise HTTPException(status_code=401, detail="Invalid API key")
+
 
 app = FastAPI(title="Personal Dashboard PDF Worker", docs_url=None, redoc_url=None)
 
@@ -52,7 +74,7 @@ def health():
 
 
 @app.post("/crop-image")
-async def crop_image(file: UploadFile = File(...), left: int = Form(...), top: int = Form(...), width: int = Form(...), height: int = Form(...)):
+async def crop_image(file: UploadFile = File(...), left: int = Form(...), top: int = Form(...), width: int = Form(...), height: int = Form(...), _: None = Depends(verify_api_key)):
     payload = await file.read(MAX_EXTRACTED_IMAGE_BYTES + 1)
     if len(payload) > MAX_EXTRACTED_IMAGE_BYTES:
         raise HTTPException(413, "Image is too large")
@@ -76,6 +98,7 @@ async def convert(
     strip_headers_footers: bool = Form(default=True), bind_captions_enabled: bool = Form(default=True),
     extract_annotations_enabled: bool = Form(default=True), include_yaml_frontmatter: bool = Form(default=True),
     fix_hyphenation_enabled: bool = Form(default=True), detect_tables: bool = Form(default=True),
+    _: None = Depends(verify_api_key),
 ):
     contents = await file.read(MAX_FILE_SIZE + 1)
     if len(contents) > MAX_FILE_SIZE:
@@ -138,7 +161,7 @@ async def convert(
 
 
 @app.post("/export-zip")
-def export_zip(payload: ZipExport):
+def export_zip(payload: ZipExport, _: None = Depends(verify_api_key)):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(f"{safe_stem(payload.source_filename)}.md", payload.markdown_content)
@@ -152,7 +175,7 @@ def export_zip(payload: ZipExport):
 
 
 @app.post("/export-html")
-def export_html(payload: HtmlExport):
+def export_html(payload: HtmlExport, _: None = Depends(verify_api_key)):
     image_data = {}
     for image in payload.images:
         try:

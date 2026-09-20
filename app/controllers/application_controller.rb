@@ -2,7 +2,8 @@ class ApplicationController < ActionController::Base
   include Pagy::Method
 
   before_action :set_locale
-  helper_method :current_user, :current_panel_user, :authenticated?
+  before_action :ensure_csp_nonce
+  helper_method :current_user, :current_panel_user, :authenticated?, :csp_nonce
 
   def current_user
     return @current_user if defined?(@current_user)
@@ -27,7 +28,15 @@ class ApplicationController < ActionController::Base
     current_user.present?
   end
 
+  def csp_nonce
+    session[:csp_nonce]
+  end
+
   private
+
+  def ensure_csp_nonce
+    session[:csp_nonce] ||= SecureRandom.base64(32)
+  end
 
   def require_authentication
     return if authenticated?

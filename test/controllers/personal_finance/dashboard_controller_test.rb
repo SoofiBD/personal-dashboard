@@ -17,9 +17,10 @@ class PersonalFinance::DashboardControllerTest < PersonalFinance::IntegrationTes
     get root_path
 
     assert_response :success
-    assert_select ".module-launcher-card", count: 7
+    assert_select ".module-launcher-card", count: 8
     assert_select ".module-launcher-card", text: /(Notlar|Notes)/i
     assert_select ".module-launcher-card", text: /Finance/i
+    assert_select ".module-launcher-card", text: /(Spor Salonu|Gym)/i
     assert_select ".module-launcher-card", text: /MarkItDown/i
     assert_select ".module-launcher-card", text: /PDF (Düzenleme|Editor)/i
     assert_select ".module-launcher-card", text: /(Veritabanı|Database)/i

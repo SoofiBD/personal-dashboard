@@ -14,12 +14,13 @@
     <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-    <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous" %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true, integrity: "sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF", crossorigin: "anonymous" %>
-    <%= javascript_include_tag "application", defer: true %>
+    <%= stylesheet_link_tag "application", nonce: csp_nonce %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous", nonce: csp_nonce %>
+    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true, integrity: "sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF", crossorigin: "anonymous", nonce: csp_nonce %>
+    <%= javascript_include_tag "application", defer: true, nonce: csp_nonce %>
+    <%= yield :module_js %>
   </head>
 
   <body>
@@ -34,13 +35,13 @@
           <div class="brand-wrapper">
             <div class="sidebar-module-selector" data-module-switcher>
               <div class="active-module-header">
-                <%= link_to (current_mod == :notes ? notes_root_path : current_mod == :database_tools ? database_tools_path : current_mod == :nas ? nas_path : current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
+                <%= link_to (current_mod == :gym ? gym_root_path : current_mod == :notes ? notes_root_path : current_mod == :database_tools ? database_tools_path : current_mod == :nas ? nas_path : current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
                   <div class="brand-icon brand-icon--<%= current_mod %>">
-                    <%= finance_svg_icon(current_mod == :notes ? "notes" : (current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault")), class: "icon-brand") %>
+                    <%= finance_svg_icon(current_mod == :gym ? "gym" : current_mod == :notes ? "notes" : (current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault")), class: "icon-brand") %>
                   </div>
                   <div class="brand-text">
                     <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-                    <span class="brand-subtitle"><%= current_mod == :notes ? t("notes.module", default: "NOTLAR") : current_mod == :database_tools ? t("database_tools.title") : current_mod == :nas ? t("nas.title") : current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
+                    <span class="brand-subtitle"><%= current_mod == :gym ? "SPOR SALONU" : current_mod == :notes ? t("notes.module", default: "NOTLAR") : current_mod == :database_tools ? t("database_tools.title") : current_mod == :nas ? t("nas.title") : current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
                   </div>
                 <% end %>
                 <button type="button" class="module-switch-trigger" data-module-switch-toggle aria-expanded="false" aria-label="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>" title="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>">
@@ -65,6 +66,15 @@
                   <div class="module-dropdown-icon icon-notes"><%= finance_svg_icon("notes") %></div>
                   <div class="module-dropdown-info"><strong><%= t("notes.module", default: "Notlar") %></strong><span><%= t("notes.module_description", default: "Markdown, etiketler ve bağlantılar") %></span></div>
                   <% if current_mod == :notes %><span class="module-active-dot" aria-hidden="true"></span><% end %>
+                <% end %>
+
+                <%= link_to gym_root_path, class: "module-dropdown-item #{'is-active' if current_mod == :gym}" do %>
+                  <div class="module-dropdown-icon icon-gym"><%= finance_svg_icon("gym") %></div>
+                  <div class="module-dropdown-info">
+                    <strong><%= t("gym.module", default: "Spor Salonu") %></strong>
+                    <span><%= t("gym.module_description", default: "Antrenman planları ve ilerleme") %></span>
+                  </div>
+                  <% if current_mod == :gym %><span class="module-active-dot" aria-hidden="true"></span><% end %>
                 <% end %>
 
                 <%= link_to finance_pdf_tools_path, class: "module-dropdown-item #{'is-active' if current_mod == :pdf_tools}" do %>
@@ -112,6 +122,18 @@
                     <%= finance_navigation_item t("notes.new", default: "Yeni not"), new_notes_note_path, "plus" %>
                   <% end %>
                   <%= finance_navigation_item t("app.sidebar.module_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
+                </nav>
+              </div>
+            <% elsif current_mod == :gym %>
+              <!-- Spor Salonu Modülü -->
+              <div class="sidebar-section">
+                <p class="sidebar-label"><%= t("gym.sidebar.section_workspace", default: "ANTRENMAN") %></p>
+                <nav class="sidebar-nav">
+                  <%= finance_navigation_item t("gym.sidebar.dashboard", default: "Genel Bakış"), gym_root_path, "dashboard" %>
+                  <%= finance_navigation_item t("gym.sidebar.exercises", default: "Egzersizler"), gym_exercises_path, "gym" %>
+                  <%= finance_navigation_item t("gym.sidebar.routines", default: "Planlar"), gym_routines_path, "recurring" %>
+                  <%= finance_navigation_item t("gym.sidebar.workouts", default: "Geçmiş"), gym_workouts_path, "chart" %>
+                  <%= finance_navigation_item t("gym.sidebar.stats", default: "İstatistikler"), gym_stats_path, "chart" %>
                 </nav>
               </div>
             <% elsif current_mod == :nas %>

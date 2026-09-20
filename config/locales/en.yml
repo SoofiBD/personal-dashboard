@@ -1053,3 +1053,166 @@ en:
     mfa_code_help: Codes refresh every 30 seconds.
     mfa_enable_btn: Enable 2FA
     mfa_complete_btn: Complete Sign In
+    signup_title: Create Account
+    signup_subtitle: Enter details for the first administrator account. This account will manage all settings.
+    name_label: Name
+    name_placeholder: Your name
+    email_label: Email (Optional)
+    email_placeholder: example@domain.com
+    password_label: Password
+    password_placeholder: "••••••••••••••••"
+    password_confirmation_label: Confirm Password
+    password_hint: Minimum 16 characters
+    currency_label: Currency
+    locale_label: Language
+    signup_submit: Create Account
+    signin_link: Already have an account? Sign in
+    no_account_link: No account yet? Create the first one
+  signups:
+    created: Account created successfully. Please sign in.
+    not_allowed: An account already exists. Please sign in.
+  gym:
+    active_session: Active Workout
+    add: Add
+    add_day: Add Day
+    add_set: Add Set
+    all: All
+    back: Back
+    best_reps: Reps
+    best_set: Best Set
+    best_set_desc: Estimated 1RM from completed sets (Epley).
+    best_weight: Weight
+    catalog_empty: Exercise catalog is empty
+    catalog_empty_hint: Load the base exercises with one click.
+    catalog_seeded: "%{count} exercises added to the catalog."
+    confirm_delete: Delete it?
+    confirm_discard: Discard the workout?
+    continue: Continue
+    dashboard:
+      eyebrow: Workout Log
+      subtitle: Training plans, live sessions and progress tracking.
+      title: Gym
+    day_empty: Empty day
+    day_name: "Day name (e.g. Push)"
+    delete: Delete
+    delete_day: Delete Day
+    deleted: Deleted.
+    discard: Discard
+    discarded: Workout discarded.
+    edit: Edit
+    est_1rm: Est. 1RM
+    exercise_history: History
+    exercise_saved: Exercise added.
+    fields:
+      bodyweight: Bodyweight
+      category: Category
+      description: Description
+      distance: Distance
+      duration: Duration (s)
+      equipment: Equipment
+      exercise: Exercise
+      mode: Logging
+      name: Exercise Name
+      policy: Progression
+      reps: Reps
+      routine_name: Plan Name
+      sets: Sets
+      unilateral: Unilateral
+      warmup: Warm-up %
+      weight: Weight
+    filter: Filter
+    finished: Workout finished.
+    free_session: Free workout
+    free_session_short: Free
+    history:
+      eyebrow: Workout History
+      subtitle: Completed sessions and tonnage.
+      title: History
+    library:
+      eyebrow: Exercise Catalog
+      subtitle: Filter by muscle group, see details and history.
+      title: Exercises
+    load_catalog: Load Catalog
+    load_templates: Load Starter Plans
+    manage: Manage
+    manage_exercises: Manage Exercises
+    modes:
+      cardio: Cardio
+      reps: Reps
+      time: Timed
+    month_sessions: Sessions This Month
+    muscle_group: Muscle group
+    name_placeholder: "E.g. Full Body 3-Day"
+    new_exercise: New Exercise
+    new_exercise_hint: A name + muscle group is enough. Behaves like any built-in move.
+    new_routine: New Plan
+    no_data: No data yet.
+    no_exercises: No results found.
+    no_history: No history for this exercise.
+    no_routines: No plans yet. Create your first training plan.
+    no_workouts: No completed workouts.
+    policies:
+      double: Double progression
+      greyskull: Greyskull
+      linear: Linear
+      "off": "Off"
+      time: Timed
+    progression:
+      reasons:
+        deload: Two under-target sets, 10% deload
+        double_up: "Top of range reached +%{step}kg"
+        greyskull_deload: Failed set, 10% deload
+        greyskull_double: "Final set doubled the target +%{step}kg"
+        greyskull_up: "Final set beat the target +%{step}kg"
+        linear_up: "All sets hit %{reps} reps +%{step}kg"
+        time_up: "All sets held full time +%{step}s"
+    recent_workouts: Recent Workouts
+    routines: Training Plans
+    routines_desc: Start a day to build the session from the plan.
+    routines:
+      eyebrow: Training Plans
+      form_hint: Plan name and description.
+      subtitle: Manage days and exercises.
+      title: Plans
+    save: Save
+    saved: Saved.
+    search: Search
+    see_all: See All
+    session:
+      best_sets: Best Sets
+      completion: Completion
+      done: Done
+      duration: Duration
+      finish: Finish Workout
+      notes: Notes
+      sets_done: sets done
+      subtitle: Check off sets, update weights, finish.
+      summary_title: Session Summary
+      title: Active Session
+      tonnage: Tonnage
+      undo: Undo
+      warmup: Warm-up
+    sidebar:
+      section_workspace: TRAINING
+    start: Start
+    start_day: Start
+    start_free: Start a free session
+    start_free_hint: Start a free session with this exercise.
+    start_day_title: Start the day
+    start_requires_plan: Pick a day or an exercise.
+    started: Workout started.
+    stats:
+      eyebrow: Training Statistics
+      sessions: Total Sessions
+      sets_done: Sets Completed
+      subtitle: Weekly volume, tonnage and most-trained exercises.
+      title: Statistics
+      tonnage: Total Tonnage
+      top_exercises: Most Trained
+      top_exercises_desc: By tonnage of the last 30 days.
+      weekly_volume: Weekly Volume
+      weekly_volume_desc: Tonnage of the last 8 weeks (weight × reps).
+    streak: Week Streak
+    templates_seeded: "%{count} starter plans added."
+    trend: Estimated 1RM Trend
+    week_volume: Weekly Volume

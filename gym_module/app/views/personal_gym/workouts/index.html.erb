@@ -1,0 +1,28 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("gym.history.eyebrow", default: "Antrenman Geçmişi") %></p>
+    <h1><%= t("gym.history.title", default: "Geçmiş") %></h1>
+    <p class="page-subtitle"><%= t("gym.history.subtitle", default: "Tamamlanmış seanslar ve tonaj.") %></p>
+  </div>
+  <%= link_to gym_root_path, class: "button button-secondary" do %>
+    <span><%= t("gym.back", default: "Geri") %></span>
+  <% end %>
+</header>
+
+<% if @workouts.any? %>
+  <div class="finance-list">
+    <% @workouts.each do |workout| %>
+      <article class="finance-item-row">
+        <div>
+          <strong><%= link_to l(workout.started_at, format: :long), gym_workout_path(workout) %></strong>
+          <span class="transaction-category"><%= workout.routine&.name || t("gym.free_session_short", default: "Serbest") %> · <%= workout.sets.count { |s| s.done? } %>/<%= workout.sets.count %> set · <%= workout.sets.map(&:exercise).uniq.map(&:name).join(", ") %></span>
+        </div>
+        <span class="badge-pill badge-pill-subtle"><%= Gym::Effort.tonnage(workout.sets).to_i %> kg</span>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <p><%= t("gym.no_workouts", default: "Tamamlanmış antrenman yok.") %></p>
+  </div>
+<% end %>

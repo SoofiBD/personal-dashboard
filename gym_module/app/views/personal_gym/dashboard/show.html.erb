@@ -1,0 +1,113 @@
+<% content_for :module_js do %>
+  <%= javascript_include_tag "gym", defer: true %>
+<% end %>
+<header class="page-header">
+  <div>
+    <p class="eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+      <%= t("gym.dashboard.eyebrow", default: "Antrenman Günlüğü") %>
+    </p>
+    <h1><%= t("gym.dashboard.title", default: "Spor Salonu") %></h1>
+    <p class="page-subtitle"><%= t("gym.dashboard.subtitle", default: "Antrenman planları, canlı seans ve ilerleme takibi.") %></p>
+  </div>
+  <%= link_to new_gym_routine_path, class: "button button-primary" do %>
+    <%= finance_svg_icon("plus", class: "icon-sm") %>
+    <span><%= t("gym.new_routine", default: "Yeni Plan") %></span>
+  <% end %>
+</header>
+
+<% if @active_workout %>
+  <section class="panel gym-active-panel" aria-label="<%= t('gym.active_session', default: 'Aktif antrenman') %>">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("gym.active_session", default: "Aktif Antrenman") %></h2>
+        <p><%= @active_workout.routine&.name || t("gym.free_session", default: "Serbest antrenman") %> · <%= @active_workout.sets.count %> set</p>
+      </div>
+      <span class="gym-timer" data-gym-timer data-started-at="<%= @active_workout.started_at.iso8601 %>">00:00</span>
+    </div>
+    <div class="form-actions">
+      <%= link_to t("gym.continue", default: "Devam Et"), gym_workout_path(@active_workout), class: "button button-primary" %>
+      <%= button_to t("gym.discard", default: "İptal Et"), gym_workout_path(@active_workout), method: :delete, class: "button button-secondary", form_class: "gym-inline-form" %>
+    </div>
+  </section>
+<% end %>
+
+<section class="gym-stats" aria-label="<%= t('gym.stats.title', default: 'İstatistikler') %>">
+  <article class="panel gym-stat"><span><%= t("gym.week_volume", default: "Haftalık Hacim") %></span><strong><%= number_with_delimiter(@week_volume.to_i) %> kg</strong></article>
+  <article class="panel gym-stat"><span><%= t("gym.streak", default: "Hafta Serisi") %></span><strong><%= @weekly_streak %></strong></article>
+  <article class="panel gym-stat"><span><%= t("gym.month_sessions", default: "Bu Ay Seans") %></span><strong><%= @month_sessions %></strong></article>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.routines", default: "Antrenman Planları") %></h2>
+      <p><%= t("gym.routines_desc", default: "Bir günü başlatarak seansı plana göre oluştur.") %></p>
+    </div>
+    <%= link_to t("gym.manage", default: "Düzenle"), gym_routines_path, class: "text-link" %>
+  </div>
+  <% if @routines.any? %>
+    <div class="finance-list">
+      <% @routines.each do |routine| %>
+        <article class="finance-item-row">
+          <div>
+            <strong><%= routine.name %></strong>
+            <div class="gym-day-chips">
+              <% routine.days.ordered.each do |day| %>
+                <% if PersonalGym::Workout.active_for(current_user).nil? %>
+                  <%= button_to day.name, gym_workouts_path, params: {routine_day_id: day.id}, class: "badge-pill gym-day-start", form_class: "gym-inline-form", title: t("gym.start_day_title", default: "Günü başlat") %>
+                <% else %>
+                  <span class="badge-pill badge-pill-subtle"><%= day.name %></span>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+          <%= link_to t("gym.edit", default: "Düzenle"), edit_gym_routine_path(routine), class: "text-link" %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p><%= t("gym.no_routines", default: "Henüz plan yok. İlk antrenman planını oluştur.") %></p>
+      <div class="form-actions">
+        <%= button_to t("gym.load_templates", default: "Hazır Planları Yükle"), seed_templates_gym_routines_path, class: "button button-primary", form_class: "gym-inline-form" %>
+      </div>
+    </div>
+  <% end %>
+</section>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.recent_workouts", default: "Son Antrenmanlar") %></h2>
+    </div>
+    <%= link_to t("gym.see_all", default: "Tümünü Gör"), gym_workouts_path, class: "text-link" %>
+  </div>
+  <% if @recent_workouts.any? %>
+    <div class="finance-list">
+      <% @recent_workouts.each do |workout| %>
+        <article class="finance-item-row">
+          <div>
+            <strong><%= link_to l(workout.started_at, format: :long), gym_workout_path(workout) %></strong>
+            <span class="transaction-category"><%= workout.routine&.name || t("gym.free_session_short", default: "Serbest") %> · <%= workout.sets.count { |s| s.done? } %>/<%= workout.sets.count %> set</span>
+          </div>
+          <span class="badge-pill badge-pill-subtle"><%= Gym::Effort.tonnage(workout.sets).to_i %> kg</span>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <p><%= t("gym.no_workouts", default: "Tamamlanmış antrenman yok.") %></p>
+    </div>
+  <% end %>
+</section>
+
+<% if PersonalGym::Exercise.none? %>
+  <section class="panel">
+    <div class="empty-state">
+      <h2><%= t("gym.catalog_empty", default: "Egzersiz kataloğu boş") %></h2>
+      <p><%= t("gym.catalog_empty_hint", default: "Temel egzersizleri tek tıkla yükle.") %></p>
+      <%= button_to t("gym.load_catalog", default: "Kataloğu Yükle"), gym_seed_catalog_path, class: "button button-primary", form_class: "gym-inline-form" %>
+    </div>
+  </section>
+<% end %>

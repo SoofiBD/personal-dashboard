@@ -5,6 +5,7 @@ class Totp
   STEP = 30
   DIGITS = 6
   CODE_PATTERN = /\A\d{6}\z/
+  ALGORITHM = "SHA256".freeze
 
   def self.generate_secret(length: 32)
     Array.new(length) { ALPHABET[SecureRandom.random_number(ALPHABET.length)] }.join
@@ -18,7 +19,7 @@ class Totp
 
   def self.code_for(secret, at: Time.current)
     counter = (at.to_i / STEP)
-    digest = OpenSSL::HMAC.digest("SHA1", decode(secret), [counter].pack("Q>"))
+    digest = OpenSSL::HMAC.digest(ALGORITHM, decode(secret), [counter].pack("Q>"))
     offset = digest.getbyte(-1) & 0x0f
     binary = digest.byteslice(offset, 4).unpack1("N") & 0x7fff_ffff
     format("%0#{DIGITS}d", binary % (10**DIGITS))
@@ -26,7 +27,7 @@ class Totp
 
   def self.provisioning_uri(account_name:, issuer:, secret:)
     label = ERB::Util.url_encode("#{issuer}:#{account_name}")
-    "otpauth://totp/#{label}?secret=#{secret}&issuer=#{ERB::Util.url_encode(issuer)}&algorithm=SHA1&digits=#{DIGITS}&period=#{STEP}"
+    "otpauth://totp/#{label}?secret=#{secret}&issuer=#{ERB::Util.url_encode(issuer)}&algorithm=#{ALGORITHM}&digits=#{DIGITS}&period=#{STEP}"
   end
 
   def self.decode(secret)

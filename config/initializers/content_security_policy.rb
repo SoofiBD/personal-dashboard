@@ -11,7 +11,7 @@ Rails.application.configure do
     policy.img_src :self, :data
     policy.object_src :none
     policy.script_src :self, "https://cdn.jsdelivr.net"
-    policy.style_src :self, :unsafe_inline, "https://fonts.googleapis.com"
+    policy.style_src :self, "https://fonts.googleapis.com"
     policy.connect_src :self
     policy.base_uri :none
     policy.frame_ancestors :none
@@ -20,4 +20,7 @@ Rails.application.configure do
     policy.manifest_src :self
     policy.upgrade_insecure_requests true
   end
+
+  config.content_security_policy_nonce_generator = ->(request) { request.session[:csp_nonce] ||= SecureRandom.base64(32) }
+  config.content_security_policy_nonce_directives = %w[script-src style-src]
 end

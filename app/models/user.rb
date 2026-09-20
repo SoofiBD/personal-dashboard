@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   has_secure_password validations: false
   encrypts :mfa_secret
@@ -5,32 +7,36 @@ class User < ApplicationRecord
   ROLES = %w[owner editor viewer].freeze
   LOCALES = %w[tr en].freeze
 
-  validates :name, presence: true, length: {maximum: 80}
-  validates :currency, presence: true, length: {is: 3}
+  validates :name, presence: true, length: { maximum: 80 }
+  validates :currency, presence: true, length: { is: 3 }
   validates :time_zone, presence: true
-  validates :role, inclusion: {in: ROLES}
-  validates :locale, inclusion: {in: LOCALES}
-  validates :ai_provider, inclusion: {in: %w[jan_local]}
-  validates :ai_model, length: {maximum: 200}, allow_blank: true
-  validates :email, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}, unless: :owner?
-  validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
+  validates :role, inclusion: { in: ROLES }
+  validates :locale, inclusion: { in: LOCALES }
+  validates :ai_provider, inclusion: { in: %w[jan_local gemini] }
+  validates :ai_model, length: { maximum: 200 }, allow_blank: true
+  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, unless: :owner?
+  validates :email, uniqueness: { case_sensitive: false }, allow_blank: true
   validate :password_security_requirements
 
-  has_many :financial_accounts, class_name: "PersonalFinance::Account", dependent: :destroy
-  has_many :finance_categories, class_name: "PersonalFinance::Category", dependent: :destroy
-  has_many :finance_transactions, class_name: "PersonalFinance::Transaction", dependent: :destroy
-  has_many :finance_budget_periods, class_name: "PersonalFinance::BudgetPeriod", dependent: :destroy
-  has_many :finance_budget_templates, class_name: "PersonalFinance::BudgetTemplate", dependent: :destroy
-  has_many :finance_notifications, class_name: "PersonalFinance::Notification", dependent: :destroy
-  has_many :finance_subscriptions, class_name: "PersonalFinance::Subscription", dependent: :destroy
-  has_many :finance_debts, class_name: "PersonalFinance::Debt", dependent: :destroy
-  has_many :finance_savings_goals, class_name: "PersonalFinance::SavingsGoal", dependent: :destroy
-  has_many :finance_purchase_plans, class_name: "PersonalFinance::PurchasePlan", dependent: :destroy
-  has_many :document_conversions, class_name: "PersonalFinance::DocumentConversion", dependent: :destroy
-  has_many :notes, class_name: "Notes::Note", dependent: :destroy
-  has_many :note_links, class_name: "Notes::NoteLink", dependent: :destroy
-  has_many :learning_items, class_name: "Learning::Item", dependent: :destroy
-  has_many :learning_attempts, class_name: "Learning::Attempt", dependent: :destroy
+  has_many :financial_accounts, class_name: 'PersonalFinance::Account', dependent: :destroy
+  has_many :finance_categories, class_name: 'PersonalFinance::Category', dependent: :destroy
+  has_many :finance_transactions, class_name: 'PersonalFinance::Transaction', dependent: :destroy
+  has_many :finance_budget_periods, class_name: 'PersonalFinance::BudgetPeriod', dependent: :destroy
+  has_many :finance_budget_templates, class_name: 'PersonalFinance::BudgetTemplate', dependent: :destroy
+  has_many :finance_notifications, class_name: 'PersonalFinance::Notification', dependent: :destroy
+  has_many :finance_subscriptions, class_name: 'PersonalFinance::Subscription', dependent: :destroy
+  has_many :finance_debts, class_name: 'PersonalFinance::Debt', dependent: :destroy
+  has_many :finance_savings_goals, class_name: 'PersonalFinance::SavingsGoal', dependent: :destroy
+  has_many :finance_purchase_plans, class_name: 'PersonalFinance::PurchasePlan', dependent: :destroy
+  has_many :document_conversions, class_name: 'PersonalFinance::DocumentConversion', dependent: :destroy
+  has_many :notes, class_name: 'Notes::Note', dependent: :destroy
+  has_many :note_links, class_name: 'Notes::NoteLink', dependent: :destroy
+  has_many :learning_items, class_name: 'Learning::Item', dependent: :destroy
+  has_many :learning_attempts, class_name: 'Learning::Attempt', dependent: :destroy
+  has_many :gym_routines, class_name: 'PersonalGym::Routine', dependent: :destroy
+  has_many :gym_workouts, class_name: 'PersonalGym::Workout', dependent: :destroy
+  has_many :ai_memories, dependent: :destroy
+  has_many :ai_conversations, dependent: :destroy
 
   def onboarded?
     onboarded_at.present? || financial_accounts.exists? || finance_categories.exists? || finance_transactions.exists?
@@ -38,10 +44,10 @@ class User < ApplicationRecord
 
   def self.dashboard_owner
     order(:id).first_or_create! do |user|
-      user.name = ENV.fetch("DASHBOARD_OWNER_NAME", "Personal Dashboard")
-      user.currency = ENV.fetch("DASHBOARD_CURRENCY", "TRY")
-      user.time_zone = ENV.fetch("DASHBOARD_TIME_ZONE", "Europe/Istanbul")
-      user.email = ENV["DASHBOARD_OWNER_EMAIL"]
+      user.name = ENV.fetch('DASHBOARD_OWNER_NAME', 'Personal Dashboard')
+      user.currency = ENV.fetch('DASHBOARD_CURRENCY', 'TRY')
+      user.time_zone = ENV.fetch('DASHBOARD_TIME_ZONE', 'Europe/Istanbul')
+      user.email = ENV['DASHBOARD_OWNER_EMAIL']
     end
   end
 
@@ -57,11 +63,11 @@ class User < ApplicationRecord
   end
 
   def owner?
-    role == "owner"
+    role == 'owner'
   end
 
   def editor?
-    role == "editor"
+    role == 'editor'
   end
 
   def can_manage_finances?
@@ -94,13 +100,27 @@ class User < ApplicationRecord
     update!(mfa_secret: nil, mfa_enabled: false, mfa_confirmed_at: nil)
   end
 
+  def generate_password_reset_token!
+    self.password_reset_token = SecureRandom.urlsafe_base64(32)
+    self.password_reset_sent_at = Time.current
+    save!
+  end
+
+  def clear_password_reset_token!
+    update!(password_reset_token: nil, password_reset_sent_at: nil)
+  end
+
+  def password_reset_token_expired?
+    password_reset_sent_at.nil? || password_reset_sent_at < 2.hours.ago
+  end
+
   private
 
   def password_security_requirements
     return if password.nil?
 
-    errors.add(:password, "must be at least 16 characters") if password.length < 16
-    errors.add(:password, "must not exceed 72 bytes") if password.bytesize > 72
-    errors.add(:password_confirmation, "does not match password") unless password == password_confirmation
+    errors.add(:password, 'must be at least 16 characters') if password.length < 16
+    errors.add(:password, 'must not exceed 72 bytes') if password.bytesize > 72
+    errors.add(:password_confirmation, 'does not match password') unless password == password_confirmation
   end
 end

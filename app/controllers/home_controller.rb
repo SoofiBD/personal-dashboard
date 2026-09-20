@@ -38,6 +38,17 @@ class HomeController < ApplicationController
         icon: "dashboard"
       },
       {
+        key: "gym",
+        title_key: "gym.module",
+        default_title: "Spor Salonu",
+        description_key: "gym.module_description",
+        default_description: "Antrenman planları, canlı seanslar ve ilerleme takibi.",
+        path: gym_root_path,
+        badge_key: "gym.module_badge",
+        default_badge: "Fitness",
+        icon: "gym"
+      },
+      {
         key: "markitdown",
         title_key: "home.modules.markitdown.title",
         default_title: "MarkItDown",

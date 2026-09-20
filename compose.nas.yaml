@@ -24,8 +24,17 @@ services:
       timeout: 3s
       retries: 3
     networks: [nas, nas-egress]
+    secrets:
+      - nas_api_token
+      - nas_password
 
 networks:
   nas:
     internal: true
   nas-egress: {}
+
+secrets:
+  nas_api_token:
+    file: ./secrets/nas_api_token.txt
+  nas_password:
+    file: ./secrets/nas_password.txt

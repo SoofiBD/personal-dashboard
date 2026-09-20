@@ -1,0 +1,22 @@
+<div class="auth-form">
+  <h1 class="auth-title"><%= t("backend.passwords.reset_title", default: "Yeni Parola Belirleyin") %></h1>
+  <p class="auth-subtitle"><%= t("backend.passwords.reset_subtitle", default: "Yeni parolanız en az 16 karakter olmalıdır.") %></p>
+
+  <%= form_with url: password_path(token: params[:token]), method: :patch, class: "auth-form-inner" do |form| %>
+    <div class="form-field">
+      <%= form.label :password, t("backend.passwords.new_password", default: "Yeni Parola") %>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", class: "form-input", minlength: 16, maxlength: 72 %>
+    </div>
+
+    <div class="form-field">
+      <%= form.label :password_confirmation, t("backend.passwords.confirm_password", default: "Parola Tekrar") %>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", class: "form-input", minlength: 16, maxlength: 72 %>
+    </div>
+
+    <%= form.submit t("backend.passwords.update_password", default: "Parolayı Güncelle"), class: "btn btn-primary btn-block" %>
+  <% end %>
+
+  <div class="auth-footer">
+    <%= link_to t("backend.passwords.back_to_login", default: "Girişe Dön"), new_session_path %>
+  </div>
+</div>

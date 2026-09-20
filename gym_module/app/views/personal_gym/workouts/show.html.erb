@@ -1,0 +1,116 @@
+<% content_for :module_js do %>
+  <%= javascript_include_tag "gym", defer: true %>
+<% end %>
+<% if @workout.active? %>
+  <header class="page-header">
+    <div>
+      <p class="eyebrow"><%= @workout.routine&.name || t("gym.free_session", default: "Serbest antrenman") %></p>
+      <h1><%= t("gym.session.title", default: "Aktif Seans") %></h1>
+      <p class="page-subtitle"><%= t("gym.session.subtitle", default: "Setleri işaretle, ağırlıkları güncelle, bitir.") %></p>
+    </div>
+    <span class="gym-timer gym-timer-lg" data-gym-timer data-started-at="<%= @workout.started_at.iso8601 %>">00:00</span>
+  </header>
+
+  <% @workout.sets.group_by(&:exercise).each do |exercise, sets| %>
+    <section class="panel gym-exercise-panel" data-gym-exercise="<%= exercise.id %>">
+      <div class="panel-header">
+        <div>
+          <h2><%= link_to exercise.name, gym_exercise_path(exercise) %></h2>
+          <p><%= sets.count { |s| s.done? } %>/<%= sets.size %> <%= t("gym.session.sets_done", default: "set tamamlandı") %></p>
+        </div>
+        <span class="badge-pill badge-pill-subtle"><%= Gym::Effort.tonnage(sets).to_i %> kg</span>
+      </div>
+
+      <div class="gym-set-list">
+        <% sets.each_with_index do |set, index| %>
+          <article class="gym-set-row <%= "is-done" if set.done? %>">
+            <span class="gym-set-kind"><%= set.kind == "warmup" ? t("gym.session.warmup", default: "Isınma") : "#{index + 1}" %></span>
+
+            <%= form_with model: set, scope: :gym_workout_set, url: gym_workout_set_path(@workout, set), method: :patch, class: "gym-set-form" do |form| %>
+              <% if exercise.mode_reps? %>
+                <label><%= form.number_field :weight, step: 0.5, min: 0, value: set.weight, "aria-label": t("gym.fields.weight", default: "Ağırlık") %> kg</label>
+                <label><%= form.number_field :reps, min: 0, value: set.reps, "aria-label": t("gym.fields.reps", default: "Tekrar") %></label>
+              <% elsif exercise.mode_time? %>
+                <label><%= form.number_field :duration_seconds, min: 0, value: set.duration_seconds, "aria-label": t("gym.fields.duration", default: "Süre") %> sn</label>
+              <% else %>
+                <label><%= form.number_field :distance_km, step: 0.1, min: 0, value: set.distance_km, "aria-label": t("gym.fields.distance", default: "Mesafe") %> km</label>
+                <label><%= form.number_field :duration_seconds, min: 0, value: set.duration_seconds, "aria-label": t("gym.fields.duration", default: "Süre") %> sn</label>
+              <% end %>
+              <%= form.submit t("gym.save", default: "Kaydet"), class: "button button-secondary" %>
+            <% end %>
+
+            <div class="gym-row-actions">
+              <%= button_to set.done? ? t("gym.session.undo", default: "Geri Al") : t("gym.session.done", default: "Tamam"), gym_workout_set_path(@workout, set), method: :patch, params: {gym_workout_set: {done: set.done? ? "0" : "1"}}, class: "button #{set.done? ? "button-secondary" : "button-primary"}", form_class: "gym-inline-form" %>
+              <%= button_to finance_svg_icon("trash", class: "icon-sm"), gym_workout_set_path(@workout, set), method: :delete, class: "button button-secondary gym-icon-btn", form_class: "gym-inline-form", "aria-label": t("gym.delete", default: "Sil") %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+
+      <div class="gym-add-plan">
+        <%= form_with model: @workout.sets.new, scope: :gym_workout_set, url: gym_workout_sets_path(@workout), method: :post, class: "gym-plan-form" do |form| %>
+          <%= form.hidden_field :exercise_id, value: exercise.id %>
+          <% if exercise.mode_reps? %>
+            <label><%= form.number_field :weight, step: 0.5, min: 0, placeholder: "kg" %></label>
+            <label><%= form.number_field :reps, min: 0, placeholder: t("gym.fields.reps", default: "Tekrar") %></label>
+          <% else %>
+            <label><%= form.number_field :duration_seconds, min: 0, placeholder: "sn" %></label>
+          <% end %>
+          <%= form.submit t("gym.add_set", default: "Set Ekle"), class: "button button-primary" %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="panel gym-finish-panel">
+    <div class="form-actions">
+      <%= button_to t("gym.session.finish", default: "Antrenmanı Bitir"), finish_gym_workout_path(@workout), method: :patch, class: "button button-primary", form_class: "gym-inline-form" %>
+      <%= button_to t("gym.discard", default: "İptal Et"), gym_workout_path(@workout), method: :delete, class: "button button-secondary", form_class: "gym-inline-form", data: {turbo_confirm: t("gym.confirm_discard", default: "Antrenman iptal edilsin mi?")} %>
+    </div>
+  </section>
+<% else %>
+  <% summary = Gym::WorkoutFinisher.new(@workout).summary %>
+  <header class="page-header">
+    <div>
+      <p class="eyebrow"><%= @workout.routine&.name || t("gym.free_session", default: "Serbest antrenman") %></p>
+      <h1><%= l(@workout.started_at, format: :long) %></h1>
+      <p class="page-subtitle"><%= t("gym.session.summary_title", default: "Seans Özeti") %></p>
+    </div>
+    <%= link_to gym_root_path, class: "button button-secondary" do %><span><%= t("gym.back", default: "Geri") %></span><% end %>
+  </header>
+
+  <section class="gym-stats">
+    <article class="panel gym-stat"><span><%= t("gym.session.duration", default: "Süre") %></span><strong><%= summary[:duration_seconds] ? "#{summary[:duration_seconds] / 60} dk" : "—" %></strong></article>
+    <article class="panel gym-stat"><span><%= t("gym.session.tonnage", default: "Tonaj") %></span><strong><%= number_with_delimiter(summary[:tonnage].to_i) %> kg</strong></article>
+    <article class="panel gym-stat"><span><%= t("gym.session.completion", default: "Tamamlanma") %></span><strong><%= (summary[:completion] * 100).round %>%</strong></article>
+  </section>
+
+  <% if summary[:best_sets].any? %>
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2><%= t("gym.session.best_sets", default: "En İyi Setler") %></h2>
+          <p><%= t("gym.best_set_desc", default: "Tamamlanan setlerden tahmini 1RM (Epley).") %></p>
+        </div>
+      </div>
+      <div class="finance-list">
+        <% summary[:best_sets].each do |best| %>
+          <article class="finance-item-row">
+            <div>
+              <strong><%= link_to best[:exercise].name, gym_exercise_path(best[:exercise]) %></strong>
+              <span class="transaction-category"><%= best[:weight] %> kg × <%= best[:reps] %></span>
+            </div>
+            <span class="badge-pill badge-pill-subtle"><%= t("gym.est_1rm", default: "Tahmini 1RM") %>: <%= best[:estimate] %> kg</span>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @workout.notes.present? %>
+    <section class="panel">
+      <div class="panel-header"><div><h2><%= t("gym.session.notes", default: "Notlar") %></h2></div></div>
+      <p><%= @workout.notes %></p>
+    </section>
+  <% end %>
+<% end %>
