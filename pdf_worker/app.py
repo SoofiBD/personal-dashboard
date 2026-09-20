@@ -30,9 +30,12 @@ IMAGE_RENDER_PROFILES = {
     "maximum": {"dpi": 300, "format": "png", "content_type": "image/png"},
 }
 
-PDF_WORKER_API_KEY = os.environ.get("PDF_WORKER_API_KEY", "")
-if not PDF_WORKER_API_KEY or len(PDF_WORKER_API_KEY) < 32:
-    raise RuntimeError("PDF_WORKER_API_KEY must be set and at least 32 characters")
+def _get_api_key():
+    key = os.environ.get("PDF_WORKER_API_KEY", "")
+    if not key or len(key) < 32:
+        raise RuntimeError("PDF_WORKER_API_KEY must be set and at least 32 characters")
+    return key
+
 
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -46,11 +49,16 @@ async def verify_api_key(authorization: str = Depends(api_key_header)):
     if not token or len(token) < 32:
         raise HTTPException(status_code=401, detail="Invalid API key")
     import hmac
-    if not hmac.compare_digest(token, PDF_WORKER_API_KEY):
+    if not hmac.compare_digest(token, _get_api_key()):
         raise HTTPException(status_code=401, detail="Invalid API key")
 
 
 app = FastAPI(title="Personal Dashboard PDF Worker", docs_url=None, redoc_url=None)
+
+
+@app.on_event("startup")
+def _validate_env():
+    _get_api_key()
 
 
 class ZipImage(BaseModel):

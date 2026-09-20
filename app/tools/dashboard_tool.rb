@@ -7,8 +7,7 @@ class DashboardTool
     @user = user
   end
 
-  define_function :get_overview, description: "Balance, today spending, active workout, learning status, note count" do
-  end
+  define_function :get_overview, description: "Balance, today spending, active workout, learning status, note count"
 
   define_function :get_recent_activity, description: "Cross-module activity last N days (default 3)" do
     property :days, type: "integer", description: "Number of days", required: false
