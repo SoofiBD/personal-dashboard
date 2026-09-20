@@ -7,11 +7,9 @@ class GymTool
     @user = user
   end
 
-  define_function :list_routines, description: "All routines with exercises" do
-  end
+  define_function :list_routines, description: "All routines with exercises"
 
-  define_function :get_active_workout, description: "Current workout + sets" do
-  end
+  define_function :get_active_workout, description: "Current workout + sets"
 
   define_function :get_recent_workouts, description: "Last N workouts (default 5)" do
     property :limit, type: "integer", description: "Max results", required: false

@@ -7,8 +7,7 @@ class FinanceTool
     @user = user
   end
 
-  define_function :get_monthly_summary, description: "Current month expense/income totals by category" do
-  end
+  define_function :get_monthly_summary, description: "Current month expense/income totals by category"
 
   define_function :create_expense, description: "Create expense. Params: amount, category_name, description" do
     property :amount, type: "number", description: "Amount", required: true
@@ -22,24 +21,19 @@ class FinanceTool
     property :description, type: "string", description: "Description", required: true
   end
 
-  define_function :list_accounts, description: "All accounts with balances" do
-  end
+  define_function :list_accounts, description: "All accounts with balances"
 
   define_function :get_recent_transactions, description: "Transactions from last N days (default 7)" do
     property :days, type: "integer", description: "Number of days", required: false
   end
 
-  define_function :get_budget_status, description: "Budget vs actual for current month" do
-  end
+  define_function :get_budget_status, description: "Budget vs actual for current month"
 
-  define_function :list_subscriptions, description: "Active subscriptions with costs" do
-  end
+  define_function :list_subscriptions, description: "Active subscriptions with costs"
 
-  define_function :get_debts, description: "Active debts overview" do
-  end
+  define_function :get_debts, description: "Active debts overview"
 
-  define_function :get_savings_goals, description: "Savings goals with progress" do
-  end
+  define_function :get_savings_goals, description: "Savings goals with progress"
 
   def get_monthly_summary
     range = current_month_range
