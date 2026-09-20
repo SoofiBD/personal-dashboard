@@ -7,9 +7,9 @@ class AiSettingsController < ApplicationController
   def show
     @user = current_user
     @jan = Ai::JanClient.new
-    @jan_health = @jan.health
+    @health = @jan.health
   rescue Ai::JanClient::Error => e
-    @jan_health = {connected: false, models: [], error: e.message}
+    @health = {connected: false, models: [], error: e.message}
   end
 
   def health
@@ -28,7 +28,7 @@ class AiSettingsController < ApplicationController
       @user = current_user
       @user.errors.add(:ai_provider, "Geçersiz sağlayıcı")
       @jan = Ai::JanClient.new
-      @jan_health = {connected: true, models: []}
+      @health = {connected: true, models: []}
       return render :show, status: :unprocessable_content
     end
 
@@ -39,7 +39,7 @@ class AiSettingsController < ApplicationController
         @user = current_user
         @user.errors.add(:ai_model, "Jan tarafından sunulan modellerden biri olmalıdır.")
         @jan = jan
-        @jan_health = {connected: true, models: available_models}
+        @health = {connected: true, models: available_models}
         return render :show, status: :unprocessable_content
       end
     else
@@ -47,7 +47,7 @@ class AiSettingsController < ApplicationController
         @user = current_user
         @user.errors.add(:ai_model, "Gemini model adı gereklidir.")
         @jan = Ai::JanClient.new
-        @jan_health = {connected: true, models: []}
+        @health = {connected: true, models: []}
         return render :show, status: :unprocessable_content
       end
     end
