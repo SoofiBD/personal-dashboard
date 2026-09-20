@@ -8,6 +8,6 @@ class AiConversation < ApplicationRecord
   }
 
   scope :cleanup_old, lambda { |days: 3|
-    where('created_at < ?', days.days.ago)
+    where("created_at < ?", days.days.ago)
   }
 end

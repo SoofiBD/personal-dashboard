@@ -10,13 +10,13 @@ class AiAssistantService
   def initialize(user:)
     @user = user
     @llm = Langchain::LLM::GoogleGemini.new(
-      api_key: ENV.fetch('GEMINI_API_KEY'),
-      default_options: { chat_model: 'gemini-2.0-flash', temperature: 0.2 }
+      api_key: ENV.fetch("GEMINI_API_KEY"),
+      default_options: {chat_model: "gemini-2.0-flash", temperature: 0.2}
     )
   end
 
   def ask(user_message)
-    raise Error, 'Empty message' if user_message.blank?
+    raise Error, "Empty message" if user_message.blank?
 
     instructions = build_instructions
     assistant = build_assistant(instructions)
@@ -24,14 +24,14 @@ class AiAssistantService
     replay_conversation_history(assistant)
     assistant.add_message_and_run!(content: user_message)
 
-    response = assistant.messages.last&.content || 'No response generated'
+    response = assistant.messages.last&.content || "No response generated"
     save_exchange(user_message, response)
     cleanup_old_conversations
 
     response
   rescue Langchain::LLM::GoogleGemini::Error => e
     raise Error, "Gemini API error: #{e.message}"
-  rescue StandardError => e
+  rescue => e
     raise Error, "Assistant error: #{e.message}"
   end
 
@@ -41,9 +41,9 @@ class AiAssistantService
 
   def build_instructions
     SYSTEM_PROMPT
-      .gsub('{locale}', user.locale)
-      .gsub('{currency}', user.currency)
-      .gsub('{date}', Date.current.strftime('%Y-%m-%d'))
+      .gsub("{locale}", user.locale)
+      .gsub("{currency}", user.currency)
+      .gsub("{date}", Date.current.strftime("%Y-%m-%d"))
   end
 
   def build_assistant(instructions)
@@ -71,17 +71,17 @@ class AiAssistantService
       next if msg.content.blank?
 
       case msg.role
-      when 'user', 'assistant'
+      when "user", "assistant"
         assistant.add_message(role: msg.role, content: msg.content)
-      when 'tool'
-        assistant.add_message(role: 'tool', content: msg.content)
+      when "tool"
+        assistant.add_message(role: "tool", content: msg.content)
       end
     end
   end
 
   def save_exchange(user_msg, assistant_msg)
-    AiConversation.create!(user: user, role: 'user', content: user_msg)
-    AiConversation.create!(user: user, role: 'assistant', content: assistant_msg)
+    AiConversation.create!(user: user, role: "user", content: user_msg)
+    AiConversation.create!(user: user, role: "assistant", content: assistant_msg)
   end
 
   def cleanup_old_conversations

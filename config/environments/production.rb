@@ -51,7 +51,7 @@ Rails.application.configure do
   config.force_ssl = true
 
   config.hosts = [ENV.fetch("DASHBOARD_DOMAIN")]
-  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = {exclude: ->(request) { request.path == "/up" }}
 
   config.action_dispatch.default_headers.merge!(
     "Referrer-Policy" => "strict-origin-when-cross-origin",

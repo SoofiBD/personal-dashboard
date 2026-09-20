@@ -96,7 +96,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_20_000003) do
     t.jsonb "conversion_options", default: {}, null: false
     t.index ["user_id", "created_at"], name: "index_document_conversions_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_document_conversions_on_user_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'processing'::character varying, 'completed'::character varying, 'failed'::character varying]::text[])", name: "document_conversions_status_valid"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'processing'::character varying::text, 'completed'::character varying::text, 'failed'::character varying::text])", name: "document_conversions_status_valid"
   end
 
   create_table "finance_budget_allocations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
