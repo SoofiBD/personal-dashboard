@@ -1,0 +1,56 @@
+<%= render "personal_gym/routines/form", routine: @routine %>
+
+<% @routine.reload.days.ordered.each do |day| %>
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= day.name %></h2>
+      </div>
+      <%= button_to t("gym.delete_day", default: "Günü Sil"), gym_routine_day_path(@routine, day), method: :delete, class: "button button-secondary", form_class: "gym-inline-form", data: {turbo_confirm: t("gym.confirm_delete", default: "Silinsin mi?")} %>
+    </div>
+
+    <% day.routine_exercises.ordered.each do |plan| %>
+      <article class="gym-plan-row">
+        <%= form_with model: plan, scope: :gym_routine_exercise, url: gym_routine_plan_path(@routine, plan), method: :patch, class: "gym-plan-form" do |form| %>
+          <span class="gym-plan-name"><%= plan.exercise.name %></span>
+          <label><%= t("gym.fields.sets", default: "Set") %><%= form.number_field :target_sets, min: 1, max: 20, value: plan.target_sets %></label>
+          <% if plan.exercise.mode_reps? %>
+            <label><%= t("gym.fields.reps", default: "Tekrar") %><%= form.text_field :target_reps, value: plan.target_reps, placeholder: "5 veya 8-12" %></label>
+          <% end %>
+          <label><%= t("gym.fields.weight", default: "Ağırlık") %><%= form.number_field :target_weight, step: 0.5, min: 0, value: plan.target_weight %></label>
+          <% if plan.exercise.mode_time? %>
+            <label><%= t("gym.fields.duration", default: "Süre (sn)") %><%= form.number_field :target_duration_seconds, min: 1, value: plan.target_duration_seconds %></label>
+          <% end %>
+          <label><%= t("gym.fields.policy", default: "İlerleme") %><%= form.select :progression_policy, policy_options_for(plan.exercise), selected: plan.progression_policy %></label>
+          <label><%= t("gym.fields.warmup", default: "Isınma %") %><%= form.text_field :warmup, value: plan.warmup, placeholder: "40,70" %></label>
+          <%= form.submit t("gym.save", default: "Kaydet"), class: "button button-secondary" %>
+        <% end %>
+        <%= button_to finance_svg_icon("trash", class: "icon-sm"), gym_routine_plan_path(@routine, plan), method: :delete, class: "button button-secondary gym-icon-btn", form_class: "gym-inline-form", "aria-label": t("gym.delete", default: "Sil") %>
+      </article>
+    <% end %>
+
+    <div class="gym-add-plan">
+      <%= form_with model: day.routine_exercises.new, scope: :gym_routine_exercise, url: gym_routine_plans_path(@routine, routine_day_id: day.id), method: :post, class: "gym-plan-form" do |form| %>
+        <label><%= t("gym.fields.exercise", default: "Egzersiz") %><%= form.collection_select :exercise_id, PersonalGym::Exercise.ordered, :id, :name %></label>
+        <label><%= t("gym.fields.sets", default: "Set") %><%= form.number_field :target_sets, min: 1, max: 20, value: 3 %></label>
+        <label><%= t("gym.fields.reps", default: "Tekrar") %><%= form.text_field :target_reps, placeholder: "5 veya 8-12" %></label>
+        <label><%= t("gym.fields.weight", default: "Ağırlık") %><%= form.number_field :target_weight, step: 0.5, min: 0 %></label>
+        <label><%= t("gym.fields.duration", default: "Süre (sn)") %><%= form.number_field :target_duration_seconds, min: 1 %></label>
+        <label><%= t("gym.fields.warmup", default: "Isınma %") %><%= form.text_field :warmup, placeholder: "40,70" %></label>
+        <%= form.submit t("gym.add", default: "Ekle"), class: "button button-primary" %>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.add_day", default: "Gün Ekle") %></h2>
+    </div>
+  </div>
+  <%= form_with model: @routine.days.new, scope: :gym_routine_day, url: gym_routine_days_path(@routine), method: :post, class: "gym-day-form" do |form| %>
+    <%= form.text_field :name, placeholder: t("gym.day_name", default: "Gün adı (örn: İtiş)") %>
+    <%= form.submit t("gym.add", default: "Ekle"), class: "button button-primary" %>
+  <% end %>
+</section>

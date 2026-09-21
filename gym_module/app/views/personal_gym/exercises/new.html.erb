@@ -1,0 +1,45 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("gym.library.eyebrow", default: "Egzersiz Kataloğu") %></p>
+    <h1><%= t("gym.new_exercise", default: "Yeni Egzersiz") %></h1>
+    <p class="page-subtitle"><%= t("gym.new_exercise_hint", default: "Ad + kas grubu yeterli. Her yerde normal hareket gibi davranır.") %></p>
+  </div>
+  <%= link_to gym_exercises_path, class: "button button-secondary" do %>
+    <span><%= t("gym.back", default: "Geri") %></span>
+  <% end %>
+</header>
+
+<section class="panel">
+  <%= form_with model: @exercise, scope: :gym_exercise, url: gym_exercises_path do |form| %>
+    <% if @exercise.errors.any? %>
+      <div class="form-errors">
+        <ul>
+          <% @exercise.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= form.label :name, t("gym.fields.name", default: "Hareket Adı") %>
+      <%= form.text_field :name, required: true, maxlength: 120, placeholder: "Örn: Hip Abduction" %>
+    </div>
+
+    <div class="gym-plan-form">
+      <label><%= t("gym.fields.category", default: "Kategori") %><%= form.select :category, [["strength", "strength"], ["timed", "timed"], ["cardio", "cardio"]] %></label>
+      <label><%= t("gym.fields.mode", default: "Kayıt") %><%= form.select :logging_mode, [["reps", "reps"], ["time", "time"], ["cardio", "cardio"]] %></label>
+      <label><%= t("gym.muscle_group", default: "Kas grubu") %><%= form.text_field :muscle_group, placeholder: "chest, back, legs, shoulders, arms, core, cardio" %></label>
+      <label><%= t("gym.fields.equipment", default: "Ekipman") %><%= form.text_field :equipment, placeholder: "barbell, dumbbell, cable, machine, bodyweight" %></label>
+    </div>
+
+    <div class="gym-plan-form">
+      <label><%= form.check_box :bodyweight %> <%= t("gym.fields.bodyweight", default: "Vücut ağırlığı") %></label>
+      <label><%= form.check_box :unilateral %> <%= t("gym.fields.unilateral", default: "Tek taraflı") %></label>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit t("gym.save", default: "Kaydet"), class: "button button-primary" %>
+    </div>
+  <% end %>
+</section>

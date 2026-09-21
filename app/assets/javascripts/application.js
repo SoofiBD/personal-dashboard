@@ -968,6 +968,8 @@
     document.querySelectorAll("[data-document-workspace]").forEach((workspace) => {
       if (workspace.dataset.documentWorkspaceBound) return;
       workspace.dataset.documentWorkspaceBound = "true";
+      // Paperling-derived bundle owns editor+preview when mounted.
+      if (workspace.querySelector("[data-md-editor]")) return;
 
       const editor = workspace.querySelector("[data-markdown-editor]");
       const preview = workspace.querySelector("[data-markdown-preview]");

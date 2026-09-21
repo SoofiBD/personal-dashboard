@@ -223,7 +223,7 @@ module PersonalFinance
       end
     rescue ActiveRecord::RecordInvalid => error
       source = error.record
-      source.errors.each { |attribute, message| @transaction.errors.add(attribute, message) } unless source.equal?(@transaction)
+      source.errors.each { |error| @transaction.errors.add(error.attribute, error.message) } unless source.equal?(@transaction)
       render :new, status: :unprocessable_entity
     end
 

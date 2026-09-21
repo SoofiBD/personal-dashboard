@@ -5439,6 +5439,36 @@ input.auth-input:focus,
   border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.auth-footer {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.auth-footer-link {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.auth-footer-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* NAS workspace uses the shared light/dark theme. */
 .nas-workspace { max-width: 1200px; margin: 0 auto; padding: 32px 20px; color: var(--text-main); }
 .nas-header, .nas-toolbar, .nas-breadcrumb, .nas-pagination { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }

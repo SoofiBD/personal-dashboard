@@ -1,0 +1,353 @@
+/* Personal Gym module styles — all scoped under .gym-* classes to avoid
+   global CSS conflicts. Reuses design tokens from application.css. */
+
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+.gym-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+/* Adjacent panels need breathing room (panels have no outer margin). */
+.gym-stats + .panel,
+.panel + .panel,
+section.panel + section.panel {
+  margin-top: var(--space-md);
+}
+
+.gym-stats .panel {
+  margin-top: 0;
+}
+
+.gym-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+}
+
+.gym-stat span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gym-stat strong {
+  font-size: 1.4rem;
+  font-family: var(--font-mono);
+}
+
+.gym-timer {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--accent);
+  background: var(--accent-glow);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.gym-timer-lg {
+  font-size: 1.6rem;
+  padding: var(--space-sm) var(--space-md);
+}
+
+.gym-inline-form {
+  display: inline-flex;
+}
+
+.gym-day-start {
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.gym-day-start:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.gym-row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+/* Day chips / exercise chips: flex-wrap with min 8px gap (touch spacing).
+   Replaces the nowrap .transaction-category span which clipped + jammed. */
+.gym-day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: 6px;
+}
+
+/* Header with 2+ actions: keep buttons grouped with a real gap. */
+.gym-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.gym-set-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.gym-set-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all 200ms ease;
+}
+
+.gym-set-row.is-done {
+  opacity: 0.6;
+  border-color: var(--accent-glow);
+}
+
+.gym-set-row.is-done .gym-set-form label {
+  text-decoration: line-through;
+}
+
+.gym-set-kind {
+  min-width: 3.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+}
+
+.gym-set-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.gym-set-form label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.gym-set-form input[type="number"] {
+  width: 5.5rem;
+  padding: 6px 10px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  transition: border-color 200ms ease;
+}
+
+.gym-set-form input[type="number"]:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.gym-plan-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.gym-plan-form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.gym-plan-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.gym-plan-form input,
+.gym-plan-form select {
+  padding: 6px 10px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  transition: border-color 200ms ease;
+}
+
+.gym-plan-form input:focus,
+.gym-plan-form select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.gym-plan-name {
+  min-width: 12rem;
+  font-weight: 600;
+}
+
+.gym-icon-btn {
+  padding: var(--space-xs);
+}
+
+.gym-add-plan {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.gym-day-form {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.gym-day-form input {
+  flex: 1;
+  max-width: 20rem;
+  padding: 10px 14px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  transition: border-color 200ms ease;
+}
+
+.gym-day-form input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.gym-filters {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+}
+
+.gym-filters > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.gym-filters input,
+.gym-filters select {
+  padding: 8px 12px;
+  background: var(--surface-input);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  transition: border-color 200ms ease;
+}
+
+.gym-filters input:focus,
+.gym-filters select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.gym-trend {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+  min-height: 140px;
+  padding: var(--space-md) 0;
+}
+
+.gym-trend > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  min-height: 140px;
+}
+
+.gym-trend span {
+  width: 100%;
+  max-width: 42px;
+  background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.gym-trend small {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.gym-trend em {
+  color: var(--text-subtle);
+  font-size: 0.7rem;
+  font-style: normal;
+}
+
+.gym-chart-wrap {
+  position: relative;
+  height: 280px;
+}
+
+.gym-active-panel {
+  border-color: var(--accent-glow);
+  box-shadow: var(--shadow-glow);
+}
+
+.gym-finish-panel {
+  margin-top: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .gym-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .gym-set-row {
+    flex-wrap: wrap;
+  }
+
+  .gym-plan-name {
+    min-width: 100%;
+  }
+
+  .gym-trend {
+    gap: 4px;
+  }
+}

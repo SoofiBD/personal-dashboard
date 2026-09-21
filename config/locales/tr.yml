@@ -1058,3 +1058,166 @@ tr:
     mfa_code_help: Kodlar 30 saniyede bir yenilenir.
     mfa_enable_btn: MFA’yı Etkinleştir
     mfa_complete_btn: Girişi Tamamla
+    signup_title: Hesap Oluştur
+    signup_subtitle: İlk yönetici hesabı için bilgileri girin. Bu hesap tüm ayarları yönetecek.
+    name_label: İsim
+    name_placeholder: Adınız
+    email_label: E-posta (İsteğe bağlı)
+    email_placeholder: ornek@domain.com
+    password_label: Parola
+    password_placeholder: "••••••••••••••••"
+    password_confirmation_label: Parola Tekrarı
+    password_hint: En az 16 karakter
+    currency_label: Para Birimi
+    locale_label: Dil
+    signup_submit: Hesabı Oluştur
+    signin_link: Zaten hesabınız var mı? Giriş yapın
+    no_account_link: Henüz hesap yok mu? İlk hesabı oluşturun
+  signups:
+    created: Hesap başarıyla oluşturuldu. Lütfen giriş yapın.
+    not_allowed: Hesap zaten mevcut. Lütfen giriş yapın.
+  gym:
+    active_session: Aktif Antrenman
+    add: Ekle
+    add_day: Gün Ekle
+    add_set: Set Ekle
+    all: Tümü
+    back: Geri
+    best_reps: Tekrar
+    best_set: En İyi Set
+    best_set_desc: Tamamlanan setlerden tahmini 1RM (Epley).
+    best_weight: Ağırlık
+    catalog_empty: Egzersiz kataloğu boş
+    catalog_empty_hint: Temel egzersizleri tek tıkla yükle.
+    catalog_seeded: "%{count} egzersiz kataloğa eklendi."
+    confirm_delete: Silinsin mi?
+    confirm_discard: Antrenman iptal edilsin mi?
+    continue: Devam Et
+    dashboard:
+      eyebrow: Antrenman Günlüğü
+      subtitle: Antrenman planları, canlı seans ve ilerleme takibi.
+      title: Spor Salonu
+    day_empty: Boş gün
+    day_name: "Gün adı (örn: İtiş)"
+    delete: Sil
+    delete_day: Günü Sil
+    deleted: Silindi.
+    discard: İptal Et
+    discarded: Antrenman iptal edildi.
+    edit: Düzenle
+    est_1rm: Tahmini 1RM
+    exercise_history: Geçmiş
+    exercise_saved: Egzersiz eklendi.
+    fields:
+      bodyweight: Vücut ağırlığı
+      category: Kategori
+      description: Açıklama
+      distance: Mesafe
+      duration: Süre (sn)
+      equipment: Ekipman
+      exercise: Egzersiz
+      mode: Kayıt
+      name: Hareket Adı
+      policy: İlerleme
+      reps: Tekrar
+      routine_name: Plan Adı
+      sets: Set
+      unilateral: Tek taraflı
+      warmup: Isınma %
+      weight: Ağırlık
+    filter: Filtrele
+    finished: Antrenman tamamlandı.
+    free_session: Serbest antrenman
+    free_session_short: Serbest
+    history:
+      eyebrow: Antrenman Geçmişi
+      subtitle: Tamamlanmış seanslar ve tonaj.
+      title: Geçmiş
+    library:
+      eyebrow: Egzersiz Kataloğu
+      subtitle: Kas grubuna göre filtrele, detay ve geçmişi gör.
+      title: Egzersizler
+    load_catalog: Kataloğu Yükle
+    load_templates: Hazır Planları Yükle
+    manage: Düzenle
+    manage_exercises: Egzersizleri Düzenle
+    modes:
+      cardio: Kardiyo
+      reps: Tekrar
+      time: Süre
+    month_sessions: Bu Ay Seans
+    muscle_group: Kas grubu
+    name_placeholder: "Örn: Full Body 3 Gün"
+    new_exercise: Yeni Egzersiz
+    new_exercise_hint: Ad + kas grubu yeterli. Her yerde normal hareket gibi davranır.
+    new_routine: Yeni Plan
+    no_data: Henüz veri yok.
+    no_exercises: Sonuç bulunamadı.
+    no_history: Bu egzersiz için geçmiş yok.
+    no_routines: Henüz plan yok. İlk antrenman planını oluştur.
+    no_workouts: Tamamlanmış antrenman yok.
+    policies:
+      double: Çift ilerleme
+      greyskull: Greyskull
+      linear: Lineer
+      "off": Kapalı
+      time: Süre
+    progression:
+      reasons:
+        deload: İki hedef altı set, %10 sökülme
+        double_up: "Aralığın tepesine ulaşıldı +%{step}kg"
+        greyskull_deload: Başarısız set, %10 sökülme
+        greyskull_double: "Son set hedefin iki katı +%{step}kg"
+        greyskull_up: "Son set hedefi geçti +%{step}kg"
+        linear_up: "Tüm setler %{reps} tekrara ulaştı +%{step}kg"
+        time_up: "Tüm setler tam sürede tutuldu +%{step}s"
+    recent_workouts: Son Antrenmanlar
+    routines: Antrenman Planları
+    routines_desc: Bir günü başlatarak seansı plana göre oluştur.
+    routines:
+      eyebrow: Antrenman Planları
+      form_hint: Plan adı ve açıklama.
+      subtitle: Günleri ve egzersizleri yönet.
+      title: Planlar
+    save: Kaydet
+    saved: Kaydedildi.
+    search: Ara
+    see_all: Tümünü Gör
+    session:
+      best_sets: En İyi Setler
+      completion: Tamamlanma
+      done: Tamam
+      duration: Süre
+      finish: Antrenmanı Bitir
+      notes: Notlar
+      sets_done: set tamamlandı
+      subtitle: Setleri işaretle, ağırlıkları güncelle, bitir.
+      summary_title: Seans Özeti
+      title: Aktif Seans
+      tonnage: Tonaj
+      undo: Geri Al
+      warmup: Isınma
+    sidebar:
+      section_workspace: ANTRENMAN
+    start: Başlat
+    start_day: Başlat
+    start_day_title: Günü başlat
+    start_free: Serbest seans başlat
+    start_free_hint: Bu egzersizle serbest bir seans başlat.
+    start_requires_plan: Bir gün veya egzersiz seçin.
+    started: Antrenman başladı.
+    stats:
+      eyebrow: Antrenman İstatistikleri
+      sessions: Toplam Seans
+      sets_done: Tamamlanan Set
+      subtitle: Haftalık hacim, tonaj ve en çok çalışılan egzersizler.
+      title: İstatistikler
+      tonnage: Toplam Tonaj
+      top_exercises: En Çok Çalışılanlar
+      top_exercises_desc: Son 30 günün tonajına göre.
+      weekly_volume: Haftalık Hacim
+      weekly_volume_desc: Son 8 haftanın tonaj (ağırlık × tekrar).
+    streak: Hafta Serisi
+    templates_seeded: "%{count} hazır plan eklendi."
+    trend: Tahmini 1RM Trendi
+    week_volume: Haftalık Hacim

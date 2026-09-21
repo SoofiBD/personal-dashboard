@@ -1,0 +1,83 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= @exercise.muscle_group&.humanize %></p>
+    <h1><%= @exercise.name %></h1>
+    <p class="page-subtitle"><%= t("gym.modes.#{@exercise.logging_mode}", default: @exercise.logging_mode) %> · <%= @exercise.equipment&.humanize %></p>
+  </div>
+  <%= link_to gym_exercises_path, class: "button button-secondary" do %>
+    <span><%= t("gym.back", default: "Geri") %></span>
+  <% end %>
+</header>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.best_set", default: "En İyi Set") %></h2>
+      <p><%= t("gym.best_set_desc", default: "Tamamlanan setlerden tahmini 1RM (Epley).") %></p>
+    </div>
+  </div>
+  <% if @best_set %>
+    <div class="gym-stats">
+      <article class="panel gym-stat"><span><%= t("gym.est_1rm", default: "Tahmini 1RM") %></span><strong><%= @best_set[:estimate] %> kg</strong></article>
+      <article class="panel gym-stat"><span><%= t("gym.best_weight", default: "Ağırlık") %></span><strong><%= @best_set[:weight] %> kg</strong></article>
+      <article class="panel gym-stat"><span><%= t("gym.best_reps", default: "Tekrar") %></span><strong><%= @best_set[:reps] %></strong></article>
+    </div>
+  <% else %>
+    <div class="empty-state"><p><%= t("gym.no_data", default: "Henüz veri yok.") %></p></div>
+  <% end %>
+</section>
+
+<% if @series.any? %>
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("gym.trend", default: "Tahmini 1RM Trendi") %></h2>
+      </div>
+    </div>
+    <div class="gym-trend">
+      <% max = @series.map { |p| p[:est] }.max %>
+      <% @series.each do |point| %>
+        <div>
+          <span style="height: <%= [((point[:est] / max) * 100).round, 5].max %>%"></span>
+          <small><%= point[:est] %></small>
+          <em><%= point[:label] %></em>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2><%= t("gym.exercise_history", default: "Geçmiş") %></h2>
+    </div>
+  </div>
+  <% if @history.any? %>
+    <div class="finance-list">
+      <% @history.each do |workout| %>
+        <article class="finance-item-row">
+          <div>
+            <strong><%= l(workout.started_at, format: :long) %></strong>
+            <span class="transaction-category">
+              <% workout.sets.select { |s| s.exercise_id == @exercise.id && s.done? && s.kind == "working" }.each do |set| %>
+                <span class="badge-pill badge-pill-subtle"><%= set.weight %>kg × <%= set.reps %></span>
+              <% end %>
+            </span>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="empty-state"><p><%= t("gym.no_history", default: "Bu egzersiz için geçmiş yok.") %></p></div>
+  <% end %>
+</section>
+
+<% if PersonalGym::Workout.active_for(current_user).nil? %>
+  <section class="panel">
+    <div class="empty-state">
+      <p><%= t("gym.start_free_hint", default: "Bu egzersizle serbest bir seans başlat.") %></p>
+      <%= button_to t("gym.start", default: "Başlat"), gym_workouts_path, params: {exercise_id: @exercise.id, sets: 3}, class: "button button-primary", form_class: "gym-inline-form" %>
+    </div>
+  </section>
+<% end %>

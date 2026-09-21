@@ -1,0 +1,89 @@
+services:
+  web:
+    image: personal-dashboard-web
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: >-
+      sh -c 'rm -f tmp/pids/server.pid;
+      ./bin/rails db:prepare && exec ./bin/rails server -b 0.0.0.0'
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - storage_data:/rails/storage
+    expose:
+      - "3000"
+    env_file:
+      - .env.local
+    environment:
+      RAILS_ENV: development
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      TEST_DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${TEST_POSTGRES_DB}"
+      PDF_WORKER_URL: "http://pdf-worker:8000"
+      PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY}"
+      JAN_API_BASE_URL: "${JAN_API_BASE_URL:-http://host.docker.internal:1337}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  jobs:
+    image: personal-dashboard-web
+    command: ./bin/jobs
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - storage_data:/rails/storage
+    env_file:
+      - .env.local
+    environment:
+      RAILS_ENV: development
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      TEST_DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${TEST_POSTGRES_DB}"
+      PDF_WORKER_URL: "http://pdf-worker:8000"
+      PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY}"
+      JAN_API_BASE_URL: "${JAN_API_BASE_URL:-http://host.docker.internal:1337}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  pdf-worker:
+    build:
+      context: ./pdf_worker
+    volumes:
+      - ./pdf_worker:/app
+    expose:
+      - "8000"
+    environment:
+      PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY}"
+
+  db:
+    image: postgres:16-alpine
+    env_file:
+      - .env.local
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  bundle_cache:
+  postgres_data:
+  storage_data:
+

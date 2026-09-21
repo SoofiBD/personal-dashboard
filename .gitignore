@@ -18,12 +18,23 @@
 /graphify-out/
 .DS_Store
 *.rdb
+.bundle/config
+Gemfile.lock.backup
+*.backup
+temp_file
 pdf_worker/**/__pycache__/
 **/__pycache__/
 pdf_worker/*.ses
 
 # NAS credentials and local recovery material
 .private/
+secrets/
 .env.nas*
 *.pem
 *.pem.bak
+
+# Frontend node_modules
+frontend/md-editor/node_modules/
+
+# ChartDB - built in Docker, no need for node_modules locally
+modules/chartdb/node_modules/

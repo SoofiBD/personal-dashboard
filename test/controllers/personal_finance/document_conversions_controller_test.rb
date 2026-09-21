@@ -14,10 +14,10 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
 
     assert_response :success
     assert_select "[data-document-workspace]"
-    assert_select "textarea[data-markdown-editor]", text: "# Report"
-    assert_select "[data-markdown-line-numbers]"
-    assert_select "input[data-markdown-find]"
-    assert_select "button[data-replace-all]", text: "Tümünü değiştir"
+    assert_select "[data-md-editor='workspace']"
+    assert_select "textarea[data-mde-source]", text: "# Report"
+    assert_select "[data-mde-app]"
+    assert_select "[data-mde-export]", count: 2
     assert_select "form[action='#{reprocess_finance_document_conversion_path(@conversion)}']"
     assert_select "form[action='#{export_html_finance_document_conversion_path(@conversion)}']"
     assert_select "a[href='#{source_pdf_finance_document_conversion_path(@conversion)}']", minimum: 2
@@ -63,9 +63,9 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
   end
 
   test "binds gallery image buttons outside the workspace to the editor" do
-    source = Rails.root.join("app/assets/javascripts/application.js").read
+    source = Rails.root.join("frontend/md-editor/src/mount.tsx").read
 
-    assert_includes source, 'document.querySelectorAll("[data-insert-image]")'
+    assert_includes source, '"[data-insert-image]"'
   end
 
   test "persists edited markdown for the current user" do

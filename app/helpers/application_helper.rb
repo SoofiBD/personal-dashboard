@@ -14,6 +14,7 @@ module ApplicationHelper
 
   def active_app_module
     return :notes if controller_path.start_with?("notes/")
+    return :gym if controller_path.start_with?("personal_gym/")
     return :database_tools if controller_name == "database_tools"
     return :nas if controller_name == "nas"
 
@@ -167,6 +168,16 @@ module ApplicationHelper
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
         tag.path(d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z") +
           tag.circle(cx: "12", cy: "12", r: "3")
+      end
+    when "gym", "dumbbell"
+      content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do
+        tag.path(d: "m6.5 6.5 11 11") +
+          tag.path(d: "m21 21-1-1") +
+          tag.path(d: "m3 3 1 1") +
+          tag.path(d: "m18 22 4-4") +
+          tag.path(d: "m2 6 4-4") +
+          tag.path(d: "m3 10 7-7") +
+          tag.path(d: "m14 21 7-7")
       end
     when "shield", "security"
       content_tag(:svg, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round", class: css_class) do

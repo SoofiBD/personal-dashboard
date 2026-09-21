@@ -1,0 +1,53 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow"><%= t("gym.routines.eyebrow", default: "Antrenman Planları") %></p>
+    <h1><%= t("gym.routines.title", default: "Planlar") %></h1>
+    <p class="page-subtitle"><%= t("gym.routines.subtitle", default: "Günleri ve egzersizleri yönet.") %></p>
+  </div>
+  <div class="gym-header-actions">
+    <%= link_to new_gym_routine_path, class: "button button-primary" do %>
+      <%= finance_svg_icon("plus", class: "icon-sm") %>
+      <span><%= t("gym.new_routine", default: "Yeni Plan") %></span>
+    <% end %>
+    <%= button_to t("gym.load_templates", default: "Hazır Planları Yükle"), seed_templates_gym_routines_path, class: "button button-secondary", form_class: "gym-inline-form" %>
+  </div>
+</header>
+
+<% if @routines.any? %>
+  <% @routines.each do |routine| %>
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <h2><%= routine.name %></h2>
+          <p><%= routine.description %></p>
+        </div>
+        <div class="gym-row-actions">
+          <%= link_to t("gym.edit", default: "Düzenle"), edit_gym_routine_path(routine), class: "button button-secondary" %>
+          <%= button_to t("gym.delete", default: "Sil"), gym_routine_path(routine), method: :delete, class: "button button-secondary", form_class: "gym-inline-form", data: {turbo_confirm: t("gym.confirm_delete", default: "Silinsin mi?")} %>
+        </div>
+      </div>
+      <div class="finance-list">
+        <% routine.days.ordered.each do |day| %>
+          <article class="finance-item-row">
+            <div>
+              <strong><%= day.name %></strong>
+              <div class="gym-day-chips">
+                <% day.routine_exercises.ordered.each do |plan| %>
+                  <span class="badge-pill badge-pill-subtle"><%= plan.exercise.name %></span>
+                <% end %>
+                <% if day.routine_exercises.empty? %><%= t("gym.day_empty", default: "Boş gün") %><% end %>
+              </div>
+            </div>
+            <% if PersonalGym::Workout.active_for(current_user).nil? %>
+              <%= button_to t("gym.start_day", default: "Başlat"), gym_workouts_path, params: {routine_day_id: day.id}, class: "badge-pill gym-day-start", form_class: "gym-inline-form" %>
+            <% end %>
+          </article>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+<% else %>
+  <div class="empty-state">
+    <p><%= t("gym.no_routines", default: "Henüz plan yok. İlk antrenman planını oluştur.") %></p>
+  </div>
+<% end %>

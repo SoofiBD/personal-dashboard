@@ -1,0 +1,17 @@
+<div class="auth-form">
+  <h1 class="auth-title"><%= t("backend.passwords.forgot_title", default: "Parolamı Unuttum") %></h1>
+  <p class="auth-subtitle"><%= t("backend.passwords.forgot_subtitle", default: "E-posta adresinizi girin, size parolayı sıfırlama bağlantısı gönderelim.") %></p>
+
+  <%= form_with url: password_path, method: :post, class: "auth-form-inner" do |form| %>
+    <div class="form-field">
+      <%= form.label :email, t("backend.passwords.email_label", default: "E-posta") %>
+      <%= form.email_field :email, required: true, autocomplete: "email", class: "form-input", placeholder: "ornek@domain.com" %>
+    </div>
+
+    <%= form.submit t("backend.passwords.send_reset", default: "Sıfırlama Bağlantısı Gönder"), class: "btn btn-primary btn-block" %>
+  <% end %>
+
+  <div class="auth-footer">
+    <%= link_to t("backend.passwords.back_to_login", default: "Girişe Dön"), new_session_path %>
+  </div>
+</div>

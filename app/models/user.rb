@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   has_secure_password validations: false
   encrypts :mfa_secret
@@ -10,7 +12,7 @@ class User < ApplicationRecord
   validates :time_zone, presence: true
   validates :role, inclusion: {in: ROLES}
   validates :locale, inclusion: {in: LOCALES}
-  validates :ai_provider, inclusion: {in: %w[jan_local]}
+  validates :ai_provider, inclusion: {in: %w[jan_local gemini]}
   validates :ai_model, length: {maximum: 200}, allow_blank: true
   validates :email, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}, unless: :owner?
   validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
@@ -31,6 +33,10 @@ class User < ApplicationRecord
   has_many :note_links, class_name: "Notes::NoteLink", dependent: :destroy
   has_many :learning_items, class_name: "Learning::Item", dependent: :destroy
   has_many :learning_attempts, class_name: "Learning::Attempt", dependent: :destroy
+  has_many :gym_routines, class_name: "PersonalGym::Routine", dependent: :destroy
+  has_many :gym_workouts, class_name: "PersonalGym::Workout", dependent: :destroy
+  has_many :ai_memories, dependent: :destroy
+  has_many :ai_conversations, dependent: :destroy
 
   def onboarded?
     onboarded_at.present? || financial_accounts.exists? || finance_categories.exists? || finance_transactions.exists?
@@ -92,6 +98,20 @@ class User < ApplicationRecord
 
   def disable_mfa!
     update!(mfa_secret: nil, mfa_enabled: false, mfa_confirmed_at: nil)
+  end
+
+  def generate_password_reset_token!
+    self.password_reset_token = SecureRandom.urlsafe_base64(32)
+    self.password_reset_sent_at = Time.current
+    save!
+  end
+
+  def clear_password_reset_token!
+    update!(password_reset_token: nil, password_reset_sent_at: nil)
+  end
+
+  def password_reset_token_expired?
+    password_reset_sent_at.nil? || password_reset_sent_at < 2.hours.ago
   end
 
   private
