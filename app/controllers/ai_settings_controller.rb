@@ -21,7 +21,7 @@ class AiSettingsController < ApplicationController
   end
 
   def update
-    provider = params.dig(:user, :ai_provider).to_s
+    provider = params.dig(:user, :ai_provider).to_s.presence || "jan_local"
     model = params.dig(:user, :ai_model).to_s
 
     unless %w[jan_local gemini].include?(provider)

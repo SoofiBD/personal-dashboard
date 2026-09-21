@@ -140,7 +140,7 @@ DASHBOARD_DOMAIN=dash.burak.dev  # VEYA senin subdomain'in
 DASHBOARD_TIME_ZONE=Europe/Istanbul
 
 # AI — Gemini API Key
-GEMINI_API_KEY=AIzaSy...  # SENİN KEY'İNİ BURAYA YAZ
+GEMINI_API_KEY=<GEMINI_API_KEY>  # SENİN KEY'İNİ BURAYA YAZ
 
 # NAS Worker URL (internal Docker network)
 NAS_WORKER_URL=http://nas-worker:8000
@@ -183,7 +183,7 @@ docker compose -f compose.production.yaml -f compose.nas.yaml exec web ./bin/rai
 
 ## 🌐 OpenWrt + Tailscale Subnet Router (NAS Erişimi İçin)
 
-**Senaryo:** Lenovo ix2-dl (192.168.1.110) → OpenWrt router → Tailscale subnet router → Oracle VM
+**Senaryo:** Lenovo ix2-dl (`<NAS_LAN_IP>`) → OpenWrt router → Tailscale subnet router → Oracle VM
 
 ### OpenWrt'de:
 ```bash
@@ -204,13 +204,13 @@ sudo tailscale up --accept-routes
 
 # Test
 tailscale ping <openwrt-tailscale-ip>
-ping 192.168.1.110  # NAS'ın LAN IP'si — artık ulaşılabilir olmalı
+ping <NAS_LAN_IP>  # NAS'ın LAN IP'si — artık ulaşılabilir olmalı
 ```
 
 ### NAS Config (değişmez):
 ```bash
 # .env.nas.local zaten doğru:
-NAS_HOST=192.168.1.110  # LAN IP, Tailscale sayesinde VM'den erişilebilir
+NAS_HOST=<NAS_LAN_IP>  # LAN IP, Tailscale sayesinde VM'den erişilebilir
 NAS_USER=admin
 NAS_PASSWORD=...
 NAS_SHARE=yedek
@@ -287,7 +287,7 @@ docker compose -f compose.production.yaml -f compose.nas.yaml logs --tail=100 na
 | SSL yok | Caddy log: `docker compose logs gateway` → Let's Encrypt rate limit? |
 | DB bağlantı hatası | `DATABASE_URL` doğru mu? `postgres_password.txt` secrets ile eşleşiyor mu? |
 | NAS "Not configured" | `NAS_WORKER_URL` env var mı? `nas-worker` healthy mi? |
-| NAS bağlantı hatası | Tailscale route onaylandı mı? `ping 192.168.1.110` VM'den çalışıyor mu? |
+| NAS bağlantı hatası | Tailscale route onaylandı mı? `ping <NAS_LAN_IP>` VM'den çalışıyor mu? |
 | Out of memory | `docker stats` → memory limit artır (compose'da `mem_limit`) |
 | Disk doldu | `df -h` → log rotate, backup temizliği |
 
