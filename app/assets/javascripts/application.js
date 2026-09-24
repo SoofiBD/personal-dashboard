@@ -314,6 +314,10 @@
     const typeButtons = quickAdd.querySelectorAll("[data-quick-add-type]");
     const categoryButtons = quickAdd.querySelectorAll("[data-quick-add-category]");
     const swipeViewport = quickAdd.querySelector("[data-quick-add-swipe]");
+    const categorySection = quickAdd.querySelector("[data-quick-add-category-section]");
+    const transferAccountGroup = quickAdd.querySelector("[data-quick-add-transfer-account]");
+    const transferAccountInput = quickAdd.querySelector("[data-quick-add-transfer-account-input]");
+    const optionalDetails = quickAdd.querySelector(".quick-add-details");
     let lastFocused;
 
     if (!sheet || !backdrop || !trigger) return;
@@ -332,16 +336,24 @@
     };
 
     const selectType = (kind) => {
+      const isTransfer = kind === "transfer";
       kindInput.value = kind;
       typeButtons.forEach((button) => {
         const selected = button.dataset.quickAddType === kind;
         button.classList.toggle("is-selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
       });
-      categoryButtons.forEach((button) => {
-        button.hidden = button.dataset.quickAddCategoryKind !== kind;
-      });
-      selectCategory(visibleCategories()[0]);
+      categoryButtons.forEach((button) => { button.hidden = isTransfer || button.dataset.quickAddCategoryKind !== kind; });
+      categorySection.hidden = isTransfer;
+      transferAccountGroup.hidden = !isTransfer;
+      transferAccountInput.disabled = !isTransfer;
+      transferAccountInput.required = isTransfer;
+      if (isTransfer) {
+        optionalDetails.open = true;
+        categoryInput.value = "";
+      } else {
+        selectCategory(visibleCategories()[0]);
+      }
     };
 
     const open = () => {
@@ -502,6 +514,7 @@
   const initCashFlowChart = () => {
     const canvas = document.getElementById("cashflow-chart");
     if (!canvas || typeof window.Chart === "undefined") return;
+    if (window.Chart.getChart(canvas)) return;
 
     const dataEl = document.getElementById("cashflow-chart-data");
     if (!dataEl) return;
@@ -606,6 +619,7 @@
     const canvas = document.getElementById("spending-donut-chart");
     const dataEl = document.getElementById("spending-report-data");
     if (!canvas || !dataEl || typeof window.Chart === "undefined") return;
+    if (window.Chart.getChart(canvas)) return;
 
     let categories;
     try {
@@ -707,6 +721,7 @@
     const canvas = document.getElementById("cash-flow-forecast-chart");
     const dataEl = document.getElementById("cash-flow-forecast-data");
     if (!canvas || !dataEl || typeof window.Chart === "undefined") return;
+    if (window.Chart.getChart(canvas)) return;
 
     let rows;
     try {
@@ -1545,6 +1560,9 @@
   };
 
   const init = () => {
+    if (document.body?.dataset.applicationInitialized === "true") return;
+    document.body.dataset.applicationInitialized = "true";
+
     document.querySelectorAll("[data-auto-submit]").forEach((element) => {
       if (element.dataset.autoSubmitBound) return;
       element.dataset.autoSubmitBound = "true";
@@ -1712,6 +1730,11 @@
   };
 
   document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("turbo:before-cache", () => {
+    delete document.body?.dataset.applicationInitialized;
+    if (typeof window.Chart === "undefined") return;
+    document.querySelectorAll("canvas").forEach((canvas) => window.Chart.getChart(canvas)?.destroy());
+  });
   document.addEventListener("turbo:load", () => {
     if (document.readyState !== "loading") {
       init();

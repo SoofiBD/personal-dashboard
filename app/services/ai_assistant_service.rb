@@ -9,10 +9,7 @@ class AiAssistantService
 
   def initialize(user:)
     @user = user
-    @llm = Langchain::LLM::GoogleGemini.new(
-      api_key: ENV.fetch("GEMINI_API_KEY"),
-      default_options: {chat_model: "gemini-2.0-flash", temperature: 0.2}
-    )
+    @llm = build_llm
   end
 
   def ask(user_message)
@@ -38,6 +35,28 @@ class AiAssistantService
   private
 
   attr_reader :user, :llm
+
+  def build_llm
+    case user.ai_provider
+    when "jan_local"
+      jan = Ai::JanClient.new
+      model = user.ai_model.presence || jan.models.first
+      raise Error, "Jan için kullanılabilir bir model bulunamadı." if model.blank?
+
+      Langchain::LLM::OpenAI.new(
+        api_key: ENV.fetch("JAN_API_KEY", "jan-local"),
+        llm_options: {uri_base: "#{jan.base_url}/v1"},
+        default_options: {chat_model: model, temperature: 0.2}
+      )
+    when "gemini"
+      Langchain::LLM::GoogleGemini.new(
+        api_key: ENV.fetch("GEMINI_API_KEY"),
+        default_options: {chat_model: user.ai_model.presence || "gemini-2.0-flash", temperature: 0.2}
+      )
+    else
+      raise Error, "Desteklenmeyen AI sağlayıcısı."
+    end
+  end
 
   def build_instructions
     SYSTEM_PROMPT

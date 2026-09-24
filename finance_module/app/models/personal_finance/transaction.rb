@@ -10,6 +10,7 @@ module PersonalFinance
     has_many :tags, through: :transaction_tags, class_name: "PersonalFinance::Tag"
 
     enum :kind, {income: "income", expense: "expense", transfer: "transfer"}, validate: true
+    enum :transfer_direction, {outbound: "outbound", inbound: "inbound"}, prefix: true
 
     attr_accessor :recurrence_interval, :recurrence_end_date, :recurrence_count, :savings_goal_id
 
@@ -19,6 +20,7 @@ module PersonalFinance
     validate :owned_account
     validate :matching_category_kind
     validate :goal_contribution_requires_savings_transfer
+    validate :paired_transfer_has_direction
 
     scope :during, ->(range) { where(occurred_on: range) }
     scope :search_notes, ->(query) { where("finance_transactions.note ILIKE ?", "%#{sanitize_sql_like(query)}%") }
@@ -37,6 +39,11 @@ module PersonalFinance
     def goal_contribution_requires_savings_transfer
       return if savings_goal_id.blank?
       errors.add(:base, "Goal contributions require a transfer to a savings account") unless transfer? && account&.savings?
+    end
+
+    def paired_transfer_has_direction
+      return if transfer_group_id.blank?
+      errors.add(:transfer_direction, "is invalid") unless transfer? && transfer_direction.present?
     end
   end
 end

@@ -31,6 +31,18 @@ class PersonalFinance::CsvTransactionImportTest < ActiveSupport::TestCase
     assert_equal 1, PersonalFinance::Transaction.where(user: @user, note: "Lunch").count
   end
 
+  test "does not import the same confirmed file twice" do
+    import = create_import("date,amount,type,category,note\n2026-08-02,25,expense,Food,Lunch")
+    parser = PersonalFinance::CsvTransactionImport.new(import, mapping)
+    parser.preview
+    import.update!(column_mapping: mapping, preview_rows: parser.rows)
+
+    2.times { PersonalFinance::CsvTransactionImport.new(import).confirm! }
+
+    assert_equal 1, PersonalFinance::Transaction.where(user: @user, note: "Lunch").count
+    assert_predicate import.reload, :imported?
+  end
+
   test "rejects oversized CSV shapes before building preview rows" do
     source = ("date,amount\n" + (1..PersonalFinance::CsvTransactionImport::MAX_ROWS + 1).map { |index| "2026-08-01,#{index}" }.join("\n"))
     parser = PersonalFinance::CsvTransactionImport.new(create_import(source), mapping)

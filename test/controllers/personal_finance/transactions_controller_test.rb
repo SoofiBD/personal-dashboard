@@ -100,6 +100,24 @@ class PersonalFinance::TransactionsControllerTest < PersonalFinance::Integration
     assert_equal %w[Vacation Work], PersonalFinance::Transaction.find_by!(amount: 80).tags.order(:name).pluck(:name)
   end
 
+  test "creates and deletes both sides of a transfer" do
+    savings = PersonalFinance::Account.create!(user: @user, name: "Savings", kind: :savings, opening_balance: 0)
+    source_balance = @account.current_balance
+
+    post finance_transactions_path, params: {transaction: {financial_account_id: @account.id, transfer_account_id: savings.id, kind: "transfer", amount: 120, occurred_on: Date.current, note: "Move to savings"}}
+
+    assert_redirected_to finance_transactions_path
+    outbound = PersonalFinance::Transaction.find_by!(account: @account, kind: "transfer")
+    assert_equal 2, PersonalFinance::Transaction.where(transfer_group_id: outbound.transfer_group_id).count
+    assert_equal (source_balance - 120).to_f, @account.reload.current_balance.to_f
+    assert_equal 120.0, savings.reload.current_balance.to_f
+
+    delete finance_transaction_path(outbound)
+
+    assert_redirected_to finance_transactions_path
+    assert_empty PersonalFinance::Transaction.where(transfer_group_id: outbound.transfer_group_id)
+  end
+
   test "exports filtered transactions as an Excel-compatible CSV" do
     from = (Date.current - 7.days).to_s
     to = Date.current.to_s

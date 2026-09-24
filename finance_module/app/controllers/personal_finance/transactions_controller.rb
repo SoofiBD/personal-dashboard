@@ -97,18 +97,25 @@ module PersonalFinance
     end
 
     def create
+      return create_transfer if transaction_params[:kind] == "transfer"
+
       @transaction = owned(Transaction).new(transaction_params)
       @transaction.savings_goal_id = savings_goal_id
       create_transaction_and_rule
     end
 
     def update
+      if @transaction.transfer_group_id.present?
+        return redirect_to(finance_transactions_path, alert: "Paired transfers must be deleted and recreated to preserve both account balances.")
+      end
+
       @transaction.assign_attributes(transaction_params)
       save_or_render
     end
 
     def destroy
-      @transaction.destroy!
+      Transaction.where(user: current_panel_user, transfer_group_id: @transaction.transfer_group_id).destroy_all if @transaction.transfer_group_id.present?
+      @transaction.destroy! unless @transaction.destroyed?
       redirect_to finance_transactions_path, notice: t("transactions.flash.deleted", default: "Transaction deleted.")
     end
 
@@ -201,6 +208,29 @@ module PersonalFinance
 
     def transaction_params
       params.require(:transaction).permit(:financial_account_id, :category_id, :kind, :amount, :occurred_on, :note, :is_recurring)
+    end
+
+    def transfer_account_id
+      params.dig(:transaction, :transfer_account_id)
+    end
+
+    def create_transfer
+      raise TransferRecorder::Error, "Select a destination account for the transfer" if transfer_account_id.blank?
+
+      source = owned(Account).find(transaction_params[:financial_account_id])
+      destination = owned(Account).find(transfer_account_id)
+      records = TransferRecorder.call(user: current_panel_user, source_account: source, destination_account: destination,
+        amount: transaction_params[:amount], occurred_on: transaction_params[:occurred_on], note: transaction_params[:note])
+      inbound = records.find(&:transfer_direction_inbound?)
+      sync_tags(records.first)
+      records.last.tags = records.first.tags
+      goal = create_goal_contribution(inbound)
+      SpendingNotificationGenerator.call(inbound, goal: goal)
+      redirect_to finance_transactions_path, notice: t("transactions.flash.saved", default: "Transaction saved.")
+    rescue ActiveRecord::RecordInvalid, TransferRecorder::Error => error
+      @transaction = owned(Transaction).new(transaction_params)
+      @transaction.errors.add(:base, error.message)
+      render :new, status: :unprocessable_entity
     end
 
     def recurrence_params

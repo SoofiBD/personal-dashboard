@@ -2,15 +2,33 @@ require "csv"
 
 module PersonalFinance
   class DataController < ApplicationController
-    TABLES = {accounts: Account, categories: Category, transactions: Transaction, budget_periods: BudgetPeriod, savings_goals: SavingsGoal, purchase_plans: PurchasePlan, recurring_rules: RecurringRule, subscriptions: Subscription, debts: Debt}.freeze
+    TABLES = {
+      accounts: Account,
+      categories: Category,
+      tags: Tag,
+      budget_templates: BudgetTemplate,
+      exchange_rates: ExchangeRate,
+      budget_periods: BudgetPeriod,
+      savings_goals: SavingsGoal,
+      purchase_plans: PurchasePlan,
+      debts: Debt,
+      recurring_rules: RecurringRule,
+      transactions: Transaction,
+      subscriptions: Subscription,
+      budget_allocations: BudgetAllocation,
+      goal_contributions: GoalContribution,
+      debt_payments: DebtPayment,
+      transaction_tags: TransactionTag,
+      notifications: Notification
+    }.freeze
 
     def show
     end
 
     def export
       audit_security_event("financial_data_exported", format: request.format.symbol)
-      records = TABLES.transform_values { |model| model.where(user_id: current_panel_user.id).as_json }
-      payload = {metadata: {version: 1, exported_at: Time.current.iso8601, record_counts: records.transform_values(&:size)}, data: records}
+      records = TABLES.keys.to_h { |table| [table, export_scope(table).as_json] }
+      payload = {metadata: {version: 2, exported_at: Time.current.iso8601, record_counts: records.transform_values(&:size)}, data: records}
       respond_to do |format|
         format.json { send_data JSON.pretty_generate(payload), filename: "finance-backup-#{Date.current}.json", type: "application/json" }
         format.csv { send_data csv_export(records), filename: "finance-backup-#{Date.current}.csv", type: "text/csv" }
@@ -36,6 +54,16 @@ module PersonalFinance
       CSV.generate do |csv|
         csv << %w[table id attributes]
         records.each { |table, rows| rows.each { |row| csv << [csv_safe(table), row["id"], csv_safe(row.except("id").to_json)] } }
+      end
+    end
+
+    def export_scope(table)
+      case table
+      when :budget_allocations then BudgetAllocation.joins(:budget_period).where(finance_budget_periods: {user_id: current_panel_user.id})
+      when :goal_contributions then GoalContribution.joins(:savings_goal).where(finance_savings_goals: {user_id: current_panel_user.id})
+      when :debt_payments then DebtPayment.joins(:debt).where(finance_debts: {user_id: current_panel_user.id})
+      when :transaction_tags then TransactionTag.joins(:financial_transaction).where(finance_transactions: {user_id: current_panel_user.id})
+      else TABLES.fetch(table).where(user_id: current_panel_user.id)
       end
     end
 

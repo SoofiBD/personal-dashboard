@@ -20,8 +20,6 @@ module PersonalFinance
       validate_mapping
       return self if errors.any?
 
-      existing_keys = existing_duplicate_keys
-      seen_keys = Set.new
       parsed = CSV.parse(import.source_csv.delete_prefix("\uFEFF"), headers: true)
       if parsed.headers.compact.length > MAX_COLUMNS
         errors << "CSV files may contain at most #{MAX_COLUMNS} columns."
@@ -32,8 +30,11 @@ module PersonalFinance
         return self
       end
 
-      parsed.each_with_index do |csv_row, index|
-        row = parse_row(csv_row, index + 2)
+      parsed.each_with_index { |csv_row, index| rows << parse_row(csv_row, index + 2) }
+
+      existing_keys = existing_duplicate_keys_for(rows)
+      seen_keys = Set.new
+      rows.each do |row|
         key = duplicate_key(row)
         row["status"] = if row["error"].present?
           "error"
@@ -43,7 +44,6 @@ module PersonalFinance
           seen_keys << key
           "ready"
         end
-        rows << row
       end
       self
     rescue CSV::MalformedCSVError => error
@@ -52,7 +52,21 @@ module PersonalFinance
     end
 
     def confirm!
-      created = skipped = failed = 0
+      return import if import.imported?
+
+      import.with_lock do
+        return import if import.imported?
+
+        confirm_rows!
+      end
+      import
+    end
+
+    private
+
+    def confirm_rows!
+      skipped = failed = 0
+      ready_rows = []
       import.preview_rows.each do |row|
         if row["status"] == "duplicate"
           skipped += 1
@@ -63,29 +77,36 @@ module PersonalFinance
           next
         end
 
-        if duplicate_exists?(row)
+        ready_rows << row
+      end
+
+      existing_keys = existing_duplicate_keys_for(ready_rows)
+      seen_keys = Set.new
+      insert_rows = ready_rows.filter_map do |row|
+        key = duplicate_key(row)
+        if existing_keys.include?(key) || seen_keys.include?(key)
           skipped += 1
           next
         end
 
-        Transaction.create!(
-          user: import.user,
-          account: import.account,
+        seen_keys << key
+        {
+          user_id: import.user_id,
+          financial_account_id: import.financial_account_id,
           category_id: row["category_id"].presence,
           kind: row["kind"],
           amount: row["amount"],
           occurred_on: row["occurred_on"],
-          note: row["note"].presence
-        )
-        created += 1
-      rescue ActiveRecord::RecordInvalid
-        failed += 1
+          note: row["note"].presence,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
       end
+      Transaction.insert_all!(insert_rows) unless insert_rows.empty?
+      created = insert_rows.length
 
       import.update!(created_count: created, skipped_count: skipped, error_count: failed, imported_at: Time.current)
     end
-
-    private
 
     def validate_mapping
       %w[date amount].each { |field| errors << "Map a column for #{field}." if @mapping[field].blank? }
@@ -151,19 +172,27 @@ module PersonalFinance
 
     def category_for(name, kind)
       return if name.blank? || kind.nil?
-      Category.where(user: import.user, kind: kind).where("LOWER(name) = ?", name.downcase).first
+      categories_by_key[[kind, name.downcase]]
     end
 
     def duplicate_key(row)
       [row["occurred_on"], row["amount"], row["note"].to_s].join("|")
     end
 
-    def existing_duplicate_keys
-      Transaction.where(user: import.user).pluck(:occurred_on, :amount, :note).map { |date, amount, note| [date.iso8601, amount.to_s("F"), note.to_s].join("|") }.to_set
+    def categories_by_key
+      @categories_by_key ||= Category.where(user: import.user).to_a.index_by do |category|
+        [category.kind, category.name.downcase]
+      end
     end
 
-    def duplicate_exists?(row)
-      Transaction.exists?(user: import.user, occurred_on: row["occurred_on"], amount: row["amount"], note: row["note"].presence)
+    def existing_duplicate_keys_for(candidate_rows)
+      dates = candidate_rows.filter_map { |row| Date.iso8601(row["occurred_on"]) if row["occurred_on"].present? }
+      return Set.new if dates.empty?
+
+      Transaction.where(user: import.user, occurred_on: dates.min..dates.max)
+        .pluck(:occurred_on, :amount, :note)
+        .map { |date, amount, note| [date.iso8601, amount.to_s("F"), note.to_s].join("|") }
+        .to_set
     end
   end
 end

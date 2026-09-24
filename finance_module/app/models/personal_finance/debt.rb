@@ -3,6 +3,8 @@ module PersonalFinance
     self.table_name = "finance_debts"
     belongs_to :user, class_name: "::User"
     has_many :payments, class_name: "PersonalFinance::DebtPayment", dependent: :destroy
+
+    scope :active, -> { where(active: true) }
     validates :name, presence: true
     validates :total_amount, :remaining_amount, :monthly_payment, numericality: {greater_than_or_equal_to: 0}
     validates :remaining_installments, numericality: {only_integer: true, greater_than_or_equal_to: 0}
