@@ -36,7 +36,7 @@
           </div>
         </div>
 
-        <div class="quick-add-category-section">
+        <div class="quick-add-category-section" data-quick-add-category-section>
           <div class="quick-add-section-label">
             <%= form.label :category_id, t("transactions.category", default: "Kategori") %>
             <span><%= t("quick_add.swipe_hint", default: "Kaydırarak seç") %></span>
@@ -68,6 +68,10 @@
             <div class="form-group">
               <%= form.label :financial_account_id, t("transactions.account", default: "Hesap") %>
               <%= form.collection_select :financial_account_id, quick_accounts, :id, :name %>
+            </div>
+            <div class="form-group" data-quick-add-transfer-account hidden>
+              <%= label_tag "quick_add_transfer_account_id", "Hedef hesap" %>
+              <%= select_tag "transaction[transfer_account_id]", options_from_collection_for_select(quick_accounts, :id, :name), include_blank: "Hedef hesap seçin", id: "quick_add_transfer_account_id", disabled: true, data: {quick_add_transfer_account_input: true} %>
             </div>
           </div>
         </details>

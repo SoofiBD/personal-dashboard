@@ -8,6 +8,8 @@ module PersonalFinance
 
     enum :kind, {cash: "cash", bank: "bank", card: "card", savings: "savings"}, validate: true
 
+    scope :active, -> { where(is_active: true) }
+
     validates :name, presence: true, length: {maximum: 80}
     validates :opening_balance, numericality: true
     validates :currency, presence: true, length: {is: 3}
@@ -16,13 +18,13 @@ module PersonalFinance
     end
 
     def current_balance
-      opening_balance + transactions.sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
+      opening_balance + transactions.sum(self.class.balance_sql)
     end
 
     def balance_history(months: 6)
       first_month = (Date.current.beginning_of_month - (months - 1).months)
-      running_balance = opening_balance + transactions.where("occurred_on < ?", first_month).sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
-      totals = transactions.where(occurred_on: first_month..Date.current).group("DATE_TRUNC('month', occurred_on)").sum("CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END")
+      running_balance = opening_balance + transactions.where("occurred_on < ?", first_month).sum(self.class.balance_sql)
+      totals = transactions.where(occurred_on: first_month..Date.current).group("DATE_TRUNC('month', occurred_on)").sum(self.class.balance_sql)
       months.times.map do |offset|
         month = first_month + offset.months
         running_balance += totals[month.to_time.beginning_of_month] || 0
@@ -36,7 +38,7 @@ module PersonalFinance
 
       first_month = Date.current.beginning_of_month - (months - 1).months
       account_ids = accounts.map(&:id)
-      balance_sql = "CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount ELSE 0 END"
+      balance_sql = self.balance_sql
       opening_totals = Transaction.where(financial_account_id: account_ids).where("occurred_on < ?", first_month).group(:financial_account_id).sum(balance_sql)
       monthly_totals = Transaction.where(financial_account_id: account_ids, occurred_on: first_month..Date.current).group(:financial_account_id, "DATE_TRUNC('month', occurred_on)").sum(balance_sql).to_h { |(account_id, month), amount| [[account_id, month.to_date.beginning_of_month], amount] }
 
@@ -49,6 +51,10 @@ module PersonalFinance
         end
         [account, history]
       end
+    end
+
+    def self.balance_sql
+      "CASE WHEN kind = 'income' THEN amount WHEN kind = 'expense' THEN -amount WHEN kind = 'transfer' AND transfer_direction = 'inbound' THEN amount WHEN kind = 'transfer' AND transfer_direction = 'outbound' THEN -amount ELSE 0 END"
     end
   end
 end

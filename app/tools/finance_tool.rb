@@ -57,7 +57,7 @@ class FinanceTool
   end
 
   def create_expense(amount:, category_name:, description:)
-    category = find_category(category_name)
+    category = find_category(category_name, kind: "expense")
     return tool_response(content: {error: "Category '#{category_name}' not found"}) unless category
 
     account = find_default_account
@@ -80,7 +80,7 @@ class FinanceTool
   end
 
   def create_income(amount:, category_name:, description:)
-    category = find_category(category_name)
+    category = find_category(category_name, kind: "income")
     return tool_response(content: {error: "Category '#{category_name}' not found"}) unless category
 
     account = find_default_account
@@ -110,6 +110,7 @@ class FinanceTool
   end
 
   def get_recent_transactions(days: 7)
+    days = days.to_i.clamp(1, 90)
     start_date = days.days.ago.to_date
     transactions = user.finance_transactions
       .where(occurred_on: start_date..Date.current)
@@ -127,9 +128,11 @@ class FinanceTool
     period = user.finance_budget_periods.where("starts_on <= ? AND ends_on >= ?", Date.current, Date.current).first
     return tool_response(content: {error: "No active budget period"}) unless period
 
-    allocations = period.budget_allocations.includes(:category).map do |a|
-      spent = user.finance_transactions.expense.during(period.starts_on..period.ends_on)
-        .where(category: a.category).sum(:amount).to_f
+    spending_by_category = user.finance_transactions.expense.during(period.starts_on..period.ends_on)
+      .where.not(category_id: nil).group(:category_id).sum(:amount)
+
+    allocations = period.allocations.includes(:category).map do |a|
+      spent = spending_by_category.fetch(a.category_id, 0).to_f
       {category: a.category.name, budget: a.planned_amount.to_f, spent: spent,
        remaining: (a.planned_amount.to_f - spent).round(2)}
     end
@@ -180,8 +183,8 @@ class FinanceTool
     start_date..end_date
   end
 
-  def find_category(name)
-    PersonalFinance::Category.find_by(user: user, name: name)
+  def find_category(name, kind:)
+    PersonalFinance::Category.find_by(user: user, name: name, kind: kind)
   end
 
   def find_default_account

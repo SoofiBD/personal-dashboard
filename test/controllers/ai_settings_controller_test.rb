@@ -17,7 +17,7 @@ class AiSettingsControllerTest < ActionDispatch::IntegrationTest
     with_jan_client(jan) do
       get ai_settings_path
       assert_response :success
-      assert_select "h1", "Jan bağlantısı"
+      assert_select "h1", "Sağlayıcı ve model"
       assert_select "option[value='qwen3-4b']", "qwen3-4b"
 
       patch ai_settings_path, params: {user: {ai_model: "qwen3-4b"}}

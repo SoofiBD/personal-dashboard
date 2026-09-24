@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_20_000003) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -323,10 +323,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_20_000003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "recurring_rule_id"
+    t.uuid "transfer_group_id"
+    t.string "transfer_direction"
     t.index ["category_id"], name: "index_finance_transactions_on_category_id"
     t.index ["financial_account_id"], name: "index_finance_transactions_on_financial_account_id"
     t.index ["recurring_rule_id", "occurred_on"], name: "index_finance_transactions_on_rule_and_date", unique: true, where: "(recurring_rule_id IS NOT NULL)"
     t.index ["recurring_rule_id"], name: "index_finance_transactions_on_recurring_rule_id"
+    t.index ["transfer_group_id"], name: "index_finance_transactions_on_transfer_group_id"
     t.index ["user_id", "occurred_on"], name: "index_finance_transactions_on_user_id_and_occurred_on"
     t.index ["user_id"], name: "index_finance_transactions_on_user_id"
     t.check_constraint "amount > 0::numeric", name: "finance_transaction_amount_positive"

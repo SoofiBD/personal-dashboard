@@ -26,6 +26,7 @@
   const initVolumeChart = () => {
     const canvas = document.getElementById("gym-volume-chart");
     if (!canvas || typeof window.Chart === "undefined") return;
+    if (window.Chart.getChart(canvas)) return;
 
     const dataEl = document.querySelector("[data-gym-volume-data]");
     if (!dataEl) return;

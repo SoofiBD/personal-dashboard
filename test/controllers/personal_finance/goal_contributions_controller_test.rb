@@ -32,7 +32,8 @@ class PersonalFinance::GoalContributionsControllerTest < PersonalFinance::Integr
   end
 
   test "creates a linked contribution when a savings transfer selects a goal" do
-    post finance_transactions_path, params: {transaction: {financial_account_id: @savings_account.id, kind: "transfer", amount: 250, occurred_on: Date.current, savings_goal_id: @goal.id}}
+    source_account = PersonalFinance::Account.create!(user: @user, name: "Card", kind: "bank", opening_balance: 500)
+    post finance_transactions_path, params: {transaction: {financial_account_id: source_account.id, transfer_account_id: @savings_account.id, kind: "transfer", amount: 250, occurred_on: Date.current, savings_goal_id: @goal.id}}
 
     assert_redirected_to finance_transactions_path
     contribution = @goal.contributions.last

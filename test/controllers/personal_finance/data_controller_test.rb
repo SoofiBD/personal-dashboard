@@ -23,8 +23,10 @@ class PersonalFinance::DataControllerTest < PersonalFinance::IntegrationTest
     assert_equal "application/json", response.media_type
 
     payload = JSON.parse(response.body)
-    assert_equal 1, payload.dig("metadata", "version")
+    assert_equal 2, payload.dig("metadata", "version")
     assert_includes payload.dig("data", "accounts").pluck("id"), account.id
+    assert_includes payload.fetch("data").keys, "budget_allocations"
+    assert_includes payload.fetch("data").keys, "transaction_tags"
   end
 
   test "exports the current users data as csv" do
