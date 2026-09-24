@@ -9,7 +9,11 @@ class AiAssistantServiceTest < ActiveSupport::TestCase
     captured = nil
 
     with_env("GEMINI_API_KEY", "test-gemini-key") do
-      with_constructor_stub(Langchain::LLM::GoogleGemini, ->(**options) { captured = options; Object.new }) do
+      replacement = lambda do |**options|
+        captured = options
+        Object.new
+      end
+      with_constructor_stub(Langchain::LLM::GoogleGemini, replacement) do
         AiAssistantService.new(user: user)
       end
     end
@@ -24,7 +28,11 @@ class AiAssistantServiceTest < ActiveSupport::TestCase
     captured = nil
 
     with_constructor_stub(Ai::JanClient, jan) do
-      with_constructor_stub(Langchain::LLM::OpenAI, ->(**options) { captured = options; Object.new }) do
+      replacement = lambda do |**options|
+        captured = options
+        Object.new
+      end
+      with_constructor_stub(Langchain::LLM::OpenAI, replacement) do
         AiAssistantService.new(user: user)
       end
     end

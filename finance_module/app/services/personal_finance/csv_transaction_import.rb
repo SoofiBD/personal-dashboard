@@ -65,7 +65,7 @@ module PersonalFinance
     private
 
     def confirm_rows!
-      created = skipped = failed = 0
+      skipped = failed = 0
       ready_rows = []
       import.preview_rows.each do |row|
         if row["status"] == "duplicate"
