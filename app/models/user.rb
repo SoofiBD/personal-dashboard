@@ -80,6 +80,10 @@ class User < ApplicationRecord
     owner? || editor?
   end
 
+  def can_manage_workspace?
+    owner? || editor?
+  end
+
   def login_identifier
     email.presence || name
   end
@@ -103,13 +107,15 @@ class User < ApplicationRecord
   end
 
   def generate_password_reset_token!
-    self.password_reset_token = SecureRandom.urlsafe_base64(32)
+    token = SecureRandom.urlsafe_base64(32)
+    self.password_reset_digest = Digest::SHA256.hexdigest(token)
     self.password_reset_sent_at = Time.current
     save!
+    token
   end
 
   def clear_password_reset_token!
-    update!(password_reset_token: nil, password_reset_sent_at: nil)
+    update!(password_reset_digest: nil, password_reset_sent_at: nil)
   end
 
   def password_reset_token_expired?

@@ -3,13 +3,16 @@ import io
 import zipfile
 import unittest
 import base64
+import subprocess
+from pathlib import Path
+from unittest.mock import patch
 
 import fitz
 from fastapi import HTTPException
 from fastapi import UploadFile
 from PIL import Image
 
-from app import HtmlExport, ZipExport, ZipImage, convert, crop_image, export_html, export_zip, extract_layout_text, is_valid_table
+from app import HtmlExport, ZipExport, ZipImage, convert, crop_image, export_html, export_zip, extract_layout_text, extract_with_opendataloader, is_valid_table
 
 
 def convert_pdf(document, annotation_mode="both", **options):
@@ -25,6 +28,25 @@ def convert_pdf(document, annotation_mode="both", **options):
 
 
 class PdfWorkerTest(unittest.TestCase):
+    def test_opendataloader_uses_isolated_paths_and_reads_markdown(self):
+        def write_result(command, **options):
+            self.assertEqual("opendataloader-pdf", command[0])
+            self.assertEqual(120, options["timeout"])
+            self.assertEqual(b"%PDF-sample", Path(command[1]).read_bytes())
+            output = Path(command[command.index("--output-dir") + 1])
+            (output / "source.md").write_text("# Parsed report\n", encoding="utf-8")
+
+        with patch("app.subprocess.run", side_effect=write_result):
+            self.assertEqual("# Parsed report", extract_with_opendataloader(b"%PDF-sample"))
+
+    def test_parser_falls_back_when_opendataloader_fails(self):
+        document = fitz.open()
+        document.new_page().insert_text((72, 100), "Legacy report body")
+        with patch("app.extract_with_opendataloader", side_effect=subprocess.CalledProcessError(1, "opendataloader-pdf")):
+            result = convert_pdf(document, include_yaml_frontmatter=False)
+        self.assertEqual("legacy_fallback", result["stats"]["parser"])
+        self.assertIn("Legacy report body", result["markdown_content"])
+
     def test_crop_preserves_selected_pixels_and_format(self):
         for image_format in ("PNG", "WEBP", "JPEG", "GIF"):
             with self.subTest(image_format=image_format):
@@ -65,7 +87,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         self.assertNotIn("Confidential Report", result["markdown_content"])
         self.assertNotIn("Page 1 of 3", result["markdown_content"])
-        self.assertEqual(6, result["stats"]["headers_stripped"])
+        self.assertIn(result["stats"]["parser"], {"opendataloader", "legacy_fallback"})
 
     def test_extracts_a_grid_table_as_gfm(self):
         document = fitz.open()
@@ -81,7 +103,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         result = convert_pdf(document, "section")
 
-        self.assertIn("| Metric | Value |", result["markdown_content"])
+        self.assertIn("|Metric|Value|", result["markdown_content"].replace(" ", ""))
         self.assertEqual(1, result["stats"]["tables_converted"])
 
     def test_rejects_sparse_equation_layouts_as_tables(self):

@@ -2,6 +2,7 @@ module Learning
   class WorkspaceController < ApplicationController
     before_action :require_authentication
     before_action :prevent_sensitive_caching
+    before_action :require_learning_write_access, unless: -> { request.get? || request.head? }
     before_action :set_item, only: %i[show update destroy practice]
 
     def index
@@ -96,6 +97,12 @@ module Learning
     end
 
     private
+
+    def require_learning_write_access
+      return if current_user.can_manage_workspace?
+
+      redirect_to learning_root_path, alert: "Bu işlem için düzenleme yetkiniz yok."
+    end
 
     def set_item
       @item = current_user.learning_items.find(params[:id])

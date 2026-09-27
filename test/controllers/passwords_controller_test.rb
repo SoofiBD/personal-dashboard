@@ -1,0 +1,62 @@
+require "test_helper"
+require "stringio"
+
+class PasswordsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = User.dashboard_owner
+    @user.update!(email: "reset@example.test")
+    @old_smtp = %w[SMTP_ADDRESS SMTP_USERNAME SMTP_PASSWORD SMTP_FROM DASHBOARD_DOMAIN].to_h { |key| [key, ENV[key]] }
+    ENV.update("SMTP_ADDRESS" => "smtp.example.test", "SMTP_USERNAME" => "mailer", "SMTP_PASSWORD" => "test-only-password", "SMTP_FROM" => "reset@example.test", "DASHBOARD_DOMAIN" => "dashboard.example.test")
+    ActionMailer::Base.deliveries.clear
+  end
+
+  teardown do
+    @old_smtp.each { |key, value| value.nil? ? ENV.delete(key) : ENV[key] = value }
+    ActionMailer::Base.deliveries.clear
+  end
+
+  test "reset token is delivered by email and never logged or stored in plaintext" do
+    logs = capture_rails_logs do
+      post password_path, params: {email: @user.email}
+    end
+
+    assert_redirected_to confirm_password_path
+    assert_equal 1, ActionMailer::Base.deliveries.size
+    body = ActionMailer::Base.deliveries.last.body.decoded
+    token = body[/token=([^\s&]+)/, 1]
+    assert token.present?
+    assert_equal Digest::SHA256.hexdigest(token), @user.reload.password_reset_digest
+    assert_not_includes logs, token
+  end
+
+  test "invalid reset token is not copied to audit logs" do
+    logs = capture_rails_logs do
+      get edit_password_path(token: "attacker-supplied-secret")
+    end
+
+    assert_redirected_to new_password_path
+    assert_not_includes logs, "attacker-supplied-secret"
+  end
+
+  test "missing mail configuration does not issue a reset token" do
+    ENV.delete("SMTP_ADDRESS")
+
+    post password_path, params: {email: @user.email}
+
+    assert_redirected_to confirm_password_path
+    assert_nil @user.reload.password_reset_digest
+    assert_empty ActionMailer::Base.deliveries
+  end
+
+  private
+
+  def capture_rails_logs
+    output = StringIO.new
+    previous_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(output)
+    yield
+    output.string
+  ensure
+    Rails.logger = previous_logger
+  end
+end

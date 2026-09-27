@@ -11,6 +11,7 @@ class AiActionExecutor
   def execute!
     action.with_lock do
       raise Error, "Bu işlem artık beklemiyor." unless action.status == "pending"
+      raise Error, "Bu işlem için düzenleme yetkiniz yok." unless user.can_manage_workspace?
       if action.expired?
         action.expire_if_needed!
         raise Error, "Bu işlem için onay süresi doldu."

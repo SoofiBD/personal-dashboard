@@ -26,10 +26,9 @@ pdf_worker/**/__pycache__/
 **/__pycache__/
 pdf_worker/*.ses
 
-# NAS credentials and local recovery material
+# Local credentials and recovery material
 .private/
 secrets/
-.env.nas*
 *.pem
 *.pem.bak
 

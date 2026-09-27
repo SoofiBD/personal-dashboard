@@ -31,6 +31,10 @@ class PdfConversionClient
     )
 
     response = http.request(request)
+    if response.code.to_i == 422
+      detail = JSON.parse(response.body)["detail"]
+      raise Error, detail.truncate(300) if detail.is_a?(String)
+    end
     raise Error, "PDF dönüştürme servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)
 
     body = JSON.parse(response.body)
@@ -114,7 +118,7 @@ class PdfConversionClient
   end
 
   def http
-    Net::HTTP.start(@base_uri.host, @base_uri.port, open_timeout: 5, read_timeout: 60)
+    Net::HTTP.start(@base_uri.host, @base_uri.port, open_timeout: 5, read_timeout: 180)
   end
 
   def safe_filename(filename)

@@ -1,318 +1,45 @@
-# Oracle Cloud Free Tier Deploy Plan — Personal Dashboard
+# Oracle Cloud yayın planı
 
-**Created:** 2026-09-20  
-**Repo:** https://github.com/SoofiBD/personal-dashboard  
-**Backup PR:** #109 (branch: `deploy-backup-20260920`)
+Son gözden geçirme: 2026-09-27. Bu plan bir dağıtım kontrol listesidir; çalışan bir Oracle sunucusunda uçtan uca doğrulama yapılmadan “yayına hazır” kabul edilmez. Uygulama desteklenen Rails 8.1 serisine yükseltildi; parola sıfırlama alanı çakışması için yeni migration eklenmiştir. Migration eski parola sıfırlama bağlantılarını güvenlik gereği geçersiz kılar.
 
----
+## Yayın mimarisi
 
-## 🎯 Hedef
+- Dashboard, Oracle VM üzerinde HTTPS ile yayınlanacak. Rails, PostgreSQL, PDF işçisi, Stirling PDF, ChartDB ve Caddy Oracle tarafında çalışacak.
+- Veritabanı ve işçi servisleri özel Docker ağlarında kalır; yalnız Caddy 80/443 üzerinden dışarı açılır.
 
-- **Platform:** Oracle Cloud Free Tier (ARM, 4 OCPU, 24 GB RAM, 200 GB disk)
-- **Uygulama:** Rails 7.2 + Docker Compose (multi-service)
-- **Kullanıcılar:** 3 kişi (sen + 2)
-- **Maliyet:** $0 (Free Tier limitleri içinde)
-- **NAS Erişimi:** OpenWrt router → Tailscale Subnet Router (sonraki aşama)
+## Oracle kapasitesi ve maliyet kontrolü
 
----
+Oracle'ın [güncel Always Free kaynak belgesi](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), A1 için toplam **2 OCPU / 12 GB RAM** ve boot + block volume toplamında **200 GB** ücretsiz kota listeliyor; eski plandaki 4 OCPU / 24 GB varsayımı geçerli kabul edilmemeli. Varsayılan boot volume yaklaşık 50 GB'dır; 200 GB'ın tamamı otomatik olarak VM dosya sistemi değildir. Uygunluk, bölge, kapasite ve ücretlendirme Oracle Console'da oluşturma anında tekrar kontrol edilir. Idle Always Free VM'ler geri alınabilir; yedekler VM dışında tutulur.
 
-## 📋 Servisler (compose.production.yaml + compose.nas.yaml)
+Yerel ARM ölçümünde yaklaşık imaj boyutları: Rails üretim 220 MB, PDF işçisi 176 MB, ChartDB 39 MB; önceki ölçümde Stirling PDF 3.27 GB, PostgreSQL 411 MB. Bunlar tek tek görünen imaj boyutlarıdır; paylaşılan katmanlar, build cache, veritabanı, yüklenen dosyalar ve yedekler yüzünden gerçek disk tüketimi ayrıca ölçülmelidir. Kaynak kod klasörünün Mac'te kapladığı yaklaşık 457 MB sunucu ihtiyacının doğru ölçüsü değildir. İlk ARM build'i ve Stirling/PDF eşzamanlı kullanımında CPU, RAM ve disk yük testi yapılır.
 
-| Servis | Açıklama | Port (internal) |
-|--------|----------|-----------------|
-| `web` | Rails app (Puma) | 3000 |
-| `jobs` | Solid Queue worker | — |
-| `pdf-worker` | Python PDF conversion API | 8000 |
-| `stirling-pdf` | Stirling PDF (Docker image) | 8080 |
-| `chartdb` | ChartDB (custom build) | 80 |
-| `gateway` | Caddy reverse proxy + auto-HTTPS | 80/443 |
-| `db` | PostgreSQL 16 | 5432 |
-| `nas-worker` | SMB adapter (Python/Flask) | 8000 |
+## Yayın öncesi kapılar
 
-**Network topology:** `edge` (public) → `gateway` → internal networks (`database`, `pdf`, `stirling`, `chartdb`, `nas`)
+1. Açık PR'lar, yerel değişiklikler, CI lint/test/security kontrolleri ve migration durumu netleştirilir. Çalışan dal değil, doğrulanmış commit dağıtılır.
+2. Alan adı ve Oracle Always Free uygun A1 kapasitesi doğrulanır. Ubuntu ARM VM, ev bölgesinde uygun boot volume ile oluşturulur. SSH anahtarı kullanılır; 22/TCP yalnız yönetim IP'sine sınırlandırılır (bu mümkün değilse ek SSH sertleştirmesi yapılır). Dışarıya yalnız 80/443 açılır. PostgreSQL, PDF, Stirling ve ChartDB portları yayınlanmaz.
+3. VM'de Docker Engine ve Compose kurulur. Private repo için salt-okunur deploy key kullanılır; PAT URL içine veya shell geçmişine yazılmaz.
+4. `secrets/` Git dışında, yalnız yönetici tarafından okunabilir izinlerle hazırlanır. `rails_master_key.txt` **mevcut `config/credentials.yml.enc` dosyasını açan gerçek anahtar** olmalıdır; rastgele yeni bir anahtar üretmek mevcut credentials'ı kullanılmaz hale getirir. `postgres_password.txt` ve `pdf_worker_api_key.txt` sağlanır. Gerçek değerler plana, Git'e veya loglara yazılmaz.
+5. `.env.production.example` üzerinden Git dışı, yalnız yöneticiye okunabilir `.env.production` hazırlanır. `DATABASE_URL` içindeki parola `postgres_password.txt` ile birebir aynı olmalı; URL özel karakterleri uygun biçimde kodlanmalıdır. `DASHBOARD_DOMAIN` gerçek DNS kaydıyla eşleşir; `STIRLING_PDF_PASSWORD` benzersiz güçlü parola olmalıdır. Stirling'in belgelenmiş `SECURITY_INITIALLOGIN_PASSWORD` ayarı kullanılır; desteklenmeyen `_FILE` varyantına güvenilmez. İlk girişten sonra parola uygulama içinde değiştirilir ve varsayılan `admin/stirling` çalışmamalıdır. `GEMINI_API_KEY` gerekiyorsa güvenli biçimde eklenir. Web üzerinden parola sıfırlama kullanılacaksa `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM` ayarlanır ve teslimat test edilir; SMTP yokken sıfırlama e-postası gönderilmez. Eski plandaki `<<'EOF'` içinde `$(cat ...)` kullanımı parola yerleştirmez; bu yöntem kullanılmaz.
+6. Compose doğrulanır, derlenir ve başlatılır:
 
----
+   ```bash
+   docker compose --env-file .env.production -f compose.production.yaml config --quiet
+   docker compose --env-file .env.production -f compose.production.yaml build
+   docker compose --env-file .env.production -f compose.production.yaml up -d
+   docker compose --env-file .env.production -f compose.production.yaml ps
+   ```
 
-## 🔐 Secrets Yönetimi
+7. Web giriş noktası `db:prepare` çalıştırır. Ardından migration durumu kontrol edilir ve gerçek görev adı olan `dashboard:credentials:set` ile owner şifresi etkileşimli belirlenir; eski plandaki `dashboard:credentials:provision` görevi mevcut değildir. Parola en az 16 karakterdir ve kalıcı shell geçmişine yazılmaz.
 
-Tüm secrets `./secrets/` klasöründe **dosya tabanlı** (Docker secrets), **git'e yazılmaz**.
+   ```bash
+   docker compose --env-file .env.production -f compose.production.yaml exec web ./bin/rails db:migrate:status
+   docker compose --env-file .env.production -f compose.production.yaml exec web ./bin/rails dashboard:credentials:set
+   ```
 
-| Secret Dosyası | Kaynak | Not |
-|----------------|--------|-----|
-| `rails_master_key.txt` | `rails credentials:edit` veya `rails secret` | 64+ char |
-| `postgres_password.txt` | `openssl rand -hex 32` | |
-| `pdf_worker_api_key.txt` | `openssl rand -hex 32` | |
-| `stirling_pdf_password.txt` | `openssl rand -hex 32` | Stirling PDF admin şifresi |
-| `nas_api_token.txt` | Mevcut `.env.nas.local`'den | 32+ char, HMAC |
-| `nas_password.txt` | Mevcut `.env.nas.local`'den | NAS SMB şifresi |
+8. Dış ağdan HTTPS, oturum/MFA, parola sıfırlama e-postası ve tek kullanımlık bağlantı, finans, notlar, eğitim, spor, AI, PDF dönüştürme/düzenleme ve ChartDB kontrol edilir. PDF işçisi ve Stirling ağır işlemleri birlikte çalışırken `docker stats` ve `df -h` izlenir. Alan adı/TLS ve geri yükleme testi geçmeden üretim verisi taşınmaz. ChartDB'nin Monaco editörü tek başına yaklaşık 16 MB küçültülmüş JS dosyası üretir; uzak ağda ilk açılış süresi özellikle ölçülür.
 
----
+## Yedek ve işletim
 
-## 📦 Deploy Adımları
-
-### 1. Oracle VM Oluştur
-```bash
-# Oracle Console → Compute → Instances → Create Instance
-# - Image: Ubuntu 24.04 (ARM)
-# - Shape: VM.Standard.A1.Flex → 4 OCPU, 24 GB RAM
-# - Boot volume: 200 GB
-# - SSH Key: senin public key'in
-# - VCN: Default (public subnet)
-```
-
-**Security List Ingress Rules:**
-| Port | Protocol | Source | Açıklama |
-|------|----------|--------|----------|
-| 22 | TCP | 0.0.0.0/0 | SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (Caddy) |
-| 443 | TCP | 0.0.0.0/0 | HTTPS (Caddy) |
-
----
-
-### 2. VM'e Bağlan + Docker Kur
-```bash
-ssh ubuntu@<VM_PUBLIC_IP>
-
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
-sudo usermod -aG docker $USER
-newgrp docker  # veya logout/login
-
-docker compose version  # doğrula
-```
-
----
-
-### 3. Tailscale Kur (VM tarafı)
-```bash
-curl -fsSL https://tailscale.com/install.sh | sh
-sudo tailscale up
-# Output URL'yi tarayıcıda aç → authenticate
-# Exit node KAPALI
-```
-
----
-
-### 4. Proje Clone
-```bash
-# Private repo → Deploy key veya PAT
-# Deploy key önerilir: GitHub repo Settings → Deploy keys → Add key (VM'in ~/.ssh/id_ed25519.pub)
-
-git clone git@github.com:SoofiBD/personal-dashboard.git
-cd personal-dashboard
-
-# Veya PAT ile:
-# git clone https://<PAT>@github.com/SoofiBD/personal-dashboard.git
-```
-
----
-
-### 5. Secrets Oluştur
-```bash
-mkdir -p secrets
-
-# Mevcut .env.nas.local'den değerleri al
-source .env.nas.local  # NAS_API_TOKEN, NAS_PASSWORD export olur
-
-echo "super-secret-master-key-$(openssl rand -hex 32)" > secrets/rails_master_key.txt
-echo "$(openssl rand -hex 32)" > secrets/postgres_password.txt
-echo "$(openssl rand -hex 32)" > secrets/pdf_worker_api_key.txt
-echo "$(openssl rand -hex 32)" > secrets/stirling_pdf_password.txt
-echo "$NAS_API_TOKEN" > secrets/nas_api_token.txt
-echo "$NAS_PASSWORD" > secrets/nas_password.txt
-
-chmod 600 secrets/*.txt
-```
-
----
-
-### 6. `.env.production` Oluştur
-```bash
-cat > .env.production <<'EOF'
-# Database
-POSTGRES_DB=personal_dashboard_production
-POSTGRES_USER=personal_dashboard
-DATABASE_URL=postgresql://personal_dashboard:$(cat secrets/postgres_password.txt)@db:5432/personal_dashboard_production
-
-# Domain — Caddy buna göre SSL alacak
-DASHBOARD_DOMAIN=dash.burak.dev  # VEYA senin subdomain'in
-
-# Timezone
-DASHBOARD_TIME_ZONE=Europe/Istanbul
-
-# AI — Gemini API Key
-GEMINI_API_KEY=<GEMINI_API_KEY>  # SENİN KEY'İNİ BURAYA YAZ
-
-# NAS Worker URL (internal Docker network)
-NAS_WORKER_URL=http://nas-worker:8000
-EOF
-```
-
----
-
-### 7. Build & Deploy
-```bash
-# Build (ARM64 için ilk sefer biraz sürer)
-docker compose -f compose.production.yaml -f compose.nas.yaml build
-
-# Başlat
-docker compose -f compose.production.yaml -f compose.nas.yaml up -d
-
-# Logları izle
-docker compose -f compose.production.yaml -f compose.nas.yaml logs -f web
-docker compose -f compose.production.yaml -f compose.nas.yaml logs -f nas-worker
-```
-
----
-
-### 8. DB Migration & Admin User
-```bash
-docker compose -f compose.production.yaml -f compose.nas.yaml exec web ./bin/rails db:migrate
-
-docker compose -f compose.production.yaml -f compose.nas.yaml exec web ./bin/rails dashboard:credentials:provision
-# Şifre soracak — KAYDET!
-```
-
----
-
-### 9. Doğrulama
-- `https://dash.burak.dev` → açılmalı (Caddy auto-HTTPS)
-- Giriş yap → Dashboard çalışıyor mu?
-- NAS sekmesi → "Not configured" mı, yoksa bağlanıyor mu? (OpenWrt Tailscale sonra)
-
----
-
-## 🌐 OpenWrt + Tailscale Subnet Router (NAS Erişimi İçin)
-
-**Senaryo:** Lenovo ix2-dl (`<NAS_LAN_IP>`) → OpenWrt router → Tailscale subnet router → Oracle VM
-
-### OpenWrt'de:
-```bash
-# SSH into OpenWrt
-opkg update && opkg install tailscale
-
-# Subnet router olarak başlat
-tailscale up --advertise-routes=192.168.1.0/24 --accept-routes
-
-# Tailscale admin panel (https://login.tailscale.com/admin/machines) → 
-# OpenWrt cihazını bul → "Routes" sekmesi → 192.168.1.0/24 onayla
-```
-
-### Oracle VM'de (zaten Tailscale kurulu):
-```bash
-# Route'ları kabul et
-sudo tailscale up --accept-routes
-
-# Test
-tailscale ping <openwrt-tailscale-ip>
-ping <NAS_LAN_IP>  # NAS'ın LAN IP'si — artık ulaşılabilir olmalı
-```
-
-### NAS Config (değişmez):
-```bash
-# .env.nas.local zaten doğru:
-NAS_HOST=<NAS_LAN_IP>  # LAN IP, Tailscale sayesinde VM'den erişilebilir
-NAS_USER=admin
-NAS_PASSWORD=...
-NAS_SHARE=yedek
-```
-
-**Önemli:** ix2-dl'e **dokunmuyorsun**, OpenWrt router subnet router olur.
-
----
-
-## 🔄 Güncelleme / Bakım
-
-```bash
-cd personal-dashboard
-git pull origin main  # veya deploy branch
-docker compose -f compose.production.yaml -f compose.nas.yaml build
-docker compose -f compose.production.yaml -f compose.nas.yaml up -d
-docker compose -f compose.production.yaml -f compose.nas.yaml exec web ./bin/rails db:migrate
-```
-
----
-
-## 💾 Backup Stratejisi
-
-### Veritabanı (Günlük Cron)
-```bash
-# /etc/cron.daily/backup-db
-#!/bin/bash
-DATE=$(date +%F)
-docker exec personal-dashboard-db-1 pg_dump -U personal_dashboard personal_dashboard_production | gzip > /root/backups/db_${DATE}.sql.gz
-find /root/backups -name "db_*.sql.gz" -mtime +30 -delete
-```
-
-### Docker Volumes (Haftalık)
-```bash
-# /etc/cron.weekly/backup-volumes
-#!/bin/bash
-DATE=$(date +%F)
-tar -czf /root/backups/volumes_${DATE}.tar.gz /var/lib/docker/volumes/personal-dashboard_*
-```
-
-### Restore
-```bash
-# DB
-gunzip -c db_2026-09-20.sql.gz | docker exec -i personal-dashboard-db-1 psql -U personal_dashboard personal_dashboard_production
-
-# Volumes
-tar -xzf volumes_2026-09-20.tar.gz -C /
-docker compose -f compose.production.yaml -f compose.nas.yaml up -d
-```
-
----
-
-## 🩺 Health Checks & Monitoring
-
-```bash
-# Servis durumu
-docker compose -f compose.production.yaml -f compose.nas.yaml ps
-
-# Health check'ler (compose'da tanımlı)
-docker compose -f compose.production.yaml -f compose.nas.yaml exec web ruby -rnet/http -e "puts Net::HTTP.get_response(URI('http://127.0.0.1:3000/up')).code"
-
-# Loglar
-docker compose -f compose.production.yaml -f compose.nas.yaml logs --tail=100 web
-docker compose -f compose.production.yaml -f compose.nas.yaml logs --tail=100 nas-worker
-```
-
----
-
-## 🚨 Troubleshooting Checklist
-
-| Sorun | Kontrol |
-|-------|---------|
-| Site açılmıyor | `docker compose ps` → gateway/web healthy mi? |
-| SSL yok | Caddy log: `docker compose logs gateway` → Let's Encrypt rate limit? |
-| DB bağlantı hatası | `DATABASE_URL` doğru mu? `postgres_password.txt` secrets ile eşleşiyor mu? |
-| NAS "Not configured" | `NAS_WORKER_URL` env var mı? `nas-worker` healthy mi? |
-| NAS bağlantı hatası | Tailscale route onaylandı mı? `ping <NAS_LAN_IP>` VM'den çalışıyor mu? |
-| Out of memory | `docker stats` → memory limit artır (compose'da `mem_limit`) |
-| Disk doldu | `df -h` → log rotate, backup temizliği |
-
----
-
-## 📝 Notlar / Sonraki Adımlar
-
-- [ ] Domain DNS: `dash.burak.dev` → VM public IP (A record)
-- [ ] OpenWrt Tailscale subnet router kurulumu
-- [ ] NAS erişimi test et (listele, indir, yükle)
-- [ ] Monitoring ekle (opsiyonel: uptime-kuma, prometheus/grafana)
-- [ ] Backup cron job'ları aktif et
-- [ ] `compose.test.yaml` CI/CD pipeline'a entegre et
-
----
-
-## 📞 Acil Durumda
-
-```bash
-# Tüm servisleri durdur
-docker compose -f compose.production.yaml -f compose.nas.yaml down
-
-# Sadece web'i restart et
-docker compose -f compose.production.yaml -f compose.nas.yaml restart web
-
-# Tam temizlik (VERİ KAYBI!)
-docker compose -f compose.production.yaml -f compose.nas.yaml down -v
-```
+- PostgreSQL ve `storage_data` için düzenli, şifreli ve VM dışına taşınan yedek kurulur. Bir yedek üzerinde geri yükleme testi yapılır. `docker compose down -v` veri sildiği için olağan bakım komutu değildir.
+- Docker imajları, build cache, loglar ve yüklenen belgeler için disk doluluk alarmı; web, jobs, PDF işçisi, Stirling ve veritabanı için sağlık kontrolleri izlenir. 50 GB varsayılan boot diskinde boş alan özellikle takip edilir.
+- Güncelleme öncesi veritabanı/volume yedeği alınır; doğrulanmış commit için `build`, `up -d`, migration kontrolü ve kısa smoke test tekrarlanır. Başarısızlıkta önce uygulama commit'i geri alınır; veritabanı geri yükleme yalnız doğrulanmış yedek prosedürüyle yapılır.

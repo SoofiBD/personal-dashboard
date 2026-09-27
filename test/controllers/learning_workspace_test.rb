@@ -1,6 +1,27 @@
 require "test_helper"
 
 class LearningWorkspaceTest < PersonalFinance::IntegrationTest
+  test "viewer can read learning but cannot change it" do
+    viewer = User.create!(name: "Viewer", email: "learning-viewer@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul", password: TEST_PASSWORD, password_confirmation: TEST_PASSWORD, onboarded_at: Time.current)
+    item = viewer.learning_items.create!(title: "Private plan")
+    delete session_path
+    post session_path, params: {identifier: viewer.email, password: TEST_PASSWORD}
+
+    get learning_root_path
+    assert_response :success
+    assert_no_difference("Learning::Item.count") do
+      post learning_items_path, params: {learning_item: {title: "Not allowed", track: "general", kind: "project"}}
+    end
+    assert_redirected_to learning_root_path
+    patch learning_item_path(item), params: {learning_item: {title: "Changed"}}
+    assert_equal "Private plan", item.reload.title
+    assert_no_difference("Learning::Attempt.count") do
+      post practice_learning_item_path(item), params: {attempt: {outcome: "solved", minutes: 20, confidence: 3}}
+    end
+    delete learning_item_path(item)
+    assert Learning::Item.exists?(item.id)
+  end
+
   test "starter roadmap is idempotent and bilingual" do
     2.times { post learning_items_path, params: {starter: "1"} }
     assert_equal 8, User.dashboard_owner.learning_items.count

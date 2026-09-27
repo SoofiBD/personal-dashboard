@@ -2,7 +2,12 @@
   encode zstd gzip
   log {
     output stdout
-    format json
+    format filter {
+      request>uri query {
+        delete token
+      }
+      wrap json
+    }
   }
   header {
     Referrer-Policy "strict-origin-when-cross-origin"
@@ -36,6 +41,9 @@
   }
 
   handle {
+    request_body {
+      max_size 32MB
+    }
     reverse_proxy web:3000
   }
 }

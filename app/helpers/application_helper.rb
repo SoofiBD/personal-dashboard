@@ -16,7 +16,6 @@ module ApplicationHelper
     return :notes if controller_path.start_with?("notes/")
     return :gym if controller_path.start_with?("personal_gym/")
     return :database_tools if controller_name == "database_tools"
-    return :nas if controller_name == "nas"
 
     if controller_name.in?(%w[pdf_tools document_conversions document_assets]) || @current_module == :pdf_tools || @current_module == :markitdown
       :pdf_tools

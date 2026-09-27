@@ -26,12 +26,6 @@ Rails.application.routes.draw do
     get :confirm, on: :collection
   end
 
-  resource :nas, controller: "nas", only: %i[show destroy] do
-    get :download
-    post :upload
-    post :folder
-  end
-
   root to: "home#show"
 
   scope :notes, module: :notes, as: :notes do

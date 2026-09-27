@@ -2,7 +2,6 @@
 # Pre-push checks — run before pushing to ensure CI will pass
 set -e
 
-python3 scripts/check-nas-secrets.py
 
 echo ""
 echo "═══════════════════════════════════════════"
@@ -21,13 +20,13 @@ echo "   ✅ Tests passed"
 echo ""
 
 echo "🔒 [3/4] Running Brakeman (security)..."
-bundle exec brakeman --quiet --no-pager --except EOLRails
+bundle exec brakeman --quiet --no-pager
 echo "   ✅ Security scan passed"
 echo ""
 
 echo "📦 [4/4] Checking gem vulnerabilities..."
-bundle exec bundler-audit check --update || true
-echo "   ✅ Dependency audit completed"
+bundle exec bundler-audit check --update
+echo "   ✅ Dependency audit passed"
 echo ""
 
 echo "═══════════════════════════════════════════"
