@@ -8,6 +8,7 @@ services:
       RAILS_ENV: production
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       NAS_WORKER_URL: "${NAS_WORKER_URL:-}"
       NAS_API_TOKEN_FILE: /run/secrets/nas_api_token
       PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key

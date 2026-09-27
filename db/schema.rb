@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_27_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,24 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_actions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "action_type", null: false
+    t.string "status", default: "pending", null: false
+    t.string "summary", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.jsonb "result", default: {}, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "executed_at"
+    t.string "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "status", "expires_at", "created_at"], name: "index_ai_actions_pending_lookup"
+    t.index ["user_id", "status"], name: "index_ai_actions_on_user_id_and_status"
+    t.index ["user_id"], name: "index_ai_actions_on_user_id"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying, 'executed'::character varying, 'failed'::character varying, 'expired'::character varying]::text[])", name: "ai_actions_status_valid"
   end
 
   create_table "ai_conversations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -348,6 +366,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
   end
 
+  create_table "gym_body_metrics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.date "recorded_on", null: false
+    t.decimal "weight_kg", precision: 6, scale: 2, null: false
+    t.text "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "recorded_on"], name: "index_gym_body_metrics_on_user_id_and_recorded_on", unique: true
+    t.index ["user_id"], name: "index_gym_body_metrics_on_user_id"
+    t.check_constraint "weight_kg > 20::numeric AND weight_kg <= 500::numeric", name: "gym_body_metrics_weight_range"
+  end
+
   create_table "gym_exercises", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -360,6 +390,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
     t.boolean "bodyweight", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "instructions"
+    t.text "safety_notes"
+    t.string "demo_url"
     t.index ["muscle_group"], name: "index_gym_exercises_on_muscle_group"
     t.index ["slug"], name: "index_gym_exercises_on_slug", unique: true
   end
@@ -396,6 +429,18 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_gym_routines_on_user_id"
+  end
+
+  create_table "gym_schedule_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "routine_day_id", null: false
+    t.date "scheduled_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["routine_day_id"], name: "index_gym_schedule_entries_on_routine_day_id"
+    t.index ["user_id", "routine_day_id", "scheduled_on"], name: "index_gym_schedule_entries_unique_day", unique: true
+    t.index ["user_id", "scheduled_on"], name: "index_gym_schedule_entries_on_user_id_and_scheduled_on"
+    t.index ["user_id"], name: "index_gym_schedule_entries_on_user_id"
   end
 
   create_table "gym_workout_sets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -678,7 +723,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
     t.text "mfa_secret"
     t.boolean "mfa_enabled", default: false, null: false
     t.datetime "mfa_confirmed_at"
-    t.string "ai_provider", default: "jan_local", null: false
     t.string "ai_model"
     t.string "password_reset_token"
     t.datetime "password_reset_sent_at"
@@ -689,6 +733,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_actions", "users"
   add_foreign_key "ai_conversations", "users"
   add_foreign_key "ai_memories", "users"
   add_foreign_key "document_assets", "document_conversions"
@@ -723,10 +768,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_24_000000) do
   add_foreign_key "finance_transactions", "financial_accounts"
   add_foreign_key "finance_transactions", "users"
   add_foreign_key "financial_accounts", "users"
+  add_foreign_key "gym_body_metrics", "users"
   add_foreign_key "gym_routine_days", "gym_routines", column: "routine_id"
   add_foreign_key "gym_routine_exercises", "gym_exercises", column: "exercise_id"
   add_foreign_key "gym_routine_exercises", "gym_routine_days", column: "routine_day_id"
   add_foreign_key "gym_routines", "users"
+  add_foreign_key "gym_schedule_entries", "gym_routine_days", column: "routine_day_id"
+  add_foreign_key "gym_schedule_entries", "users"
   add_foreign_key "gym_workout_sets", "gym_exercises", column: "exercise_id"
   add_foreign_key "gym_workout_sets", "gym_workouts", column: "workout_id"
   add_foreign_key "gym_workouts", "gym_routines", column: "routine_id"

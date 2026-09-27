@@ -1587,6 +1587,7 @@
     initPasswordToggle();
     initNotesEditor();
     initNotesGraph();
+    initAiAssistant();
     registerServiceWorker();
   };
 
@@ -1727,6 +1728,103 @@
     svg.addEventListener("wheel", (event) => { event.preventDefault(); setZoom(zoom + (event.deltaY < 0 ? 0.1 : -0.1)); }, {passive: false});
     svg.addEventListener("pointerdown", (event) => { if (event.target === svg) { dragging = {x: event.clientX - pan.x, y: event.clientY - pan.y}; svg.setPointerCapture(event.pointerId); } }); svg.addEventListener("pointermove", (event) => { if (dragging) { pan = {x: event.clientX - dragging.x, y: event.clientY - dragging.y}; render(); } }); svg.addEventListener("pointerup", () => { dragging = null; });
     renderTags(); render();
+  };
+
+  const initAiAssistant = () => {
+    const shell = document.querySelector("[data-ai-assistant]");
+    if (!shell || shell.dataset.aiAssistantBound) return;
+    shell.dataset.aiAssistantBound = "true";
+
+    const form = shell.querySelector("[data-ai-form]");
+    const input = form?.querySelector("textarea[name='message']");
+    const messages = shell.querySelector("[data-ai-messages]");
+    const feedback = shell.querySelector("[data-ai-feedback]");
+    const submit = shell.querySelector("[data-ai-submit]");
+    const csrfToken = document.querySelector("meta[name='csrf-token']")?.content;
+    if (!form || !input || !messages || !feedback || !submit) return;
+
+    const addMessage = (role, content, pending = false) => {
+      const article = document.createElement("article");
+      article.className = `ai-message ai-message--${role}${pending ? " is-pending" : ""}`;
+      const label = document.createElement("p");
+      label.className = "ai-message-label";
+      label.textContent = role === "user" ? "Sen" : "Asistan";
+      const body = document.createElement("div");
+      body.className = "ai-message-content";
+      body.textContent = content;
+      article.append(label, body);
+      messages.append(article);
+      messages.scrollTop = messages.scrollHeight;
+      return article;
+    };
+
+    const sendMessage = async (message) => {
+      const content = message.trim();
+      if (!content || submit.disabled) return;
+
+      addMessage("user", content);
+      input.value = "";
+      submit.disabled = true;
+      submit.textContent = "Düşünüyor…";
+      feedback.textContent = "Asistan panel verilerini inceliyor…";
+      const pending = addMessage("assistant", "Yanıt hazırlanıyor…", true);
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken || ""
+          },
+          body: JSON.stringify({message: content})
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Asistan şu anda yanıt veremedi.");
+        pending.classList.remove("is-pending");
+        pending.querySelector(".ai-message-content").textContent = payload.response;
+        if (payload.pending_actions > 0) {
+          feedback.textContent = "Onay bekleyen işlem hazırlandı; onay kartını açıyoruz…";
+          window.setTimeout(() => window.location.reload(), 650);
+        } else {
+          feedback.textContent = "";
+        }
+      } catch (error) {
+        pending.classList.remove("is-pending");
+        pending.classList.add("is-error");
+        pending.querySelector(".ai-message-content").textContent = error.message || "Asistan şu anda yanıt veremedi.";
+        feedback.textContent = "Mesaj gönderilemedi. Sağlayıcı ve model ayarını kontrol et.";
+      } finally {
+        submit.disabled = false;
+        submit.textContent = "Gönder";
+        input.focus();
+      }
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      sendMessage(input.value);
+    });
+
+    shell.querySelectorAll("[data-ai-prompt]").forEach((button) => {
+      button.addEventListener("click", () => sendMessage(button.dataset.aiPrompt || ""));
+    });
+
+    shell.querySelector("[data-ai-clear-history]")?.addEventListener("click", async () => {
+      if (!window.confirm("Tüm asistan konuşma geçmişi silinsin mi?")) return;
+      try {
+        const response = await fetch("/ai_chat/history", {
+          method: "DELETE",
+          headers: {"Accept": "application/json", "X-CSRF-Token": csrfToken || ""}
+        });
+        if (!response.ok) throw new Error();
+        messages.replaceChildren();
+        addMessage("assistant", "Konuşma geçmişi temizlendi. Yeni bir konuyla başlayabiliriz.");
+        feedback.textContent = "Geçmiş temizlendi.";
+      } catch (_) {
+        feedback.textContent = "Geçmiş temizlenemedi. Lütfen tekrar dene.";
+      }
+    });
   };
 
   document.addEventListener("DOMContentLoaded", init);

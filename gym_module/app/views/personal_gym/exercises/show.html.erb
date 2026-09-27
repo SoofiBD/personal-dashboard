@@ -9,6 +9,21 @@
   <% end %>
 </header>
 
+<% if @exercise.instructions.present? || @exercise.safety_notes.present? || @exercise.demo_url.present? %>
+  <section class="panel">
+    <div class="panel-header"><div><h2><%= t("gym.how_to", default: "Nasıl yapılır?") %></h2></div></div>
+    <% if @exercise.instructions.present? %>
+      <div class="note-content"><%= simple_format(@exercise.instructions) %></div>
+    <% end %>
+    <% if @exercise.safety_notes.present? %>
+      <p class="gym-safety-note"><strong><%= t("gym.safety", default: "Güvenlik:") %></strong> <%= @exercise.safety_notes %></p>
+    <% end %>
+    <% if @exercise.demo_url.present? %>
+      <p><%= link_to t("gym.watch_demo", default: "Demo videosunu aç"), @exercise.demo_url, target: "_blank", rel: "noopener noreferrer", class: "button button-secondary" %></p>
+    <% end %>
+  </section>
+<% end %>
+
 <section class="panel">
   <div class="panel-header">
     <div>

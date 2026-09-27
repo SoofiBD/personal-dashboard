@@ -33,6 +33,19 @@
       <label><%= t("gym.fields.equipment", default: "Ekipman") %><%= form.text_field :equipment, placeholder: "barbell, dumbbell, cable, machine, bodyweight" %></label>
     </div>
 
+    <div class="form-group">
+      <%= form.label :instructions, t("gym.fields.instructions", default: "Uygulama adımları") %>
+      <%= form.text_area :instructions, rows: 5, maxlength: 5_000, placeholder: "Başlangıç pozisyonu, hareket sırası ve nefes ipuçları..." %>
+    </div>
+    <div class="form-group">
+      <%= form.label :safety_notes, t("gym.fields.safety_notes", default: "Güvenlik notları") %>
+      <%= form.text_area :safety_notes, rows: 3, maxlength: 2_000, placeholder: "Ağrı hissedersen dur, yükü kontrollü artır..." %>
+    </div>
+    <div class="form-group">
+      <%= form.label :demo_url, t("gym.fields.demo_url", default: "Demo videosu bağlantısı") %>
+      <%= form.url_field :demo_url, maxlength: 2_000, placeholder: "https://..." %>
+    </div>
+
     <div class="gym-plan-form">
       <label><%= form.check_box :bodyweight %> <%= t("gym.fields.bodyweight", default: "Vücut ağırlığı") %></label>
       <label><%= form.check_box :unilateral %> <%= t("gym.fields.unilateral", default: "Tek taraflı") %></label>

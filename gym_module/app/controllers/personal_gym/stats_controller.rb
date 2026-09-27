@@ -5,6 +5,8 @@ module PersonalGym
       @top_exercises = Gym::WorkoutQueries.volume_by_exercise(current_user)
       @streak = Gym::WorkoutQueries.weekly_streak(current_user)
       @totals = totals
+      @muscle_volume = Gym::WorkoutQueries.muscle_volume(current_user)
+      @muscle_readiness = Gym::WorkoutQueries.muscle_readiness(current_user)
     end
 
     private

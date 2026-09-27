@@ -77,5 +77,41 @@ module Gym
       end
       streak
     end
+
+    # Working-set count per primary/secondary muscle for the recent period.
+    # Set count is more comparable than tonnage between bodyweight and weighted work.
+    def muscle_volume(user, since: 7.days.ago)
+      sets = PersonalGym::WorkoutSet
+        .joins(:workout)
+        .includes(:exercise)
+        .where(gym_workouts: {user_id: user.id, status: "finished"})
+        .where(gym_workouts: {started_at: since..})
+        .where(kind: "working", done: true)
+
+      totals = Hash.new(0)
+      sets.find_each do |set|
+        set.exercise.muscles.each { |muscle| totals[muscle] += 1 }
+      end
+      totals.map { |muscle, set_count| {muscle: muscle, sets: set_count} }.sort_by { |row| [-row[:sets], row[:muscle]] }
+    end
+
+    # A deliberately conservative readiness hint: it never diagnoses fatigue.
+    # It combines recent working-set exposure and days since each muscle was last trained.
+    def muscle_readiness(user, today: Date.current)
+      recent = muscle_volume(user, since: 7.days.ago)
+      last_trained = {}
+      PersonalGym::WorkoutSet.joins(:workout).includes(:exercise)
+        .where(gym_workouts: {user_id: user.id, status: "finished"})
+        .where(kind: "working", done: true)
+        .order("gym_workouts.started_at DESC").each do |set|
+          set.exercise.muscles.each { |muscle| last_trained[muscle] ||= set.workout.started_at.to_date }
+        end
+
+      recent.to_h { |row| [row[:muscle], row[:sets]] }.map do |muscle, sets|
+        days = (today - last_trained.fetch(muscle)).to_i
+        status = sets >= 18 && days < 2 ? "high" : (sets >= 10 && days < 2 ? "moderate" : "ready")
+        {muscle: muscle, sets: sets, days_since: days, status: status}
+      end.sort_by { |row| [-row[:sets], row[:muscle]] }
+    end
   end
 end

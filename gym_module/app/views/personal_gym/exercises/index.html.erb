@@ -29,7 +29,7 @@
       </div>
       <div class="gym-row-actions">
         <span class="badge-pill badge-pill-subtle"><%= t("gym.modes.#{exercise.logging_mode}", default: exercise.logging_mode) %></span>
-        <% if PersonalGym::Workout.active_for(current_user).nil? %>
+        <% if @active_workout.nil? %>
           <%= button_to t("gym.start", default: "Başlat"), gym_workouts_path, params: {exercise_id: exercise.id, sets: 3}, class: "badge-pill gym-day-start", form_class: "gym-inline-form", title: t("gym.start_free", default: "Serbest seans başlat") %>
         <% end %>
       </div>

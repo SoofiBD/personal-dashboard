@@ -253,13 +253,11 @@ The following variables can be customized in `.env.local`:
 | `POSTGRES_DB` | PostgreSQL database name | `personal_dashboard_development` |
 | `POSTGRES_USER` | PostgreSQL username | `personal_dashboard` |
 | `POSTGRES_PASSWORD` | PostgreSQL password; required and never defaulted | None; generate a random value |
-| `JAN_API_BASE_URL` | Jan'ın OpenAI uyumlu yerel API adresi | Docker: `http://host.docker.internal:1337`; native Rails: `http://127.0.0.1:1337` |
-| `JAN_API_KEY` | Jan yerel API anahtarı, sunucu doğrulama istiyorsa | `jan-local` |
-| `GEMINI_API_KEY` | Google Gemini API anahtarı; Gemini sağlayıcısı seçildiğinde zorunlu | None |
+| `GEMINI_API_KEY` | Google Gemini API anahtarı; AI Asistan için zorunlu | None |
 
-### Local AI (Jan)
+### AI Assistant
 
-Start Jan's Local API Server, then open **Yapay Zekâ** under shared settings. The dashboard checks `/v1/models` and lets each user choose a served Jan model or a Gemini model. Docker Compose reaches a Jan instance running on the host through `host.docker.internal`; change `JAN_API_BASE_URL` only if Jan runs at a different private address.
+Set `GEMINI_API_KEY` in the runtime environment, then open **Yapay Zekâ Asistanı** to work with the authenticated user's finance, notes, learning and gym data. Each user can choose a Gemini model under **Sağlayıcı ve model**.
 
 ---
 

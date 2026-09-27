@@ -27,6 +27,17 @@ class FinanceTool
     property :days, type: "integer", description: "Number of days", required: false
   end
 
+  define_function :update_transaction, description: "Propose updating a non-transfer transaction; user confirmation is required" do
+    property :id, type: "string", description: "Transaction UUID", required: true
+    property :amount, type: "number", description: "New amount", required: false
+    property :description, type: "string", description: "New description", required: false
+    property :occurred_on, type: "string", description: "New date YYYY-MM-DD", required: false
+  end
+
+  define_function :delete_transaction, description: "Propose deleting a non-transfer transaction; user confirmation is required" do
+    property :id, type: "string", description: "Transaction UUID", required: true
+  end
+
   define_function :get_budget_status, description: "Budget vs actual for current month"
 
   define_function :list_subscriptions, description: "Active subscriptions with costs"
@@ -57,49 +68,11 @@ class FinanceTool
   end
 
   def create_expense(amount:, category_name:, description:)
-    category = find_category(category_name, kind: "expense")
-    return tool_response(content: {error: "Category '#{category_name}' not found"}) unless category
-
-    account = find_default_account
-    return tool_response(content: {error: "No active account found"}) unless account
-
-    transaction = user.finance_transactions.create!(
-      kind: "expense",
-      amount: amount,
-      category: category,
-      account: account,
-      occurred_on: Date.current,
-      note: description
-    )
-
-    tool_response(content: {
-      success: true,
-      transaction: {id: transaction.id, amount: amount, category: category_name, description: description,
-                    date: transaction.occurred_on}
-    })
+    propose_transaction("expense", amount, category_name, description)
   end
 
   def create_income(amount:, category_name:, description:)
-    category = find_category(category_name, kind: "income")
-    return tool_response(content: {error: "Category '#{category_name}' not found"}) unless category
-
-    account = find_default_account
-    return tool_response(content: {error: "No active account found"}) unless account
-
-    transaction = user.finance_transactions.create!(
-      kind: "income",
-      amount: amount,
-      category: category,
-      account: account,
-      occurred_on: Date.current,
-      note: description
-    )
-
-    tool_response(content: {
-      success: true,
-      transaction: {id: transaction.id, amount: amount, category: category_name, description: description,
-                    date: transaction.occurred_on}
-    })
+    propose_transaction("income", amount, category_name, description)
   end
 
   def list_accounts
@@ -118,10 +91,28 @@ class FinanceTool
       .order(occurred_on: :desc)
       .limit(50)
       .map do |t|
-        {date: t.occurred_on, amount: t.amount.to_f, kind: t.kind, category: t.category&.name,
+        {id: t.id, date: t.occurred_on, amount: t.amount.to_f, kind: t.kind, category: t.category&.name,
          account: t.account&.name, note: t.note}
       end
     tool_response(content: transactions)
+  end
+
+  def update_transaction(id:, amount: nil, description: nil, occurred_on: nil)
+    transaction = user.finance_transactions.find_by(id: id)
+    return tool_response(content: {error: "Transaction not found"}) unless transaction
+    return tool_response(content: {error: "Paired transfers must be recreated"}) if transaction.transfer_group_id.present?
+    payload = {id: transaction.id, amount: amount, note: description, occurred_on: occurred_on}.compact
+    return tool_response(content: {error: "No change supplied"}) if payload.except(:id).empty?
+    action = AiAction.propose!(user: user, action_type: "finance.update_transaction", payload: payload, summary: "Finans hareketini güncelle: #{transaction.note.presence || transaction.category&.name || transaction.id}")
+    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
+  end
+
+  def delete_transaction(id:)
+    transaction = user.finance_transactions.find_by(id: id)
+    return tool_response(content: {error: "Transaction not found"}) unless transaction
+    return tool_response(content: {error: "Paired transfers must be deleted from the panel"}) if transaction.transfer_group_id.present?
+    action = AiAction.propose!(user: user, action_type: "finance.delete_transaction", payload: {id: transaction.id}, summary: "Finans hareketini sil: #{transaction.amount} · #{transaction.note.presence || transaction.category&.name}")
+    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
   end
 
   def get_budget_status
@@ -189,6 +180,12 @@ class FinanceTool
 
   def find_default_account
     PersonalFinance::Account.find_by(user: user, is_active: true)
+  end
+
+  def propose_transaction(kind, amount, category_name, description)
+    return tool_response(content: {error: "Bu hesap için finans düzenleme yetkisi yok"}) unless user.can_manage_finances?
+    action = AiAction.propose!(user: user, action_type: "finance.create_#{kind}", payload: {amount: amount, category_name: category_name, description: description}, summary: "#{kind == "expense" ? "Gider" : "Gelir"}: #{amount} · #{category_name} · #{description}")
+    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
   end
 
   def tool_response(content:)

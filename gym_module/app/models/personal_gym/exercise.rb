@@ -1,3 +1,5 @@
+require "uri"
+
 module PersonalGym
   class Exercise < ApplicationRecord
     self.table_name = "gym_exercises"
@@ -12,6 +14,9 @@ module PersonalGym
     validates :slug, presence: true, uniqueness: {case_sensitive: false}, format: {with: /\A[a-z0-9-]+\z/}
     validates :muscle_group, length: {maximum: 60}, allow_blank: true
     validates :equipment, length: {maximum: 60}, allow_blank: true
+    validates :instructions, length: {maximum: 5_000}, allow_blank: true
+    validates :safety_notes, length: {maximum: 2_000}, allow_blank: true
+    validates :demo_url, length: {maximum: 2_000}, allow_blank: true, format: {with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true}
 
     scope :search, ->(query) { where("gym_exercises.name ILIKE ?", "%#{sanitize_sql_like(query)}%") }
     scope :ordered, -> { order(:muscle_group, :name) }

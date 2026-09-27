@@ -4,6 +4,7 @@ module PersonalGym
 
     def index
       @routines = owned(Routine).includes(days: {routine_exercises: :exercise}).ordered
+      @active_workout = PersonalGym::Workout.active_for(current_user)
     end
 
     def new
