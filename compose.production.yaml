@@ -7,10 +7,14 @@ services:
     environment:
       RAILS_ENV: production
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
+      DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      NAS_WORKER_URL: "${NAS_WORKER_URL:-}"
-      NAS_API_TOKEN_FILE: /run/secrets/nas_api_token
+      SMTP_ADDRESS: "${SMTP_ADDRESS:-}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USERNAME: "${SMTP_USERNAME:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+      SMTP_FROM: "${SMTP_FROM:-}"
       PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     expose:
       - "3000"
@@ -36,10 +40,9 @@ services:
       pdf-worker:
         condition: service_started
     restart: unless-stopped
-    networks: [edge, database, pdf, stirling, chartdb, nas]
+    networks: [edge, database, pdf, stirling, chartdb]
     secrets:
       - rails_master_key
-      - nas_api_token
       - pdf_worker_api_key
 
   jobs:
@@ -48,6 +51,7 @@ services:
     environment:
       RAILS_ENV: production
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
+      DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
       PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     volumes:
@@ -85,7 +89,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-    mem_limit: 768m
+    mem_limit: 1536m
     cpus: 1.0
     environment:
       PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
@@ -111,7 +115,7 @@ services:
       SYSTEM_MAXFILESIZE: "25"
       SECURITY_ENABLELOGIN: "true"
       SECURITY_INITIALLOGIN_USERNAME: "stirling"
-      SECURITY_INITIALLOGIN_PASSWORD_FILE: /run/secrets/stirling_pdf_password
+      SECURITY_INITIALLOGIN_PASSWORD: "${STIRLING_PDF_PASSWORD:?Set STIRLING_PDF_PASSWORD in .env.production}"
       DISABLE_ADDITIONAL_FEATURES: "true"
       METRICS_ENABLED: "false"
       SHOW_SURVEY: "false"
@@ -131,8 +135,6 @@ services:
       start_interval: 2s
     restart: unless-stopped
     networks: [stirling]
-    secrets:
-      - stirling_pdf_password
 
   chartdb:
     build:
@@ -202,9 +204,6 @@ networks:
     internal: true
   chartdb:
     internal: true
-  nas:
-    internal: true
-  nas-egress: {}
 
 volumes:
   postgres_data:
@@ -217,11 +216,7 @@ volumes:
 secrets:
   rails_master_key:
     file: ./secrets/rails_master_key.txt
-  nas_api_token:
-    file: ./secrets/nas_api_token.txt
   pdf_worker_api_key:
     file: ./secrets/pdf_worker_api_key.txt
-  stirling_pdf_password:
-    file: ./secrets/stirling_pdf_password.txt
   postgres_password:
     file: ./secrets/postgres_password.txt

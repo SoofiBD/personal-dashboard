@@ -2,6 +2,8 @@ require "stringio"
 
 module PersonalFinance
   class DocumentConversionsController < ApplicationController
+    MAX_SOURCE_PDF_BYTES = 25.megabytes
+
     def index
       @document_conversions = owned(DocumentConversion).order(created_at: :desc).limit(20)
       @document_conversion = owned(DocumentConversion).new
@@ -9,12 +11,20 @@ module PersonalFinance
 
     def create
       upload = params[:pdf_file]
-      source_pdf_data = upload&.read
       @document_conversion = owned(DocumentConversion).new(
         source_filename: File.basename(upload&.original_filename.to_s),
         custom_notes: document_conversion_params[:custom_notes],
         conversion_options: conversion_options
       )
+      if upload && upload.size > MAX_SOURCE_PDF_BYTES
+        return render_oversized_upload
+      end
+
+      source_pdf_data = upload&.read(MAX_SOURCE_PDF_BYTES + 1)
+      if source_pdf_data && source_pdf_data.bytesize > MAX_SOURCE_PDF_BYTES
+        return render_oversized_upload
+      end
+
       @document_conversion.source_pdf.attach(io: StringIO.new(source_pdf_data), filename: @document_conversion.source_filename, content_type: "application/pdf") if source_pdf_data.present?
 
       begin
@@ -94,6 +104,12 @@ module PersonalFinance
     end
 
     private
+
+    def render_oversized_upload
+      @document_conversion.errors.add(:source_pdf, "must be 25 MB or smaller")
+      @document_conversions = owned(DocumentConversion).order(created_at: :desc).limit(20)
+      render :index, status: :unprocessable_entity
+    end
 
     def document_conversion_params
       params.fetch(:document_conversion, {}).permit(:custom_notes, :markdown_content)

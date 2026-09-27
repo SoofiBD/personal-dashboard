@@ -30,12 +30,18 @@ class PasswordsController < ApplicationController
       return
     end
 
-    if user&.email.present?
-      user.generate_password_reset_token!
-      # In production, send email with reset link
-      # For now, log the token for testing
-      Rails.logger.info("Password reset token for #{user.email}: #{user.password_reset_token}")
-      audit_security_event("password_reset_requested", user_id: user.id)
+    if user&.email.present? && PasswordMailer.configured?
+      begin
+        token = user.generate_password_reset_token!
+        PasswordMailer.reset(user, token).deliver_now
+        audit_security_event("password_reset_requested", user_id: user.id)
+      rescue => error
+        user.clear_password_reset_token!
+        Rails.logger.warn(event: "password_reset_delivery_failed", error_class: error.class.name)
+        audit_security_event("password_reset_delivery_failed", user_id: user.id)
+      end
+    elsif user&.email.present?
+      audit_security_event("password_reset_unavailable", user_id: user.id)
     else
       audit_security_event("password_reset_requested_unknown_email", email: email)
     end
@@ -86,10 +92,10 @@ class PasswordsController < ApplicationController
 
   def set_user_by_token
     token = params[:token].to_s
-    @user = User.find_by(password_reset_token: token)
+    @user = User.find_by(password_reset_digest: Digest::SHA256.hexdigest(token)) if token.present?
 
     unless @user
-      audit_security_event("password_reset_invalid_token", token: token)
+      audit_security_event("password_reset_invalid_token")
       redirect_to new_password_path, alert: I18n.t("backend.passwords.invalid_token")
     end
   end

@@ -7,6 +7,9 @@ import base64
 import zipfile
 import html
 import mimetypes
+import tempfile
+import subprocess
+from pathlib import Path
 from datetime import datetime, timezone
 
 import fitz
@@ -15,7 +18,6 @@ import markdown
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Depends, Header
 from fastapi.responses import Response
 from fastapi.security import APIKeyHeader
-from markitdown import MarkItDown
 from pydantic import BaseModel, Field
 from PIL import Image, UnidentifiedImageError
 
@@ -127,26 +129,38 @@ async def convert(
         if page_count > MAX_PAGE_COUNT:
             raise HTTPException(status_code=422, detail="PDF en fazla 250 sayfa olabilir.")
         running_artifacts = find_running_artifacts(document) if strip_headers_footers else []
-        heading_candidates = find_heading_candidates(document)
         annotations = extract_annotations(document) if extract_annotations_enabled else []
         images = extract_images(document, min_image_dimension, image_quality) if extract_images_enabled else []
-        chart_rects = chart_rects_by_page(images)
-        tables = extract_tables(document, chart_rects) if detect_tables else []
-        markdown = extract_layout_text(document, chart_rects)
-        if not markdown:
-            markdown = MarkItDown().convert_stream(io.BytesIO(contents), file_extension=".pdf").text_content.strip()
+        heading_candidates = []
+        tables = []
+        parser = "opendataloader"
+        try:
+            markdown = extract_with_opendataloader(contents)
+            if not markdown:
+                raise ValueError("OpenDataLoader returned no text")
+        except Exception:
+            # Keep existing conversions usable for PDFs the Java parser cannot read.
+            parser = "legacy_fallback"
+            chart_rects = chart_rects_by_page(images)
+            heading_candidates = find_heading_candidates(document)
+            tables = extract_tables(document, chart_rects) if detect_tables else []
+            markdown = extract_layout_text(document, chart_rects)
+            if not markdown:
+                markdown = "\n\n".join(page.get_text("text", sort=True).strip() for page in document).strip()
         document.close()
     except HTTPException:
         raise
     except Exception as error:
         raise HTTPException(status_code=422, detail="PDF dönüştürülemedi.") from error
 
+    if not markdown.strip():
+        raise HTTPException(status_code=422, detail="Bu PDF'de seçilebilir metin bulunamadı. Taranmış belgeler için OCR gerekir.")
     markdown, headers_stripped = sanitize_markdown(markdown, running_artifacts, fix_hyphenation_enabled)
     markdown, captions_bound = bind_captions(markdown, images) if bind_captions_enabled else (markdown, 0)
-    markdown, headings_synthesized = synthesize_headings(markdown, heading_candidates)
+    markdown, headings_synthesized = synthesize_headings(markdown, heading_candidates) if parser == "legacy_fallback" else (markdown, 0)
     if include_yaml_frontmatter:
         markdown = inject_frontmatter(markdown, file.filename or "document.pdf", custom_notes)
-    markdown, tables_converted = append_tables(markdown, tables)
+    markdown, tables_converted = append_tables(markdown, tables) if parser == "legacy_fallback" else (markdown, len(re.findall(r"(?m)^\|[^\n]+\|\n\|[\s:|-]+\|$", markdown)))
     markdown = append_images(markdown, images)
     markdown, annotations_inlined = inline_annotations(markdown, annotations) if annotation_mode in {"inline", "both"} else (markdown, 0)
     section_annotations = annotations if annotation_mode in {"section", "both"} else [annotation for annotation in annotations if annotation["type"] == "note"]
@@ -155,6 +169,7 @@ async def convert(
         "markdown_content": markdown,
         "stats": {
             "page_count": page_count,
+            "parser": parser,
             "headers_stripped": headers_stripped,
             "captions_bound": captions_bound,
             "headings_synthesized": headings_synthesized,
@@ -166,6 +181,24 @@ async def convert(
         },
         "images": images,
     }
+
+
+def extract_with_opendataloader(contents):
+    # Each request gets an isolated directory; neither filenames nor paths come from the upload.
+    with tempfile.TemporaryDirectory(prefix="pdf-parse-") as workspace:
+        source = Path(workspace) / "source.pdf"
+        output = Path(workspace) / "output"
+        source.write_bytes(contents)
+        output.mkdir()
+        subprocess.run(
+            ["opendataloader-pdf", str(source), "--output-dir", str(output),
+             "--format", "markdown", "--image-output", "off", "--table-method", "cluster", "--quiet"],
+            check=True, capture_output=True, text=True, timeout=120,
+        )
+        result = output / "source.md"
+        if not result.is_file():
+            raise ValueError("OpenDataLoader did not create Markdown")
+        return result.read_text(encoding="utf-8").strip()
 
 
 @app.post("/export-zip")

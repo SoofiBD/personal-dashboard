@@ -6,6 +6,23 @@ class PersonalGym::GymFlowTest < PersonalFinance::IntegrationTest
     PersonalGym::ExerciseCatalog.install!
   end
 
+  test "viewer can browse gym but cannot create workouts or shared exercises" do
+    viewer = User.create!(name: "Viewer", email: "gym-viewer@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul", password: TEST_PASSWORD, password_confirmation: TEST_PASSWORD, onboarded_at: Time.current)
+    delete session_path
+    post session_path, params: {identifier: viewer.email, password: TEST_PASSWORD}
+
+    get gym_root_path
+    assert_response :success
+    assert_no_difference("PersonalGym::Exercise.count") do
+      post gym_exercises_path, params: {gym_exercise: {name: "Unapproved", category: "strength", logging_mode: "reps"}}
+    end
+    assert_redirected_to gym_root_path
+    assert_no_difference("PersonalGym::Workout.count") do
+      post gym_workouts_path
+    end
+    assert_redirected_to gym_root_path
+  end
+
   test "a routine can be started, logged, finished, and analyzed" do
     user = User.dashboard_owner
     exercise = PersonalGym::Exercise.find_by!(slug: "barbell-bench-press")

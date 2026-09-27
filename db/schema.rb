@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_27_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_27_000006) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -724,10 +724,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_27_000004) do
     t.boolean "mfa_enabled", default: false, null: false
     t.datetime "mfa_confirmed_at"
     t.string "ai_model"
-    t.string "password_reset_token"
+    t.string "password_reset_digest"
     t.datetime "password_reset_sent_at"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["password_reset_token"], name: "index_users_on_password_reset_token", unique: true
+    t.index ["password_reset_digest"], name: "index_users_on_password_reset_digest", unique: true
     t.index ["role"], name: "index_users_on_role"
   end
 

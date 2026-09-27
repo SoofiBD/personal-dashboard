@@ -3,6 +3,7 @@
 class AiActionsController < ApplicationController
   before_action :require_authentication
   before_action :prevent_sensitive_caching
+  before_action :require_workspace_edit_permission
   before_action :set_action
 
   def approve
@@ -27,6 +28,10 @@ class AiActionsController < ApplicationController
   end
 
   private
+
+  def require_workspace_edit_permission
+    redirect_to ai_assistant_path, alert: "Bu işlem için düzenleme yetkiniz yok." unless current_user.can_manage_workspace?
+  end
 
   def set_action
     @action = current_user.ai_actions.find(params[:id])

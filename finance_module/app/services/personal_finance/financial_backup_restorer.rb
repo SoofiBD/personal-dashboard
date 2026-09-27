@@ -64,6 +64,7 @@ module PersonalFinance
     end
 
     def restore_record(model, attributes)
+      validate_dependent_ownership!(model, attributes)
       record = scoped_records(model).find_or_initialize_by(id: attributes.fetch("id"))
       record.assign_attributes(attributes.except("id", "user_id", "created_at", "updated_at"))
       record.user = @user if record.has_attribute?(:user_id)
@@ -73,6 +74,7 @@ module PersonalFinance
     def restore_debt_payments(model)
       new_rows = []
       table_rows(:debt_payments).each do |attributes|
+        validate_dependent_ownership!(model, attributes)
         existing = scoped_records(model).find_by(id: attributes.fetch("id"))
         if existing
           existing.assign_attributes(attributes.except("id", "user_id", "created_at", "updated_at"))
@@ -95,6 +97,20 @@ module PersonalFinance
       raise InvalidBackup, "#{table} must be an array" unless value.is_a?(Array)
 
       value
+    end
+
+    def validate_dependent_ownership!(model, attributes)
+      model.reflect_on_all_associations(:belongs_to).each do |association|
+        parent_model = association.klass
+        next unless parent_model.column_names.include?("user_id")
+
+        parent_id = attributes[association.foreign_key.to_s]
+        next if parent_id.blank? && association.options[:optional]
+
+        unless parent_id.present? && parent_model.exists?(id: parent_id, user_id: @user.id)
+          raise InvalidBackup, "Backup association is invalid"
+        end
+      end
     end
 
     def scoped_records(model)

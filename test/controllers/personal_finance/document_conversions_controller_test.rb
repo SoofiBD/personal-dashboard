@@ -47,6 +47,38 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "select[name='conversion_options[image_quality]']"
   end
 
+  test "accepts a small PDF and queues conversion" do
+    file = Tempfile.new(["small", ".pdf"])
+    file.write("%PDF-small")
+    file.flush
+    upload = Rack::Test::UploadedFile.new(file.path, "application/pdf")
+
+    assert_difference("PersonalFinance::DocumentConversion.count", 1) do
+      assert_enqueued_jobs 1, only: PersonalFinance::PdfDocumentConversionJob do
+        post finance_document_conversions_path, params: {pdf_file: upload}
+      end
+    end
+    assert_response :redirect
+  ensure
+    file&.close!
+  end
+
+  test "rejects oversized PDF before storing or queuing it" do
+    file = Tempfile.new(["oversized", ".pdf"])
+    file.truncate(PersonalFinance::DocumentConversionsController::MAX_SOURCE_PDF_BYTES + 1)
+    file.flush
+    upload = Rack::Test::UploadedFile.new(file.path, "application/pdf")
+
+    assert_no_difference("PersonalFinance::DocumentConversion.count") do
+      assert_no_enqueued_jobs only: PersonalFinance::PdfDocumentConversionJob do
+        post finance_document_conversions_path, params: {pdf_file: upload}
+      end
+    end
+    assert_response :unprocessable_entity
+  ensure
+    file&.close!
+  end
+
   test "serves an image asset belonging to the current user" do
     asset = @conversion.assets.build(filename: "img_p1_1.png", content_type: "image/png", byte_size: 3, width: 100, height: 100, page_number: 1)
     asset.file.attach(io: StringIO.new("abc"), filename: asset.filename, content_type: asset.content_type)

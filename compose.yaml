@@ -1,9 +1,4 @@
 services:
-  nas-worker:
-    extends:
-      file: compose.nas.yaml
-      service: nas-worker
-
   web:
     image: personal-dashboard-web
     build:
@@ -40,7 +35,6 @@ services:
       STIRLING_PDF_STATUS_URL: "http://stirling-pdf:8080/pdf-editor/api/v1/info/status"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks: [default, nas]
     depends_on:
       db:
         condition: service_healthy
@@ -87,7 +81,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-    mem_limit: 768m
+    mem_limit: 1536m
     cpus: 1.0
     environment:
       PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY:?Set PDF_WORKER_API_KEY via --env-file .env.local}"
@@ -186,14 +180,3 @@ volumes:
   caddy_data:
   caddy_config:
   storage_data:
-
-networks:
-  nas:
-    internal: true
-  nas-egress: {}
-
-secrets:
-  nas_api_token:
-    file: ./secrets/nas_api_token.txt
-  nas_password:
-    file: ./secrets/nas_password.txt

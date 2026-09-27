@@ -34,10 +34,15 @@
             <article class="ai-action-card">
               <p><%= action.summary %></p>
               <small><%= l(action.expires_at, format: :short) %> tarihine kadar geçerli</small>
-              <div class="ai-action-card-actions">
-                <%= button_to "Onayla", approve_ai_action_path(action), method: :post, class: "button button-primary button-sm" %>
-                <%= button_to "Reddet", reject_ai_action_path(action), method: :post, class: "button button-secondary button-sm" %>
-              </div>
+              <details class="ai-action-review">
+                <summary>Değişiklik ayrıntılarını incele</summary>
+                <p>İşlem türü: <%= action.action_type %></p>
+                <pre><%= JSON.pretty_generate(action.payload) %></pre>
+                <div class="ai-action-card-actions">
+                  <%= button_to "Onayla", approve_ai_action_path(action), method: :post, class: "button button-primary button-sm" %>
+                  <%= button_to "Reddet", reject_ai_action_path(action), method: :post, class: "button button-secondary button-sm" %>
+                </div>
+              </details>
             </article>
           <% end %>
         </section>
