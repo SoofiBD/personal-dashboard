@@ -23,7 +23,7 @@ class AiActionExecutor
     end
   rescue Error
     raise
-  rescue => e
+  rescue
     action.update!(status: "failed", error_message: "İşlem tamamlanamadı.") if action.persisted?
     raise Error, "İşlem tamamlanamadı. Lütfen panelden kontrol edin."
   end

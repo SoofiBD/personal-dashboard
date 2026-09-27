@@ -184,7 +184,7 @@ class FinanceTool
 
   def propose_transaction(kind, amount, category_name, description)
     return tool_response(content: {error: "Bu hesap için finans düzenleme yetkisi yok"}) unless user.can_manage_finances?
-    action = AiAction.propose!(user: user, action_type: "finance.create_#{kind}", payload: {amount: amount, category_name: category_name, description: description}, summary: "#{kind == "expense" ? "Gider" : "Gelir"}: #{amount} · #{category_name} · #{description}")
+    action = AiAction.propose!(user: user, action_type: "finance.create_#{kind}", payload: {amount: amount, category_name: category_name, description: description}, summary: "#{(kind == "expense") ? "Gider" : "Gelir"}: #{amount} · #{category_name} · #{description}")
     tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
   end
 

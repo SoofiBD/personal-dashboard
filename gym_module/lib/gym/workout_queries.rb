@@ -109,7 +109,11 @@ module Gym
 
       recent.to_h { |row| [row[:muscle], row[:sets]] }.map do |muscle, sets|
         days = (today - last_trained.fetch(muscle)).to_i
-        status = sets >= 18 && days < 2 ? "high" : (sets >= 10 && days < 2 ? "moderate" : "ready")
+        status = if sets >= 18 && days < 2
+          "high"
+        else
+          ((sets >= 10 && days < 2) ? "moderate" : "ready")
+        end
         {muscle: muscle, sets: sets, days_since: days, status: status}
       end.sort_by { |row| [-row[:sets], row[:muscle]] }
     end

@@ -128,7 +128,7 @@ class GymTool
     date = recorded_on.present? ? Date.iso8601(recorded_on) : Date.current
     action = AiAction.propose!(user: user, action_type: "gym.record_body_metric", payload: {"weight_kg" => weight.to_s("F"), "recorded_on" => date.iso8601, "note" => note.to_s.first(1_000)}, summary: "Vücut ağırlığı kaydet: #{weight.to_s("F")} kg (#{date})")
     tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
-  rescue Date::Error, ArgumentError => e
+  rescue ArgumentError => e
     tool_response(content: {error: e.message})
   end
 
@@ -177,7 +177,11 @@ class GymTool
     sets = Integer(item.fetch("sets", 3))
     raise ArgumentError, "Set sayısı 1-20 arasında olmalıdır." unless sets.between?(1, 20)
     policy = item.fetch("progression_policy", exercise.mode_reps? ? "linear" : "off").to_s
-    allowed = exercise.mode_cardio? ? %w[off] : (exercise.mode_time? ? %w[off time] : Gym::Progression::POLICIES)
+    allowed = if exercise.mode_cardio?
+      %w[off]
+    else
+      (exercise.mode_time? ? %w[off time] : Gym::Progression::POLICIES)
+    end
     raise ArgumentError, "#{exercise.name} için ilerleme yöntemi geçersiz." unless allowed.include?(policy)
 
     result = {"exercise_id" => exercise.id, "sets" => sets, "progression_policy" => policy, "warmup" => item["warmup"].to_s.first(40)}
