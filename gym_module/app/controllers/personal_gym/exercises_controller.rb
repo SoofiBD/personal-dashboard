@@ -6,6 +6,7 @@ module PersonalGym
       @exercises = Exercise.ordered
       @exercises = @exercises.search(params[:q]) if params[:q].present?
       @exercises = @exercises.where(muscle_group: params[:muscle]) if params[:muscle].present?
+      @active_workout = PersonalGym::Workout.active_for(current_user)
     end
 
     def show
@@ -46,7 +47,7 @@ module PersonalGym
     end
 
     def exercise_params
-      params.require(:gym_exercise).permit(:name, :category, :logging_mode, :muscle_group, :equipment, :bodyweight, :unilateral)
+      params.require(:gym_exercise).permit(:name, :category, :logging_mode, :muscle_group, :equipment, :bodyweight, :unilateral, :instructions, :safety_notes, :demo_url)
     end
 
     def unique_slug(name)

@@ -12,11 +12,14 @@ Rails.application.routes.draw do
     post :verify
   end
   resource :profile, only: %i[show update]
-  resource :ai_settings, only: %i[show update] do
-    get :health
-  end
+  resource :ai_settings, only: %i[show update]
+  get "ai", to: "ai_chats#show", as: :ai_assistant
   post "ai_chat", to: "ai_chats#create"
   delete "ai_chat/history", to: "ai_chats#destroy"
+  resources :ai_actions, only: [] do
+    post :approve, on: :member
+    post :reject, on: :member
+  end
   resources :users, only: %i[index new create edit update]
 
   resource :password, controller: "passwords", only: %i[new create edit update] do
@@ -130,6 +133,8 @@ Rails.application.routes.draw do
       patch :finish, on: :member
       resources :sets, controller: :workout_sets, only: %i[create update destroy]
     end
+    resources :body_metrics, only: %i[create destroy]
+    resources :schedule_entries, only: %i[create destroy]
     resource :stats, only: :show
   end
 

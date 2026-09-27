@@ -8,24 +8,14 @@ class AiSettingsControllerTest < ActionDispatch::IntegrationTest
     post session_path, params: {password: password}
   end
 
-  test "shows local AI settings and saves a model returned by Jan" do
-    jan = Object.new
-    jan.define_singleton_method(:health) { {connected: true, models: ["qwen3-4b"]} }
-    jan.define_singleton_method(:models) { ["qwen3-4b"] }
-    jan.define_singleton_method(:base_url) { "http://jan:1337" }
+  test "shows Gemini settings and saves a model" do
+    get ai_settings_path
+    assert_response :success
+    assert_select "h1", "Sağlayıcı ve model"
 
-    with_jan_client(jan) do
-      get ai_settings_path
-      assert_response :success
-      assert_select "h1", "Sağlayıcı ve model"
-      assert_select "option[value='qwen3-4b']", "qwen3-4b"
-
-      patch ai_settings_path, params: {user: {ai_model: "qwen3-4b"}}
-      assert_redirected_to ai_settings_path
-    end
-
-    assert_equal "jan_local", @owner.reload.ai_provider
-    assert_equal "qwen3-4b", @owner.ai_model
+    patch ai_settings_path, params: {user: {ai_model: "gemini-2.0-flash"}}
+    assert_redirected_to ai_settings_path
+    assert_equal "gemini-2.0-flash", @owner.reload.ai_model
   end
 
   test "requires authentication" do
@@ -34,13 +24,12 @@ class AiSettingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  private
+  test "shows the authenticated assistant workspace" do
+    get ai_assistant_path
 
-  def with_jan_client(client)
-    original = Ai::JanClient.method(:new)
-    Ai::JanClient.define_singleton_method(:new) { |*_args, **_options| client }
-    yield
-  ensure
-    Ai::JanClient.define_singleton_method(:new, original)
+    assert_response :success
+    assert_select "h1", "Birlikte karar verelim."
+    assert_select "form[data-ai-form]"
+    assert_select "a[href='#{ai_settings_path}']", "Sağlayıcı ve model"
   end
 end

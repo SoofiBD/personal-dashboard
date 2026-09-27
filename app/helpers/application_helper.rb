@@ -20,7 +20,7 @@ module ApplicationHelper
 
     if controller_name.in?(%w[pdf_tools document_conversions document_assets]) || @current_module == :pdf_tools || @current_module == :markitdown
       :pdf_tools
-    elsif controller_name.in?(%w[profiles ai_settings users mfa]) || @current_module == :settings
+    elsif controller_name.in?(%w[profiles ai_settings ai_chats users mfa]) || @current_module == :settings
       :settings
     else
       :finance

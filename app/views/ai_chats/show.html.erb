@@ -1,0 +1,88 @@
+<section class="ai-assistant-page" data-ai-assistant>
+  <header class="page-header ai-assistant-header">
+    <div>
+      <p class="eyebrow">YAPAY ZEKÂ ASİSTANI</p>
+      <h1>Birlikte karar verelim.</h1>
+      <p class="page-subtitle">Asistan; finans, notlar, öğrenme ve antrenman alanlarındaki kendi verilerinle çalışır. Bir işlem yapmadan önce senden açık onay ister.</p>
+    </div>
+    <div class="ai-assistant-header-actions">
+      <%= link_to "Sağlayıcı ve model", ai_settings_path, class: "button button-secondary" %>
+      <button type="button" class="button button-ghost" data-ai-clear-history>Geçmişi temizle</button>
+    </div>
+  </header>
+
+  <div class="ai-assistant-layout">
+    <aside class="panel ai-assistant-context" aria-labelledby="assistant-context-title">
+      <div class="ai-assistant-orb" aria-hidden="true">
+        <%= finance_svg_icon("sparkles", class: "ai-assistant-orb-icon") %>
+      </div>
+      <h2 id="assistant-context-title">Çalışma biçimi</h2>
+      <p>Yanıtlar paneldeki kendi hesabının verilerine dayanır; asistan eksik veriyi tahmin etmez.</p>
+      <ul class="ai-assistant-capabilities">
+        <li>Finans özeti, bütçe ve hesaplar</li>
+        <li>Notlar, öğrenme ve spor takibi</li>
+        <li>İstendiğinde taslak işlem önerileri</li>
+      </ul>
+      <p class="ai-assistant-note">Kayıt oluşturan veya güncelleyen her iş için önce onayını ister.</p>
+    </aside>
+
+    <div class="panel ai-assistant-chat">
+      <% if @pending_actions.any? %>
+        <section class="ai-action-queue" aria-labelledby="pending-actions-title">
+          <h2 id="pending-actions-title">Onay bekleyen işlemler</h2>
+          <% @pending_actions.each do |action| %>
+            <article class="ai-action-card">
+              <p><%= action.summary %></p>
+              <small><%= l(action.expires_at, format: :short) %> tarihine kadar geçerli</small>
+              <div class="ai-action-card-actions">
+                <%= button_to "Onayla", approve_ai_action_path(action), method: :post, class: "button button-primary button-sm" %>
+                <%= button_to "Reddet", reject_ai_action_path(action), method: :post, class: "button button-secondary button-sm" %>
+              </div>
+            </article>
+          <% end %>
+        </section>
+      <% end %>
+      <div class="ai-assistant-chat-header">
+        <div>
+          <h2>Asistan</h2>
+          <p>Bugün neyi birlikte netleştirelim?</p>
+        </div>
+        <span class="ai-assistant-status"><span aria-hidden="true"></span> Hazır</span>
+      </div>
+
+      <div class="ai-assistant-messages" data-ai-messages aria-live="polite" aria-relevant="additions">
+        <% if @conversations.any? %>
+          <% @conversations.each do |conversation| %>
+            <article class="ai-message ai-message--<%= conversation.role == "user" ? "user" : "assistant" %>">
+              <p class="ai-message-label"><%= conversation.role == "user" ? "Sen" : "Asistan" %></p>
+              <div class="ai-message-content"><%= conversation.content %></div>
+            </article>
+          <% end %>
+        <% else %>
+          <article class="ai-message ai-message--assistant">
+            <p class="ai-message-label">Asistan</p>
+            <div class="ai-message-content">Merhaba. Bütçeni analiz edebilir, son hareketlerini özetleyebilir veya planlarını birlikte gözden geçirebiliriz.</div>
+          </article>
+        <% end %>
+      </div>
+
+      <div class="ai-assistant-prompts" aria-label="Örnek sorular">
+        <button type="button" data-ai-prompt="Bu ay bütçem nasıl gidiyor?">Bütçemi özetle</button>
+        <button type="button" data-ai-prompt="Son günlerdeki finans hareketlerimi analiz et.">Son hareketleri incele</button>
+        <button type="button" data-ai-prompt="Yeni spor programımı buraya yapıştıracağım. Katalogdaki hareketlerle günlere ayırıp onaya hazır bir rutin önerisi oluştur.">Spor programı ekle</button>
+        <button type="button" data-ai-prompt="Eğitim programımı buraya yapıştıracağım. Bunu haftalık veya aylık tarihleri olan bir öğrenme planına dönüştür ve onaya hazırla.">Eğitim planı ekle</button>
+        <button type="button" data-ai-prompt="Bugün panelimde dikkat etmem gerekenleri söyle.">Bugün ne önemli?</button>
+      </div>
+
+      <form class="ai-assistant-composer" data-ai-form action="<%= ai_chat_path %>" method="post">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <label for="ai-message">Mesajın</label>
+        <div class="ai-assistant-composer-row">
+          <textarea id="ai-message" name="message" rows="2" maxlength="4000" required placeholder="Örn. Bu ay hangi harcamaları azaltabilirim?"></textarea>
+          <button type="submit" class="button button-primary" data-ai-submit>Gönder</button>
+        </div>
+        <p class="ai-assistant-feedback" data-ai-feedback role="status"></p>
+      </form>
+    </div>
+  </div>
+</section>

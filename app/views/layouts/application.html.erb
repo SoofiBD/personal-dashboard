@@ -149,7 +149,7 @@
                 <p class="sidebar-label"><%= t("nas.workspace") %></p>
                 <nav class="sidebar-nav">
                   <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
-                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yerel Yapay Zekâ"), ai_settings_path, "sparkles" %>
+                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yapay Zekâ Asistanı"), ai_assistant_path, "sparkles" %>
                   <%= finance_navigation_item t("nas.workspace"), root_path, "overview" %>
                 </nav>
               </div>
@@ -188,7 +188,7 @@
                 <p class="sidebar-label"><%= t("app.sidebar.section_shared_settings", default: "ORTAK AYARLAR") %></p>
                 <nav class="sidebar-nav">
                   <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
-                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yerel Yapay Zekâ"), ai_settings_path, "sparkles" %>
+                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yapay Zekâ Asistanı"), ai_assistant_path, "sparkles" %>
                   <% if current_panel_user.owner? %>
                     <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
                   <% end %>
@@ -248,7 +248,7 @@
                 <p class="sidebar-label"><%= t("app.sidebar.section_shared_settings", default: "ORTAK AYARLAR") %></p>
                 <nav class="sidebar-nav">
                   <%= finance_navigation_item t("app.sidebar.profile", default: "Profil & Güvenlik"), profile_path, "settings" %>
-                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yerel Yapay Zekâ"), ai_settings_path, "sparkles" %>
+                  <%= finance_navigation_item t("app.sidebar.ai", default: "Yapay Zekâ Asistanı"), ai_assistant_path, "sparkles" %>
                   <% if current_panel_user.owner? %>
                     <%= finance_navigation_item t("app.sidebar.users", default: "Kullanıcılar"), users_path, "accounts" %>
                   <% end %>

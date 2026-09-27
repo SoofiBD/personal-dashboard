@@ -19,6 +19,34 @@
   <article class="panel gym-stat"><span><%= t("gym.streak", default: "Hafta Serisi") %></span><strong><%= @streak %></strong></article>
 </section>
 
+<section class="gym-insights-grid" aria-label="<%= t('gym.training_load', default: 'Antrenman yükü') %>">
+  <article class="panel gym-insight-card">
+    <div class="panel-header"><div><h2><%= t("gym.muscle_volume", default: "Kas Grubu Hacmi") %></h2><p><%= t("gym.muscle_volume_desc", default: "Son 7 gündeki tamamlanmış çalışma setleri.") %></p></div></div>
+    <% if @muscle_volume.any? %>
+      <ul class="gym-load-list">
+        <% max_sets = @muscle_volume.map { |row| row[:sets] }.max %>
+        <% @muscle_volume.each do |row| %>
+          <li><span><%= row[:muscle].humanize %></span><div class="gym-load-bar" aria-label="<%= row[:muscle].humanize %>: <%= row[:sets] %> set"><i style="width: <%= ((row[:sets].to_f / max_sets) * 100).round %>%"></i></div><strong><%= row[:sets] %></strong></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_load_data", default: "Analiz için tamamlanmış bir antrenman kaydet.") %></p>
+    <% end %>
+  </article>
+  <article class="panel gym-insight-card">
+    <div class="panel-header"><div><h2><%= t("gym.readiness", default: "Yük / Dinlenme Dengesi") %></h2><p><%= t("gym.readiness_desc", default: "Teşhis değil; son yük ve dinlenme günlerine göre hatırlatma.") %></p></div></div>
+    <% if @muscle_readiness.any? %>
+      <ul class="gym-readiness-list">
+        <% @muscle_readiness.each do |row| %>
+          <li><span><%= row[:muscle].humanize %></span><span class="badge-pill gym-readiness-<%= row[:status] %>"><%= {"high" => "Yüksek yük", "moderate" => "Dengeli", "ready" => "Hazır"}.fetch(row[:status]) %></span><small><%= row[:sets] %> set · <%= row[:days_since] %> gün önce</small></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_readiness_data", default: "Yük/dinlenme dengesi için antrenman verisi gerekli.") %></p>
+    <% end %>
+  </article>
+</section>
+
 <section class="panel">
   <div class="panel-header">
     <div>

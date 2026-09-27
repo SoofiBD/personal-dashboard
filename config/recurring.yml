@@ -25,6 +25,9 @@ development:
   purge_expired_document_conversions:
     class: PersonalFinance::PurgeExpiredDocumentConversionsJob
     schedule: every day at 03:17
+  cleanup_ai_data:
+    class: CleanupAiDataJob
+    schedule: every day at 03:31
 
 production:
   generate_recurring_transactions:
@@ -42,3 +45,6 @@ production:
   purge_expired_document_conversions:
     class: PersonalFinance::PurgeExpiredDocumentConversionsJob
     schedule: every day at 03:17
+  cleanup_ai_data:
+    class: CleanupAiDataJob
+    schedule: every day at 03:31

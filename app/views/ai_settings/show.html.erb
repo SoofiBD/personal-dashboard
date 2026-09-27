@@ -2,36 +2,29 @@
   <div>
     <p class="eyebrow">YAPAY ZEKÂ</p>
     <h1>Sağlayıcı ve model</h1>
-    <p class="page-subtitle">Finans ve doküman araçları için hesabınıza ait sağlayıcı ve model tercihini yönetin.</p>
+    <p class="page-subtitle">Asistanın kullanacağı Gemini modelini hesabın için yönetin.</p>
   </div>
 </header>
 
 <div class="ai-settings-grid">
   <section class="panel">
-    <div class="panel-header"><div><h2>Model tercihi</h2><p>Bu tercih yalnızca hesabınıza uygulanır. Jan modelleri yerel API'den doğrulanır; Gemini model adı doğrudan girilir.</p></div></div>
+    <div class="panel-header"><div><h2>Gemini model tercihi</h2><p>Bu tercih yalnızca hesabına uygulanır. Model adı doğrudan girilir.</p></div></div>
     <%= form_with model: @user, url: ai_settings_path, method: :patch do |form| %>
       <% if @user.errors.any? %><div class="form-errors" role="alert" tabindex="-1"><%= @user.errors.full_messages.to_sentence %></div><% end %>
       <div class="form-group">
-        <%= form.label :ai_provider, "Sağlayıcı" %>
-        <%= form.select :ai_provider, [["Yerel Jan", "jan_local"], ["Google Gemini", "gemini"]], {}, autocomplete: "off" %>
-      </div>
-      <div class="form-group">
         <%= form.label :ai_model, "Kullanılacak model" %>
-        <%= form.text_field :ai_model, list: "jan-models", autocomplete: "off", placeholder: @user.ai_provider == "gemini" ? "gemini-2.0-flash" : "Otomatik seç" %>
-        <datalist id="jan-models"><% @health[:models].each do |model| %><option value="<%= model %>"><%= model %></option><% end %></datalist>
-        <small>Jan için boş bırakırsanız sunucunun ilk kullanılabilir modeli seçilir. Gemini için model adı zorunludur.</small>
+        <%= form.text_field :ai_model, autocomplete: "off", placeholder: "gemini-2.0-flash" %>
+        <small>Model adı zorunludur. Değiştirmek istemiyorsanız <code>gemini-2.0-flash</code> kullanın.</small>
       </div>
       <div class="form-actions"><%= form.submit "Model tercihini kaydet", class: "button button-primary" %></div>
     <% end %>
   </section>
 
-  <aside class="panel ai-connection-panel" aria-labelledby="jan-status-title">
-    <div class="panel-header"><div><h2 id="jan-status-title">Bağlantı durumu</h2><p>Yerel API: <code><%= @jan&.base_url || ENV.fetch("JAN_API_BASE_URL", Ai::JanClient::DEFAULT_BASE_URL) %></code></p></div></div>
-    <p class="security-status <%= "is-enabled" if @health[:connected] %>" role="status" aria-atomic="true"><%= @health[:connected] ? "Bağlı · #{@health[:models].size} model bulundu" : "Bağlantı kurulamadı" %></p>
-    <% unless @health[:connected] %>
-      <p class="ai-status-note"><%= @health[:error] %></p>
-      <p class="ai-status-note">Jan’ı açın, Local API Server’ı başlatın ve sunucu adresinin <code>JAN_API_BASE_URL</code> ile eşleştiğini doğrulayın.</p>
+  <aside class="panel ai-connection-panel" aria-labelledby="gemini-status-title">
+    <div class="panel-header"><div><h2 id="gemini-status-title">Gemini yapılandırması</h2><p>Anahtar yalnızca sunucu ortamında tutulur ve hiçbir zaman tarayıcıya gönderilmez.</p></div></div>
+    <p class="security-status <%= "is-enabled" if @gemini_configured %>" role="status" aria-atomic="true"><%= @gemini_configured ? "Anahtar yapılandırıldı" : "Anahtar yapılandırılmadı" %></p>
+    <% unless @gemini_configured %>
+      <p class="ai-status-note"><code>GEMINI_API_KEY</code> değişkenini uygulamanın ortam dosyasına ekleyin ve uygulamayı yeniden başlatın.</p>
     <% end %>
-    <%= link_to "Bağlantıyı yeniden denetle", ai_settings_path, class: "button button-secondary ai-health-link", data: {turbo: false} %>
   </aside>
 </div>

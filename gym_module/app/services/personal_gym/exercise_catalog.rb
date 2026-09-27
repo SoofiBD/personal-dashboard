@@ -1,5 +1,16 @@
 module PersonalGym
   class ExerciseCatalog
+    GUIDANCE = {
+      "barbell-bench-press" => {instructions: "1. Gözlerin barın altında, ayakların yere sağlam basacak şekilde uzan.\n2. Kürek kemiklerini geriye-aşağı al; beli doğal kavisinde tut.\n3. Barı kontrollü biçimde alt göğse indir, dirsekleri gövdeden yaklaşık 45–75° açıda tut.\n4. Ayaklardan güç alıp barı başlangıç noktasına bastır; bilekleri barın altında hizalı tut.", safety_notes: "Omuzda keskin ağrı olursa dur. Ağır setlerde emniyet kolları veya spotter kullan."},
+      "back-squat" => {instructions: "1. Barı üst sırtına yerleştir, karnını sıkıp kaburgaları kontrol et.\n2. Kalça ve dizleri birlikte kırarak dengeli biçimde çömel.\n3. Dizleri ayak parmaklarının yönünde takip ettir, topukları yerden kaldırma.\n4. Alt pozisyondan tüm ayağınla zemini iterek kalk.", safety_notes: "Belini nötr tut; ağrı veya denge kaybında seti sonlandır. Ağır setlerde rack güvenliklerini ayarla."},
+      "deadlift" => {instructions: "1. Barı ayağın orta hizasına koy, kalçayı geriye gönderip bara yaklaş.\n2. Karnını sık, sırtını uzun ve nötr tut, koltuk altlarını gövdeye kilitle.\n3. Zemini iterek barı bacaklarına yakın kaldır.\n4. Kalçayı geriye göndererek barı aynı kontrollü hat üzerinden indir.", safety_notes: "Sırtı yuvarlayarak yerden koparma. Keskin bel ağrısında dur ve form/yük için uzman desteği al."},
+      "overhead-press" => {instructions: "1. Barı omuz önünde, bilekler barın altında tut.\n2. Kalçayı sıkıp karnı brace et; belden geriye aşırı yatma.\n3. Barı yüze yakın dik hatta yukarı bastır.\n4. Başını barın altına getirip üstte kontrollü kilitle.", safety_notes: "Bel veya omuz ağrısında yükü azalt ya da dur. Dar alanlarda bar yolunu çevreden uzak tut."},
+      "barbell-row" => {instructions: "1. Kalçadan menteşe yap, gövdeyi sabit ve sırtı nötr tut.\n2. Barı alt kaburgalara doğru çek; dirsekleri geriye sür.\n3. Kürek kemiklerini kontrollü sık.\n4. Barı sallanmadan başlangıca indir.", safety_notes: "Ağırlığı ivmeyle çekme. Bel pozisyonunu koruyamıyorsan yükü azalt."},
+      "pull-up" => {instructions: "1. Barı kavra, omuzları kulaklardan uzaklaştır.\n2. Göğsünü bara yönlendirirken dirsekleri aşağı-arkaya çek.\n3. Üstte kontrol et, sonra omuzları kontrolü kaybetmeden tam açılmaya dön.\n4. Gerekirse lastik veya asist makinesiyle hareket aralığını koru.", safety_notes: "Omuzda sıkışma ya da ağrı hissedersen hareketi bırak."},
+      "romanian-deadlift" => {instructions: "1. Dizleri hafif kır, barı bacaklara yakın tut.\n2. Kalçayı geriye gönderirken hamstringlerde gerilimi hisset.\n3. Sırtı nötr tutarak sadece kontrol edebildiğin derinliğe in.\n4. Kalçayı sıkarak ayağa kalk.", safety_notes: "Belden eğilme veya barı vücuttan uzaklaştırma. Hamstring ağrısında dur."},
+      "plank" => {instructions: "1. Dirsekleri omuz altında, vücudu baştan topuğa düz çizgide kur.\n2. Karnı ve kalçayı sık, yere bakarak boynu uzun tut.\n3. Belin çökmesine veya kalçanın yükselmesine izin verme.\n4. Form bozulmadan süreyi tamamla.", safety_notes: "Bel ağrısı oluşursa seti bitir; daha kısa sürelerle ilerle."}
+    }.freeze
+
     CATALOG = [
       {name: "Barbell Bench Press", slug: "barbell-bench-press", category: :strength, logging_mode: :reps, muscle_group: "chest", equipment: "barbell", muscles: ["chest", "triceps", "front_delts"]},
       {name: "Incline Barbell Press", slug: "incline-barbell-press", category: :strength, logging_mode: :reps, muscle_group: "chest", equipment: "barbell", muscles: ["upper_chest", "front_delts"]},
@@ -40,16 +51,12 @@ module PersonalGym
 
     def self.install!
       CATALOG.each do |attrs|
-        PersonalGym::Exercise.find_or_create_by!(slug: attrs[:slug]) do |exercise|
-          exercise.name = attrs[:name]
-          exercise.category = attrs[:category]
-          exercise.logging_mode = attrs[:logging_mode]
-          exercise.muscle_group = attrs[:muscle_group]
-          exercise.equipment = attrs[:equipment]
-          exercise.muscles = attrs[:muscles]
-          exercise.unilateral = attrs.fetch(:unilateral, false)
-          exercise.bodyweight = attrs.fetch(:bodyweight, false)
-        end
+        exercise = PersonalGym::Exercise.find_or_initialize_by(slug: attrs[:slug])
+        exercise.assign_attributes(attrs.except(:slug)) if exercise.new_record?
+        guide = GUIDANCE[attrs[:slug]]
+        exercise.instructions = guide[:instructions] if guide && exercise.instructions.blank?
+        exercise.safety_notes = guide[:safety_notes] if guide && exercise.safety_notes.blank?
+        exercise.save!
       end
       PersonalGym::Exercise.count
     end

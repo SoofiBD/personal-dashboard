@@ -12,7 +12,6 @@ class User < ApplicationRecord
   validates :time_zone, presence: true
   validates :role, inclusion: {in: ROLES}
   validates :locale, inclusion: {in: LOCALES}
-  validates :ai_provider, inclusion: {in: %w[jan_local gemini]}
   validates :ai_model, length: {maximum: 200}, allow_blank: true
   validates :email, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}, unless: :owner?
   validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
@@ -35,8 +34,11 @@ class User < ApplicationRecord
   has_many :learning_attempts, class_name: "Learning::Attempt", dependent: :destroy
   has_many :gym_routines, class_name: "PersonalGym::Routine", dependent: :destroy
   has_many :gym_workouts, class_name: "PersonalGym::Workout", dependent: :destroy
+  has_many :gym_body_metrics, class_name: "PersonalGym::BodyMetric", dependent: :destroy
+  has_many :gym_schedule_entries, class_name: "PersonalGym::ScheduleEntry", dependent: :destroy
   has_many :ai_memories, dependent: :destroy
   has_many :ai_conversations, dependent: :destroy
+  has_many :ai_actions, dependent: :destroy
 
   def onboarded?
     onboarded_at.present? || financial_accounts.exists? || finance_categories.exists? || finance_transactions.exists?

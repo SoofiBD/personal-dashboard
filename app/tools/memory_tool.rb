@@ -31,10 +31,8 @@ class MemoryTool
   end
 
   def remember(key:, value:, category:)
-    memory = user.ai_memories.find_or_initialize_by(key: key, category: category)
-    memory.value = value
-    memory.save!
-    tool_response(content: {success: true, key: key, category: category, value: value})
+    action = AiAction.propose!(user: user, action_type: "memory.remember", payload: {key: key, value: value, category: category}, summary: "Asistan hafızasına kaydet: #{key}")
+    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
   end
 
   def recall(key:)
@@ -55,9 +53,8 @@ class MemoryTool
   def forget(key:)
     memory = user.ai_memories.find_by(key: key)
     return tool_response(content: {error: "Memory '#{key}' not found"}) unless memory
-
-    memory.destroy!
-    tool_response(content: {success: true, deleted_key: key})
+    action = AiAction.propose!(user: user, action_type: "memory.forget", payload: {key: key}, summary: "Asistan hafızasından sil: #{key}")
+    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
   end
 
   def search_memories(query:)

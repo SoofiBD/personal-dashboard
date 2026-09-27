@@ -38,6 +38,93 @@
   <article class="panel gym-stat"><span><%= t("gym.month_sessions", default: "Bu Ay Seans") %></span><strong><%= @month_sessions %></strong></article>
 </section>
 
+<section class="gym-insights-grid" aria-label="<%= t('gym.progress_tracking', default: 'İlerleme takibi') %>">
+  <article class="panel gym-insight-card">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("gym.body_weight", default: "Vücut Ağırlığı") %></h2>
+        <p><%= t("gym.body_weight_desc", default: "Ölçümleri gün bazında takip et.") %></p>
+      </div>
+    </div>
+    <% if @latest_weight %>
+      <div class="gym-weight-summary">
+        <strong><%= @latest_weight.weight_kg %> kg</strong>
+        <span><%= l(@latest_weight.recorded_on, format: :short) %></span>
+        <% if @weight_change %><small class="<%= @weight_change.positive? ? "gym-change-up" : "gym-change-down" %>"><%= @weight_change.positive? ? "+" : "" %><%= @weight_change %> kg</small><% end %>
+      </div>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_metrics", default: "Henüz ölçüm yok.") %></p>
+    <% end %>
+    <%= form_with model: PersonalGym::BodyMetric.new, scope: :gym_body_metric, url: gym_body_metrics_path, class: "gym-compact-form" do |form| %>
+      <div><%= form.label :weight_kg, t("gym.weight_kg", default: "kg") %><%= form.number_field :weight_kg, min: 20, max: 500, step: 0.1, required: true %></div>
+      <div><%= form.label :recorded_on, t("gym.date", default: "Tarih") %><%= form.date_field :recorded_on, value: Date.current, required: true %></div>
+      <%= form.submit t("gym.add_measurement", default: "Ölçüm ekle"), class: "button button-secondary" %>
+    <% end %>
+  </article>
+
+  <article class="panel gym-insight-card">
+    <div class="panel-header">
+      <div>
+        <h2><%= t("gym.week_plan", default: "Bu Haftanın Planı") %></h2>
+        <p><%= l(@week_range.begin, format: :short) %> — <%= l(@week_range.end, format: :short) %></p>
+      </div>
+    </div>
+    <% if @scheduled_workouts.any? %>
+      <ol class="gym-schedule-list">
+        <% @scheduled_workouts.each do |entry| %>
+          <li>
+            <span><strong><%= l(entry.scheduled_on, format: "%a %d %b") %></strong><%= entry.routine_day.routine.name %> · <%= entry.routine_day.name %></span>
+            <div class="gym-schedule-actions">
+              <% if entry.scheduled_on == Date.current && @active_workout.nil? %>
+                <%= button_to t("gym.start", default: "Başlat"), gym_workouts_path, params: {routine_day_id: entry.routine_day_id}, class: "button button-secondary button-sm", form_class: "gym-inline-form" %>
+              <% end %>
+              <%= button_to t("gym.remove", default: "Kaldır"), gym_schedule_entry_path(entry), method: :delete, class: "text-link gym-remove-button", form_class: "gym-inline-form" %>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_week_plan", default: "Bu hafta için planlı antrenman yok.") %></p>
+    <% end %>
+    <% if @routine_days.any? %>
+      <%= form_with model: PersonalGym::ScheduleEntry.new, scope: :gym_schedule_entry, url: gym_schedule_entries_path, class: "gym-compact-form" do |form| %>
+        <div><%= form.label :routine_day_id, t("gym.routine_day", default: "Antrenman günü") %><%= form.select :routine_day_id, @routine_days.map { |day| ["#{day.routine.name} · #{day.name}", day.id] }, include_blank: t("gym.select", default: "Seç") %></div>
+        <div><%= form.label :scheduled_on, t("gym.date", default: "Tarih") %><%= form.date_field :scheduled_on, value: Date.current, min: @week_range.begin, max: @week_range.end, required: true %></div>
+        <%= form.submit t("gym.add_to_week", default: "Haftaya ekle"), class: "button button-secondary" %>
+      <% end %>
+    <% end %>
+  </article>
+</section>
+
+<section class="gym-insights-grid" aria-label="<%= t('gym.training_load', default: 'Antrenman yükü') %>">
+  <article class="panel gym-insight-card">
+    <div class="panel-header"><div><h2><%= t("gym.muscle_volume", default: "Kas Grubu Hacmi") %></h2><p><%= t("gym.muscle_volume_desc", default: "Son 7 gündeki tamamlanmış çalışma setleri.") %></p></div></div>
+    <% if @muscle_volume.any? %>
+      <ul class="gym-load-list">
+        <% max_sets = @muscle_volume.map { |row| row[:sets] }.max %>
+        <% @muscle_volume.each do |row| %>
+          <li><span><%= row[:muscle].humanize %></span><div class="gym-load-bar" aria-label="<%= row[:muscle].humanize %>: <%= row[:sets] %> set"><i style="width: <%= ((row[:sets].to_f / max_sets) * 100).round %>%"></i></div><strong><%= row[:sets] %></strong></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_load_data", default: "Analiz için tamamlanmış bir antrenman kaydet.") %></p>
+    <% end %>
+  </article>
+
+  <article class="panel gym-insight-card">
+    <div class="panel-header"><div><h2><%= t("gym.readiness", default: "Yük / Dinlenme Dengesi") %></h2><p><%= t("gym.readiness_desc", default: "Teşhis değil; son yük ve dinlenme günlerine göre hatırlatma.") %></p></div></div>
+    <% if @muscle_readiness.any? %>
+      <ul class="gym-readiness-list">
+        <% @muscle_readiness.each do |row| %>
+          <li><span><%= row[:muscle].humanize %></span><span class="badge-pill gym-readiness-<%= row[:status] %>"><%= {"high" => "Yüksek yük", "moderate" => "Dengeli", "ready" => "Hazır"}.fetch(row[:status]) %></span><small><%= row[:sets] %> set · <%= row[:days_since] %> gün önce</small></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="empty-state gym-inline-empty"><%= t("gym.no_readiness_data", default: "Yük/dinlenme dengesi için antrenman verisi gerekli.") %></p>
+    <% end %>
+  </article>
+</section>
+
 <section class="panel">
   <div class="panel-header">
     <div>
@@ -54,7 +141,7 @@
             <strong><%= routine.name %></strong>
             <div class="gym-day-chips">
               <% routine.days.ordered.each do |day| %>
-                <% if PersonalGym::Workout.active_for(current_user).nil? %>
+                <% if @active_workout.nil? %>
                   <%= button_to day.name, gym_workouts_path, params: {routine_day_id: day.id}, class: "badge-pill gym-day-start", form_class: "gym-inline-form", title: t("gym.start_day_title", default: "Günü başlat") %>
                 <% else %>
                   <span class="badge-pill badge-pill-subtle"><%= day.name %></span>
