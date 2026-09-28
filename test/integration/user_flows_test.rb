@@ -58,6 +58,20 @@ class UserFlowsTest < ActionDispatch::IntegrationTest
     assert_redirected_to finance_root_path
   end
 
+  test "each account opens only its own financial workspace" do
+    @owner.financial_accounts.create!(name: "Burak account", kind: "bank", opening_balance: 500, currency: "TRY", is_active: true)
+    nisa = create_user("Nisa", "nisa@example.test", "editor")
+    nisa.financial_accounts.create!(name: "Nisa account", kind: "bank", opening_balance: 100, currency: "TRY", is_active: true)
+
+    post session_path, params: {identifier: nisa.email, password: PASSWORD}
+    assert_redirected_to root_path
+    get finance_accounts_path
+
+    assert_response :success
+    assert_includes response.body, "Nisa account"
+    assert_not_includes response.body, "Burak account"
+  end
+
   test "onboards a finance user, records a transaction, and queues a PDF conversion" do
     @owner.update!(onboarded_at: nil)
     sign_in_as(@owner)

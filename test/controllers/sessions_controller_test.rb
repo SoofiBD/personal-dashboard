@@ -17,6 +17,16 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "blank identifier cannot silently sign in as the owner when other accounts exist" do
+    User.create!(name: "Nisa", email: "nisa@example.test", role: "editor", currency: "TRY", time_zone: "Europe/Istanbul", password: PASSWORD, password_confirmation: PASSWORD)
+
+    post session_path, params: {password: PASSWORD}
+
+    assert_response :unprocessable_content
+    get finance_root_path
+    assert_redirected_to new_session_path
+  end
+
   test "login returns to the requested finance path" do
     get export_finance_data_path(format: :json)
     post session_path, params: {password: PASSWORD}

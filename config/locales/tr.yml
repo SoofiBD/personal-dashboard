@@ -1034,17 +1034,17 @@ tr:
     role_editor: Düzenleyici
     role_viewer: Görüntüleyici
     role_owner_desc: Sahip — tüm ayarlar
-    role_editor_desc: Düzenleyici — finans verilerini yönetir
+    role_editor_desc: Düzenleyici — kendi finans verilerini yönetir
     role_viewer_desc: Görüntüleyici — salt okunur
     password_new: Yeni parola (isteğe bağlı)
     password_temp: Geçici parola
     password_confirmation: Parola tekrarı
   auth:
-    title: Yönetici Girişi
-    subtitle: Finansal egemenlik panelinize erişmek için parolanızı girin.
-    identifier_label: E-posta veya kullanıcı adı (İsteğe bağlı)
-    identifier_placeholder: Yönetici girişi için boş bırakabilirsiniz
-    password_label: Yönetici Parolası
+    title: Giriş Yap
+    subtitle: Kişisel panelinize erişmek için kendi hesabınızla giriş yapın.
+    identifier_label: E-posta veya kullanıcı adı
+    identifier_placeholder: Hesabınızın e-posta adresini veya kullanıcı adını girin
+    password_label: Parola
     password_placeholder: "••••••••••••••••"
     toggle_password: Parolayı göster veya gizle
     submit: Kasaya Giriş Yap

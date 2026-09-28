@@ -23,9 +23,10 @@ class HostControllerFlowsTest < ActionDispatch::IntegrationTest
   test "owners manage users while viewers are redirected" do
     sign_in(@owner)
     assert_difference("User.count", 1) do
-      post users_path, params: {user: {name: "Editor", email: "editor-controller@example.test", currency: "TRY", time_zone: "Europe/Istanbul", locale: "tr", password: PASSWORD, password_confirmation: PASSWORD, role: "editor"}}
+      post users_path, params: {user: {name: "Editor", email: "editor-controller@example.test", currency: "TRY", time_zone: "Europe/Istanbul", locale: "tr", password: PASSWORD, password_confirmation: PASSWORD}}
     end
     assert_redirected_to users_path
+    assert_equal "editor", User.find_by!(email: "editor-controller@example.test").role
 
     viewer = User.create!(name: "Viewer", email: "viewer-controller@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul", password: PASSWORD, password_confirmation: PASSWORD, onboarded_at: Time.current)
     delete session_path

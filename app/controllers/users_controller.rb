@@ -9,12 +9,12 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new(currency: current_user.currency, time_zone: current_user.time_zone, locale: current_user.locale, role: "viewer")
+    @user = User.new(currency: current_user.currency, time_zone: current_user.time_zone, locale: current_user.locale, role: "editor")
   end
 
   def create
     @user = User.new(user_params)
-    @user.role = role_param || "viewer"
+    @user.role = role_param || "editor"
     if @user.save
       audit_security_event("user_created", target_user_id: @user.id, role: @user.role)
       redirect_to users_path, notice: I18n.t("backend.users.created")
