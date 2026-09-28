@@ -30,7 +30,7 @@ services:
       - storage_data:/rails/storage
     read_only: true
     tmpfs:
-      - /rails/tmp
+      - /rails/tmp:uid=1000,gid=1000,mode=1770
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -60,7 +60,7 @@ services:
       - storage_data:/rails/storage
     read_only: true
     tmpfs:
-      - /rails/tmp
+      - /rails/tmp:uid=1000,gid=1000,mode=1770
     security_opt:
       - no-new-privileges:true
     cap_drop:
