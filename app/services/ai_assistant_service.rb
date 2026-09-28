@@ -32,6 +32,13 @@ class AiAssistantService
   TEXT
 
   MAX_HISTORY_MESSAGES = 12
+  DEFAULT_CHAT_MODEL = "gemini-3.6-flash"
+  SHUT_DOWN_CHAT_MODELS = %w[
+    gemini-2.0-flash
+    gemini-2.0-flash-001
+    gemini-2.0-flash-lite
+    gemini-2.0-flash-lite-001
+  ].freeze
 
   def initialize(user:)
     @user = user
@@ -52,9 +59,6 @@ class AiAssistantService
     cleanup_old_conversations
 
     response
-  rescue Langchain::LLM::GoogleGemini::Error => e
-    Rails.logger.warn(event: "ai_assistant_provider_error", user_id: user.id, error_class: e.class.name)
-    raise Error, "Yapay zekâ sağlayıcısı şu anda yanıt veremiyor. Lütfen daha sonra tekrar deneyin."
   rescue => e
     Rails.logger.error(event: "ai_assistant_error", user_id: user.id, error_class: e.class.name)
     raise Error, "Asistan isteği tamamlayamadı. Lütfen tekrar deneyin."
@@ -65,9 +69,16 @@ class AiAssistantService
   attr_reader :user, :llm
 
   def build_llm
+    configured_model = user.ai_model.presence
+    chat_model = if configured_model.blank? || SHUT_DOWN_CHAT_MODELS.include?(configured_model)
+      DEFAULT_CHAT_MODEL
+    else
+      configured_model
+    end
+
     Langchain::LLM::GoogleGemini.new(
       api_key: ENV.fetch("GEMINI_API_KEY"),
-      default_options: {chat_model: user.ai_model.presence || "gemini-2.0-flash", temperature: 0.2}
+      default_options: {chat_model: chat_model, temperature: 0.2}
     )
   end
 
@@ -93,8 +104,7 @@ class AiAssistantService
       llm: llm,
       instructions: instructions,
       tools: tools,
-      parallel_tool_calls: false,
-      max_turns: 5
+      parallel_tool_calls: false
     )
   end
 
