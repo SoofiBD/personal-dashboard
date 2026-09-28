@@ -32,6 +32,11 @@ secrets/
 *.pem
 *.pem.bak
 
+# Local-only planning and design notes
+/FINANCE_MODULE_BLUEPRINT.md
+/PDF_TO_MARKDOWN_SYSTEM_SPECIFICATION.md
+/ORACLE_DEPLOY_PLAN.md
+
 # Frontend node_modules
 frontend/md-editor/node_modules/
 

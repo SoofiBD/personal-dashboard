@@ -171,7 +171,7 @@ Make sure you have one of the following setups installed on your machine:
 
 ### Production HTTPS
 
-Production uses a separate Compose definition so the local HTTP stack is never reused as an internet-facing deployment. Follow [ORACLE_DEPLOY_PLAN.md](ORACLE_DEPLOY_PLAN.md): set a DNS-resolvable `DASHBOARD_DOMAIN`, matching database credentials, a unique `STIRLING_PDF_PASSWORD`, and the required Git-ignored `secrets/*.txt` files. Configure SMTP if web password reset is needed; then run:
+Production uses a separate Compose definition so the local HTTP stack is never reused as an internet-facing deployment. Set a DNS-resolvable `DASHBOARD_DOMAIN`, matching database credentials, a unique `STIRLING_PDF_PASSWORD`, and the required Git-ignored `secrets/*.txt` files. Configure SMTP if web password reset is needed; then run:
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
@@ -179,6 +179,8 @@ docker compose --env-file .env.production -f compose.production.yaml up --build 
 
 Caddy obtains and renews TLS certificates for the configured domain. Do not expose the development `compose.yaml` stack beyond `127.0.0.1`.
 NAS management is outside this repository; this stack does not expose NAS access.
+
+Keep deployment runbooks and infrastructure notes outside the repository. Do not commit production credentials, private keys, recovery material, or host-specific configuration.
 
 #### Production data-protection requirements
 
