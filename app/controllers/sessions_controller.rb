@@ -66,10 +66,11 @@ class SessionsController < ApplicationController
 
   def login_user
     identifier = params[:identifier].to_s.strip.downcase
-    return User.dashboard_owner_record if identifier.blank?
+    return User.dashboard_owner_record if identifier.blank? && User.count == 1
+    return if identifier.blank?
 
-    user = User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).first
-    user || ((User.count == 1) ? User.dashboard_owner_record : nil)
+    matches = User.where("lower(email) = ? OR lower(name) = ?", identifier, identifier).order(:id).limit(2).to_a
+    matches.one? ? matches.first : nil
   end
 
   def safe_return_to

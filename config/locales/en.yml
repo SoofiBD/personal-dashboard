@@ -1029,16 +1029,16 @@ en:
     role_editor: Editor
     role_viewer: Viewer
     role_owner_desc: Owner — all settings
-    role_editor_desc: Editor — manages financial data
-    role_viewer_desc: Viewer — read-only
+    role_editor_desc: Editor — manages their own financial data
+    role_viewer_desc: Viewer — can only view their own dashboard
     password_new: New password (optional)
     password_temp: Temporary password
     password_confirmation: Password confirmation
   auth:
     title: Sign In
     subtitle: Enter your credentials to access your personal dashboard.
-    identifier_label: Email or username (Optional)
-    identifier_placeholder: Leave blank for owner login
+    identifier_label: Email or username
+    identifier_placeholder: Enter your account email or username
     password_label: Password
     password_placeholder: "••••••••••••••••"
     toggle_password: Show or hide password
