@@ -1,5 +1,6 @@
 module PersonalFinance
   class DocumentAssetsController < ApplicationController
+    skip_before_action :ensure_onboarding_completed
     before_action :set_asset
 
     def show

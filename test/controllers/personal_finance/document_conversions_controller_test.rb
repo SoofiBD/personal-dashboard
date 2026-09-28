@@ -47,6 +47,15 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "select[name='conversion_options[image_quality]']"
   end
 
+  test "opens MarkItDown before finance onboarding is complete" do
+    @user.update!(onboarded_at: nil)
+
+    get finance_document_conversions_path
+
+    assert_response :success
+    assert_select "h1", text: /PDF.*Markdown|MarkItDown/i
+  end
+
   test "accepts a small PDF and queues conversion" do
     file = Tempfile.new(["small", ".pdf"])
     file.write("%PDF-small")

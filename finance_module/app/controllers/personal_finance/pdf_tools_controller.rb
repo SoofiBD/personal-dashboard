@@ -2,6 +2,8 @@ require "net/http"
 
 module PersonalFinance
   class PdfToolsController < ApplicationController
+    skip_before_action :ensure_onboarding_completed
+
     def show
       @stirling_available = stirling_available?
     end
