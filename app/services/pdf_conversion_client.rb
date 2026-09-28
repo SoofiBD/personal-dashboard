@@ -9,7 +9,7 @@ class PdfConversionClient
   MAX_PDF_SIZE = 25.megabytes
   MAX_MARKDOWN_SIZE = 10.megabytes
 
-  def initialize(base_url: ENV.fetch("PDF_WORKER_URL", "http://pdf-worker:8000"), api_key: ENV.fetch("PDF_WORKER_API_KEY", nil))
+  def initialize(base_url: ENV.fetch("PDF_WORKER_URL", "http://pdf-worker:8000"), api_key: worker_api_key)
     @base_uri = URI(base_url)
     @api_key = api_key
   end
@@ -105,6 +105,18 @@ class PdfConversionClient
   end
 
   private
+
+  # Docker secrets are mounted as files in production.  Keep the environment
+  # variable as the first choice so local development remains straightforward.
+  def worker_api_key
+    ENV["PDF_WORKER_API_KEY"].presence || read_secret_file(ENV["PDF_WORKER_API_KEY_FILE"])
+  end
+
+  def read_secret_file(path)
+    return if path.blank? || !File.file?(path)
+
+    File.read(path).strip.presence
+  end
 
   def validate_pdf!(pdf_data, filename)
     raise Error, "Lütfen bir PDF dosyası seçin." if pdf_data.blank?
