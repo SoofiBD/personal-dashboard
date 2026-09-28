@@ -4,6 +4,8 @@ module PersonalFinance
   class DocumentConversionsController < ApplicationController
     MAX_SOURCE_PDF_BYTES = 25.megabytes
 
+    skip_before_action :ensure_onboarding_completed
+
     def index
       @document_conversions = owned(DocumentConversion).order(created_at: :desc).limit(20)
       @document_conversion = owned(DocumentConversion).new

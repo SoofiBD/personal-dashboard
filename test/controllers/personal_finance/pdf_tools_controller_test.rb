@@ -26,4 +26,13 @@ class PersonalFinance::PdfToolsControllerTest < PersonalFinance::IntegrationTest
     assert_select ".pdf-tools-hero .pdf-tools-status", text: /Ready|Waiting/
     assert_select "#pdf-tools-ai-title", text: "AI mode"
   end
+
+  test "opens the PDF workspace before finance onboarding is complete" do
+    User.dashboard_owner.update!(onboarded_at: nil)
+
+    get finance_pdf_tools_path
+
+    assert_response :success
+    assert_select "h1", text: "PDF Çalışma Alanı"
+  end
 end
