@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     environment:
       RAILS_ENV: production
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE:?Set SECRET_KEY_BASE in .env.production}"
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
@@ -50,6 +51,7 @@ services:
     command: ./bin/jobs
     environment:
       RAILS_ENV: production
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE:?Set SECRET_KEY_BASE in .env.production}"
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
