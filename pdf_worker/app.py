@@ -33,9 +33,16 @@ IMAGE_RENDER_PROFILES = {
 }
 
 def _get_api_key():
-    key = os.environ.get("PDF_WORKER_API_KEY", "")
+    key = os.environ.get("PDF_WORKER_API_KEY", "").strip()
+    if not key:
+        secret_path = os.environ.get("PDF_WORKER_API_KEY_FILE", "")
+        if secret_path:
+            try:
+                key = Path(secret_path).read_text(encoding="utf-8").strip()
+            except OSError as error:
+                raise RuntimeError("PDF_WORKER_API_KEY_FILE could not be read") from error
     if not key or len(key) < 32:
-        raise RuntimeError("PDF_WORKER_API_KEY must be set and at least 32 characters")
+        raise RuntimeError("PDF_WORKER_API_KEY or PDF_WORKER_API_KEY_FILE must provide a key of at least 32 characters")
     return key
 
 

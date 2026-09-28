@@ -1,5 +1,7 @@
 import asyncio
 import io
+import os
+import tempfile
 import zipfile
 import unittest
 import base64
@@ -12,7 +14,7 @@ from fastapi import HTTPException
 from fastapi import UploadFile
 from PIL import Image
 
-from app import HtmlExport, ZipExport, ZipImage, convert, crop_image, export_html, export_zip, extract_layout_text, extract_with_opendataloader, is_valid_table
+from app import HtmlExport, ZipExport, ZipImage, _get_api_key, convert, crop_image, export_html, export_zip, extract_layout_text, extract_with_opendataloader, is_valid_table
 
 
 def convert_pdf(document, annotation_mode="both", **options):
@@ -28,6 +30,23 @@ def convert_pdf(document, annotation_mode="both", **options):
 
 
 class PdfWorkerTest(unittest.TestCase):
+    def test_reads_api_key_from_docker_secret_file(self):
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as secret:
+            secret.write("x" * 32 + "\n")
+        original_key = os.environ.pop("PDF_WORKER_API_KEY", None)
+        original_file = os.environ.get("PDF_WORKER_API_KEY_FILE")
+        try:
+            os.environ["PDF_WORKER_API_KEY_FILE"] = secret.name
+            self.assertEqual("x" * 32, _get_api_key())
+        finally:
+            if original_key is not None:
+                os.environ["PDF_WORKER_API_KEY"] = original_key
+            if original_file is None:
+                os.environ.pop("PDF_WORKER_API_KEY_FILE", None)
+            else:
+                os.environ["PDF_WORKER_API_KEY_FILE"] = original_file
+            os.unlink(secret.name)
+
     def test_opendataloader_uses_isolated_paths_and_reads_markdown(self):
         def write_result(command, **options):
             self.assertEqual("opendataloader-pdf", command[0])
