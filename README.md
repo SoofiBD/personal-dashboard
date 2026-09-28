@@ -171,7 +171,7 @@ Make sure you have one of the following setups installed on your machine:
 
 ### Production HTTPS
 
-Production uses a separate Compose definition so the local HTTP stack is never reused as an internet-facing deployment. Set a DNS-resolvable `DASHBOARD_DOMAIN`, matching database credentials, a unique `STIRLING_PDF_PASSWORD`, and the required Git-ignored `secrets/*.txt` files. Configure SMTP if web password reset is needed; then run:
+Production uses a separate Compose definition so the local HTTP stack is never reused as an internet-facing deployment. Set a DNS-resolvable `DASHBOARD_DOMAIN`, matching database credentials, and the required Git-ignored `secrets/*.txt` files. Stirling PDF uses the authenticated Rails session through Caddy and does not require a second password. Configure SMTP if web password reset is needed; then run:
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml up --build -d
@@ -273,7 +273,6 @@ Use `.env.local` for development and Git-ignored `.env.production` for deploymen
 | `POSTGRES_USER` | PostgreSQL username | `personal_dashboard` |
 | `POSTGRES_PASSWORD` | PostgreSQL password; required and never defaulted | None; generate a random value |
 | `GEMINI_API_KEY` | Google Gemini API anahtarı; AI Asistan için zorunlu | None |
-| `STIRLING_PDF_PASSWORD` | Unique initial Stirling PDF password | Required in both Compose stacks |
 | `DASHBOARD_DOMAIN` | Public HTTPS hostname | Required in production |
 | `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM` | Outbound mail for password reset | Optional in production; web reset is unavailable without a complete configuration |
 

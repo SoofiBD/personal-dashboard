@@ -115,9 +115,9 @@ services:
       SYSTEM_ROOTURIPATH: "/pdf-editor"
       SYSTEM_DEFAULTLOCALE: "tr-TR"
       SYSTEM_MAXFILESIZE: "25"
-      SECURITY_ENABLELOGIN: "true"
-      SECURITY_INITIALLOGIN_USERNAME: "stirling"
-      SECURITY_INITIALLOGIN_PASSWORD: "${STIRLING_PDF_PASSWORD:?Set STIRLING_PDF_PASSWORD in .env.production}"
+      # Caddy's forward_auth checks the authenticated Rails session for every
+      # /pdf-editor request. Do not require a second Stirling account login.
+      SECURITY_ENABLELOGIN: "false"
       DISABLE_ADDITIONAL_FEATURES: "true"
       METRICS_ENABLED: "false"
       SHOW_SURVEY: "false"

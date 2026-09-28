@@ -35,6 +35,19 @@ class ComposeSecurityTest < ActiveSupport::TestCase
     assert_match(/output stdout/, source)
   end
 
+  test "Stirling relies on authenticated Caddy proxy without a second password" do
+    %w[compose.yaml compose.production.yaml].each do |file|
+      service = YAML.safe_load(Rails.root.join(file).read, aliases: true).dig("services", "stirling-pdf", "environment")
+      assert_equal "false", service["SECURITY_ENABLELOGIN"]
+      assert_not service.key?("SECURITY_INITIALLOGIN_USERNAME")
+      assert_not service.key?("SECURITY_INITIALLOGIN_PASSWORD")
+    end
+
+    source = Rails.root.join("config/stirling/Caddyfile.production").read
+    assert_match(/forward_auth web:3000/, source)
+    assert_match(%r{uri /internal/pdf_editor_authorization}, source)
+  end
+
   test "referrer policy preserves same-origin form request origins" do
     [
       Rails.root.join("config/stirling/Caddyfile"),
