@@ -1,12 +1,9 @@
 import asyncio
 import io
 import os
-import tempfile
 import zipfile
 import unittest
 import base64
-import subprocess
-from pathlib import Path
 from unittest.mock import patch
 
 import fitz
@@ -14,7 +11,7 @@ from fastapi import HTTPException
 from fastapi import UploadFile
 from PIL import Image
 
-from app import HtmlExport, ZipExport, ZipImage, _get_api_key, convert, crop_image, export_html, export_zip, extract_layout_text, extract_with_opendataloader, is_valid_table
+from app import HtmlExport, ZipExport, ZipImage, _get_api_key, convert, crop_image, export_html, export_zip, extract_layout_text, is_valid_table
 
 
 def convert_pdf(document, annotation_mode="both", **options):
@@ -31,40 +28,16 @@ def convert_pdf(document, annotation_mode="both", **options):
 
 class PdfWorkerTest(unittest.TestCase):
     def test_reads_api_key_from_docker_secret_file(self):
-        with tempfile.NamedTemporaryFile(mode="w", delete=False) as secret:
-            secret.write("x" * 32 + "\n")
-        original_key = os.environ.pop("PDF_WORKER_API_KEY", None)
-        original_file = os.environ.get("PDF_WORKER_API_KEY_FILE")
-        try:
-            os.environ["PDF_WORKER_API_KEY_FILE"] = secret.name
+        with patch("app.Path.read_text", return_value="x" * 32), patch.dict(os.environ, {"PDF_WORKER_API_KEY_FILE": "/run/secrets/pdf_worker_api_key"}, clear=True):
             self.assertEqual("x" * 32, _get_api_key())
-        finally:
-            if original_key is not None:
-                os.environ["PDF_WORKER_API_KEY"] = original_key
-            if original_file is None:
-                os.environ.pop("PDF_WORKER_API_KEY_FILE", None)
-            else:
-                os.environ["PDF_WORKER_API_KEY_FILE"] = original_file
-            os.unlink(secret.name)
 
-    def test_opendataloader_uses_isolated_paths_and_reads_markdown(self):
-        def write_result(command, **options):
-            self.assertEqual("opendataloader-pdf", command[0])
-            self.assertEqual(120, options["timeout"])
-            self.assertEqual(b"%PDF-sample", Path(command[1]).read_bytes())
-            output = Path(command[command.index("--output-dir") + 1])
-            (output / "source.md").write_text("# Parsed report\n", encoding="utf-8")
-
-        with patch("app.subprocess.run", side_effect=write_result):
-            self.assertEqual("# Parsed report", extract_with_opendataloader(b"%PDF-sample"))
-
-    def test_parser_falls_back_when_opendataloader_fails(self):
+    def test_uses_markitdown_when_pdf_text_is_not_extractable_by_pymupdf(self):
         document = fitz.open()
-        document.new_page().insert_text((72, 100), "Legacy report body")
-        with patch("app.extract_with_opendataloader", side_effect=subprocess.CalledProcessError(1, "opendataloader-pdf")):
+        document.new_page().insert_text((72, 100), "Report body from MarkItDown")
+        with patch("app.extract_layout_text", return_value=""):
             result = convert_pdf(document, include_yaml_frontmatter=False)
-        self.assertEqual("legacy_fallback", result["stats"]["parser"])
-        self.assertIn("Legacy report body", result["markdown_content"])
+        self.assertEqual("markitdown", result["stats"]["parser"])
+        self.assertIn("Report body from MarkItDown", result["markdown_content"])
 
     def test_crop_preserves_selected_pixels_and_format(self):
         for image_format in ("PNG", "WEBP", "JPEG", "GIF"):
@@ -106,7 +79,7 @@ class PdfWorkerTest(unittest.TestCase):
 
         self.assertNotIn("Confidential Report", result["markdown_content"])
         self.assertNotIn("Page 1 of 3", result["markdown_content"])
-        self.assertIn(result["stats"]["parser"], {"opendataloader", "legacy_fallback"})
+        self.assertEqual("pymupdf", result["stats"]["parser"])
 
     def test_extracts_a_grid_table_as_gfm(self):
         document = fitz.open()
