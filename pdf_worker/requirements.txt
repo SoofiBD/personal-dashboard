@@ -5,4 +5,4 @@ python-multipart==0.0.20
 Markdown==3.7
 bleach==6.2.0
 Pillow==12.3.0
-opendataloader-pdf==2.5.11
+markitdown[pdf]==0.1.8

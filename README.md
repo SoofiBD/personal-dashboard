@@ -83,15 +83,9 @@ personal-dashboard/
 - **Learning:** Track plans, practice attempts, review dates, and unfinished work.
 - **Gym:** Maintain routines and weekly schedules, log sets and body weight, and review volume, streak, muscle-readiness, and exercise guidance.
 
-### PDF extraction and OpenDataLoader integration
+### PDF extraction and MarkItDown
 
-Uploaded PDFs stay on the dashboard's private storage. The Rails conversion job sends at most 25 MB / 250 pages to the internal, authenticated PDF worker. OpenDataLoader PDF 2.5.11 runs locally in that worker with Java 21 to extract Markdown, including reading order and tables. The existing PyMuPDF path still extracts images and annotations and serves as a fallback if OpenDataLoader cannot process a particular file. `processing_stats.parser` records which path produced the result. Files created for OpenDataLoader are isolated per request and removed when parsing ends; no external parsing API is used.
-
-Deployment and next integration steps:
-
-1. Rebuild the PDF worker image and verify a digital PDF with headings, columns, and tables. Production reserves up to 1.5 GB of RAM for the worker. Monitor parse time, fallback rate, and memory before increasing document limits.
-2. Scanned/image-only PDFs need OCR. The current local OpenDataLoader mode does **not** OCR them and returns a clear error when no text is found. If scan support is needed, add a separate private OpenDataLoader hybrid/OCR service, enable it only for scan/complex-page triage, and size/test its larger model dependencies independently. Do not expose it publicly.
-3. For page-grounded AI answers, request OpenDataLoader JSON alongside Markdown and store bounded element/page references separately from conversion stats. The assistant should cite source pages, treat extracted text as untrusted input, and keep document edits behind the existing action-confirmation flow. Add regression samples for invoices, Turkish text, multi-column reports, tables, and scans before enabling OCR in production.
+Uploaded PDFs stay in private dashboard storage and are sent to the internal, authenticated PDF worker (maximum 25 MB and 250 pages). PyMuPDF handles layout, tables, annotations, and figure extraction; Microsoft MarkItDown (`markitdown[pdf]`) supplies Markdown when PyMuPDF cannot extract text. `processing_stats.parser` records which parser returned the text. Both run locally in the worker; no external parsing API is used. Image-only scans still require OCR and return a clear error when no text can be extracted.
 
 ---
 
