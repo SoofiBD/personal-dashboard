@@ -33,7 +33,7 @@ module PersonalFinance
         @document_conversion.save!
         @document_conversion.processing!
         PdfDocumentConversionJob.perform_later(@document_conversion.id, annotation_mode)
-        audit_security_event("document_conversion_queued", conversion_id: @document_conversion.id, bytes: source_pdf_data.bytesize)
+        audit_security_event("document_conversion_queued", conversion_id: @document_conversion.id, bytes: source_pdf_data.to_s.bytesize)
         redirect_to finance_document_conversion_path(@document_conversion), notice: "PDF dönüşümü sıraya alındı. Tamamlandığında çalışma alanı hazır olacak."
       rescue ActiveRecord::RecordInvalid
         @document_conversions = owned(DocumentConversion).order(created_at: :desc).limit(20)

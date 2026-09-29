@@ -45,6 +45,7 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "input[name='conversion_options[extract_images_enabled]'][value='1'][checked]"
     assert_select "select[name='conversion_options[min_image_dimension]']"
     assert_select "select[name='conversion_options[image_quality]']"
+    assert_select "form.document-upload-form[data-turbo='false']"
   end
 
   test "opens MarkItDown before finance onboarding is complete" do
