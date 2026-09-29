@@ -10,6 +10,7 @@ services:
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
+      TMPDIR: /rails/tmp
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
       SMTP_ADDRESS: "${SMTP_ADDRESS:-}"
       SMTP_PORT: "${SMTP_PORT:-587}"
@@ -55,6 +56,7 @@ services:
       DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env.production}"
       DASHBOARD_DOMAIN: "${DASHBOARD_DOMAIN:?Set DASHBOARD_DOMAIN in .env.production}"
       DASHBOARD_TIME_ZONE: "${DASHBOARD_TIME_ZONE:-Europe/Istanbul}"
+      TMPDIR: /rails/tmp
       PDF_WORKER_API_KEY_FILE: /run/secrets/pdf_worker_api_key
     volumes:
       - storage_data:/rails/storage
