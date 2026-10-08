@@ -17,6 +17,13 @@ class ProfilesController < ApplicationController
     end
   end
 
+  def recovery_code
+    @user = current_user
+    @recovery_code = @user.generate_recovery_code!
+    audit_security_event("recovery_code_created", user_id: @user.id)
+    render :show
+  end
+
   private
 
   def profile_params

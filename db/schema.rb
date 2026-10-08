@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_27_000006) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -726,8 +726,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_27_000006) do
     t.string "ai_model"
     t.string "password_reset_digest"
     t.datetime "password_reset_sent_at"
+    t.string "recovery_code_digest"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["password_reset_digest"], name: "index_users_on_password_reset_digest", unique: true
+    t.index ["recovery_code_digest"], name: "index_users_on_recovery_code_digest", unique: true
     t.index ["role"], name: "index_users_on_role"
   end
 

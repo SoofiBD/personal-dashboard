@@ -26,4 +26,17 @@
       <%= link_to t("profile.setup_mfa", default: "MFA’yı Kur"), mfa_path, class: "button button-primary" %>
     <% end %>
   </section>
+
+  <section class="panel security-panel">
+    <div class="panel-header"><div><h2>Kurtarma kodu</h2><p>Parolanızı unutursanız bu kodla yeni parola belirleyebilirsiniz. Kod yalnızca oluşturulurken gösterilir.</p></div></div>
+    <% if @recovery_code %>
+      <p role="status">Kodu güvenli bir yere kaydedin. Bu sayfadan ayrıldıktan sonra tekrar gösterilmeyecek.</p>
+      <code id="recovery-code"><%= @recovery_code %></code>
+    <% elsif @user.recovery_code_digest? %>
+      <p class="security-status is-enabled">Kurtarma kodu hazır. Yeni kod oluşturursanız eskisi geçersiz olur.</p>
+    <% else %>
+      <p class="security-status">Henüz kurtarma kodu oluşturulmadı.</p>
+    <% end %>
+    <%= button_to "Yeni kurtarma kodu oluştur", profile_recovery_code_path, method: :post, class: "button button-secondary", data: {turbo: false} %>
+  </section>
 </div>

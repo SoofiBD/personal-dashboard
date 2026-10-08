@@ -16,6 +16,7 @@ class User < ApplicationRecord
   validates :email, presence: true, format: {with: URI::MailTo::EMAIL_REGEXP}, unless: :owner?
   validates :email, uniqueness: {case_sensitive: false}, allow_blank: true
   validate :password_security_requirements
+  before_save :clear_recovery_code_when_password_changes, if: :will_save_change_to_password_digest?
 
   has_many :financial_accounts, class_name: "PersonalFinance::Account", dependent: :destroy
   has_many :finance_categories, class_name: "PersonalFinance::Category", dependent: :destroy
@@ -114,6 +115,12 @@ class User < ApplicationRecord
     token
   end
 
+  def generate_recovery_code!
+    code = SecureRandom.urlsafe_base64(32)
+    update!(recovery_code_digest: Digest::SHA256.hexdigest(code))
+    code
+  end
+
   def clear_password_reset_token!
     update!(password_reset_digest: nil, password_reset_sent_at: nil)
   end
@@ -123,6 +130,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def clear_recovery_code_when_password_changes
+    self.recovery_code_digest = nil
+  end
 
   def password_security_requirements
     return if password.nil?
