@@ -2,7 +2,7 @@
   <h1 class="auth-title"><%= t("backend.passwords.reset_title", default: "Yeni Parola Belirleyin") %></h1>
   <p class="auth-subtitle"><%= t("backend.passwords.reset_subtitle", default: "Yeni parolanız en az 16 karakter olmalıdır.") %></p>
 
-  <%= form_with url: password_path(token: params[:token]), method: :patch, class: "auth-form-inner" do |form| %>
+  <%= form_with scope: :user, url: password_path(token: params[:token]), method: :patch, class: "auth-form-inner" do |form| %>
     <div class="form-field">
       <%= form.label :password, t("backend.passwords.new_password", default: "Yeni Parola") %>
       <%= form.password_field :password, required: true, autocomplete: "new-password", class: "form-input", minlength: 16, maxlength: 72 %>

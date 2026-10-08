@@ -48,6 +48,24 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_empty ActionMailer::Base.deliveries
   end
 
+  test "password reset form submits credentials in the expected scope" do
+    token = @user.generate_password_reset_token!
+
+    get edit_password_path(token: token)
+
+    assert_response :success
+    assert_select 'input[name="user[password]"]'
+    assert_select 'input[name="user[password_confirmation]"]'
+
+    patch password_path(token: token), params: {
+      user: {password: "a-long-test-password", password_confirmation: "a-long-test-password"}
+    }
+
+    assert_redirected_to new_session_path
+    assert @user.reload.authenticate("a-long-test-password")
+    assert_nil @user.password_reset_digest
+  end
+
   private
 
   def capture_rails_logs
