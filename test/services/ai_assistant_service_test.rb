@@ -68,9 +68,27 @@ class AiAssistantServiceTest < ActiveSupport::TestCase
     assistant.define_singleton_method(:add_message_and_run!) { |content:| raise StandardError, "provider request failed" }
     service.define_singleton_method(:build_assistant) { |_instructions| assistant }
 
-    error = assert_raises(AiAssistantService::Error) { service.ask("Summarize my budget") }
+    error = AiProviderStatus.stub(:check, AiProviderStatus::Result.new(code: :ok, message: "Gemini bağlantısı çalışıyor.")) do
+      assert_raises(AiAssistantService::Error) { service.ask("Summarize my budget") }
+    end
 
     assert_equal "Asistan isteği tamamlayamadı. Lütfen tekrar deneyin.", error.message
+  end
+
+  test "reports a rejected Gemini key instead of a generic error" do
+    user = User.dashboard_owner
+    service = with_env("GEMINI_API_KEY", "test-gemini-key") { AiAssistantService.new(user: user) }
+    assistant = Object.new
+    assistant.define_singleton_method(:add_message) { |role:, content:| }
+    assistant.define_singleton_method(:add_message_and_run!) { |content:| raise StandardError, "provider request failed" }
+    service.define_singleton_method(:build_assistant) { |_instructions| assistant }
+
+    status = AiProviderStatus::Result.new(code: :unauthorized, message: AiProviderStatus::MESSAGES.fetch(:unauthorized))
+    error = AiProviderStatus.stub(:check, status) do
+      assert_raises(AiAssistantService::Error) { service.ask("Hello") }
+    end
+
+    assert_equal status.message, error.message
   end
 
   private

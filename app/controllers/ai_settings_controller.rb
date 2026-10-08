@@ -6,7 +6,7 @@ class AiSettingsController < ApplicationController
 
   def show
     @user = current_user
-    @gemini_configured = ENV["GEMINI_API_KEY"].present?
+    @gemini_status = AiProviderStatus.check(model: AiAssistantService.model_for(@user))
   end
 
   def update
@@ -15,7 +15,7 @@ class AiSettingsController < ApplicationController
     unless model.present?
       @user = current_user
       @user.errors.add(:ai_model, "Gemini model adı gereklidir.")
-      @gemini_configured = ENV["GEMINI_API_KEY"].present?
+      @gemini_status = AiProviderStatus.check(model: AiAssistantService.model_for(@user))
       return render :show, status: :unprocessable_content
     end
 

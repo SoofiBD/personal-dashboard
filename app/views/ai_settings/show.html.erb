@@ -22,8 +22,8 @@
 
   <aside class="panel ai-connection-panel" aria-labelledby="gemini-status-title">
     <div class="panel-header"><div><h2 id="gemini-status-title">Gemini yapılandırması</h2><p>Anahtar yalnızca sunucu ortamında tutulur ve hiçbir zaman tarayıcıya gönderilmez.</p></div></div>
-    <p class="security-status <%= "is-enabled" if @gemini_configured %>" role="status" aria-atomic="true"><%= @gemini_configured ? "Anahtar yapılandırıldı" : "Anahtar yapılandırılmadı" %></p>
-    <% unless @gemini_configured %>
+    <p class="security-status <%= "is-enabled" if @gemini_status.available? %>" role="status" aria-atomic="true"><%= @gemini_status.message %></p>
+    <% if @gemini_status.code == :missing %>
       <p class="ai-status-note"><code>GEMINI_API_KEY</code> değişkenini uygulamanın ortam dosyasına ekleyin ve uygulamayı yeniden başlatın.</p>
     <% end %>
   </aside>

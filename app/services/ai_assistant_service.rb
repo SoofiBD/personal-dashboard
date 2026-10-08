@@ -45,6 +45,11 @@ class AiAssistantService
     @llm = build_llm
   end
 
+  def self.model_for(user)
+    configured_model = user.ai_model.presence
+    (configured_model.blank? || SHUT_DOWN_CHAT_MODELS.include?(configured_model)) ? DEFAULT_CHAT_MODEL : configured_model
+  end
+
   def ask(user_message)
     raise Error, "Empty message" if user_message.blank?
 
@@ -59,9 +64,12 @@ class AiAssistantService
     cleanup_old_conversations
 
     response
+  rescue Error
+    raise
   rescue => e
     Rails.logger.error(event: "ai_assistant_error", user_id: user.id, error_class: e.class.name)
-    raise Error, "Asistan isteği tamamlayamadı. Lütfen tekrar deneyin."
+    status = AiProviderStatus.check(model: self.class.model_for(user))
+    raise Error, status.available? ? "Asistan isteği tamamlayamadı. Lütfen tekrar deneyin." : status.message
   end
 
   private
@@ -69,16 +77,12 @@ class AiAssistantService
   attr_reader :user, :llm
 
   def build_llm
-    configured_model = user.ai_model.presence
-    chat_model = if configured_model.blank? || SHUT_DOWN_CHAT_MODELS.include?(configured_model)
-      DEFAULT_CHAT_MODEL
-    else
-      configured_model
-    end
+    key = ENV["GEMINI_API_KEY"].presence
+    raise Error, AiProviderStatus::MESSAGES.fetch(:missing) unless key
 
     Langchain::LLM::GoogleGemini.new(
-      api_key: ENV.fetch("GEMINI_API_KEY"),
-      default_options: {chat_model: chat_model, temperature: 0.2}
+      api_key: key,
+      default_options: {chat_model: self.class.model_for(user), temperature: 0.2}
     )
   end
 
