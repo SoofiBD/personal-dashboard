@@ -274,7 +274,7 @@ Use `.env.local` for development and Git-ignored `.env.production` for deploymen
 
 Set `GEMINI_API_KEY` in the runtime environment, then open **Yapay Zekâ Asistanı** to work with the authenticated user's finance, notes, learning, gym, and document data. Each user can choose a Gemini model under **Sağlayıcı ve model**. Actions are proposals until reviewed and approved in the dashboard; never put API keys in the browser or ChartDB configuration.
 
-After each production deployment or Gemini key rotation, run `docker compose --env-file .env.production -f compose.production.yaml exec web ./bin/docker-entrypoint ./bin/verify_production`. This verifies that the owner has a password and that the configured Gemini model generates a response with the live key. The **Sağlayıcı ve model** page performs the same live Gemini check and reports rejected keys, unavailable models, and exhausted quota. Password reset by email requires both an owner email address and SMTP settings; without them, use the interactive `dashboard:credentials:set` task from the server for recovery.
+After each production deployment or Gemini key rotation, run `docker compose --env-file .env.production -f compose.production.yaml exec web ./bin/docker-entrypoint ./bin/verify_production`. This verifies that the owner has a password, saved chat history can be replayed, and the configured Gemini model generates a response with the live key. The **Sağlayıcı ve model** page performs the live Gemini check and reports rejected keys, unavailable models, and exhausted quota. Password reset by email requires both an owner email address and SMTP settings; without them, use the interactive `dashboard:credentials:set` task from the server for recovery.
 
 ---
 
