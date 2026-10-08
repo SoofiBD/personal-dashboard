@@ -62,19 +62,22 @@ class PasswordsController < ApplicationController
       return
     end
 
-    if params[:user][:password].blank? || params[:user][:password_confirmation].blank?
+    credentials = params.fetch(:user, {})
+    if credentials[:password].blank? || credentials[:password_confirmation].blank?
       @user.errors.add(:password, I18n.t("backend.passwords.blank"))
       render :edit, status: :unprocessable_content
       return
     end
 
-    if params[:user][:password] != params[:user][:password_confirmation]
+    if credentials[:password] != credentials[:password_confirmation]
       @user.errors.add(:password_confirmation, I18n.t("backend.passwords.mismatch"))
       render :edit, status: :unprocessable_content
       return
     end
 
-    if @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
+    @user.assign_attributes(password: credentials[:password], password_confirmation: credentials[:password_confirmation])
+    @user.authentication_version += 1
+    if @user.save
       @user.clear_password_reset_token!
       audit_security_event("password_reset_completed", user_id: @user.id)
       reset_session

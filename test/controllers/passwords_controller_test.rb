@@ -50,6 +50,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
   test "password reset form submits credentials in the expected scope" do
     token = @user.generate_password_reset_token!
+    previous_version = @user.authentication_version
 
     get edit_password_path(token: token)
 
@@ -64,6 +65,16 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert @user.reload.authenticate("a-long-test-password")
     assert_nil @user.password_reset_digest
+    assert_equal previous_version + 1, @user.authentication_version
+  end
+
+  test "malformed reset submission returns a validation error without using the token" do
+    token = @user.generate_password_reset_token!
+
+    patch password_path(token: token), params: {password: "a-long-test-password"}
+
+    assert_response :unprocessable_content
+    assert @user.reload.password_reset_digest.present?
   end
 
   private
