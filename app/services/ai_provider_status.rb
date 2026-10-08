@@ -3,7 +3,7 @@
 require "net/http"
 
 class AiProviderStatus
-  Result = Struct.new(:code, :message, keyword_init: true) do
+  Result = Data.define(:code, :message) do
     def available?
       code == :ok
     end
