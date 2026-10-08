@@ -118,10 +118,10 @@ class AiAssistantService
       next if msg.content.blank?
 
       case msg.role
-      when "user", "assistant"
-        assistant.add_message(role: msg.role, content: msg.content)
-      when "tool"
-        assistant.add_message(role: "tool", content: msg.content)
+      when "user"
+        assistant.add_message(role: "user", content: msg.content)
+      when "assistant"
+        assistant.add_message(role: "model", content: msg.content)
       end
     end
   end

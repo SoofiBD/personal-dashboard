@@ -7,8 +7,12 @@ abort "Run this check in production." unless Rails.env.production?
 owner = User.dashboard_owner_record
 abort "Dashboard owner or password is missing." unless owner&.password_digest.present?
 
+service = AiAssistantService.new(user: owner)
+assistant = service.send(:build_assistant, "Verification")
+service.send(:replay_conversation_history, assistant)
+
 status = AiProviderStatus.check(model: AiAssistantService.model_for(owner))
 abort status.message unless status.available?
 
-puts "Dashboard password is configured and Gemini generated a response."
+puts "Dashboard password, chat history, and Gemini response are working."
 puts "Password recovery email is unavailable." unless owner.email.present? && PasswordMailer.configured?

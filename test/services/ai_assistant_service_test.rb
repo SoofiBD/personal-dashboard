@@ -58,6 +58,18 @@ class AiAssistantServiceTest < ActiveSupport::TestCase
     assert_not_includes captured.keys, :max_turns
   end
 
+  test "replays a saved reply using Gemini's model role" do
+    user = User.dashboard_owner
+    AiConversation.create!(user: user, role: "user", content: "Hello")
+    AiConversation.create!(user: user, role: "assistant", content: "Hi")
+    service = with_env("GEMINI_API_KEY", "test-gemini-key") { AiAssistantService.new(user: user) }
+    assistant = service.send(:build_assistant, "Instructions")
+
+    service.send(:replay_conversation_history, assistant)
+
+    assert_equal %w[user model], assistant.messages.map(&:role)
+  end
+
   test "converts Gemini client errors into the assistant error handled by the controller" do
     user = User.dashboard_owner
     service = with_env("GEMINI_API_KEY", "test-gemini-key") do
