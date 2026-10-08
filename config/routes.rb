@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     post :verify
   end
   resource :profile, only: %i[show update]
+  post "profile/recovery_code", to: "profiles#recovery_code", as: :profile_recovery_code
   resource :ai_settings, only: %i[show update]
   get "ai", to: "ai_chats#show", as: :ai_assistant
   post "ai_chat", to: "ai_chats#create"
@@ -25,6 +26,8 @@ Rails.application.routes.draw do
   resource :password, controller: "passwords", only: %i[new create edit update] do
     get :confirm, on: :collection
   end
+  get "password/recovery", to: "passwords#recovery", as: :password_recovery
+  post "password/recovery", to: "passwords#recover", as: :recover_password
 
   root to: "home#show"
 

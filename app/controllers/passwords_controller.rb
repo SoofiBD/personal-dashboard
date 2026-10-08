@@ -2,10 +2,12 @@ class PasswordsController < ApplicationController
   RESET_ATTEMPT_LIMIT = 3
   RESET_ATTEMPT_WINDOW = 60.minutes
   TOKEN_EXPIRY = 2.hours
+  RECOVERY_ATTEMPT_LIMIT = 5
+  RECOVERY_ATTEMPT_WINDOW = 15.minutes
 
   layout "authentication"
   before_action :prevent_sensitive_caching
-  before_action :require_no_authentication, only: %i[new create edit update]
+  before_action :require_no_authentication, only: %i[new create edit update recovery recover]
   before_action :set_user_by_token, only: %i[edit update]
 
   def new
@@ -53,6 +55,54 @@ class PasswordsController < ApplicationController
   end
 
   def edit
+  end
+
+  def recovery
+  end
+
+  def recover
+    code = params[:recovery_code].to_s.strip
+    credentials = params[:user].is_a?(ActionController::Parameters) ? params[:user] : {}
+    outcome = RateLimitCounter.with_attempt(
+      key: "password_recovery:#{request.remote_ip}",
+      limit: RECOVERY_ATTEMPT_LIMIT,
+      window: RECOVERY_ATTEMPT_WINDOW
+    ) do
+      @user = User.find_by(recovery_code_digest: Digest::SHA256.hexdigest(code)) if code.present?
+      @user ? :valid : :invalid
+    end
+
+    if outcome == :throttled
+      response.set_header("Retry-After", RECOVERY_ATTEMPT_WINDOW.to_i.to_s)
+      render plain: "Çok fazla deneme yapıldı. 15 dakika sonra yeniden deneyin.", status: :too_many_requests
+      return
+    end
+
+    unless @user
+      audit_security_event("password_recovery_invalid_code")
+      @error = "Kurtarma kodu geçersiz veya kullanılmış."
+      render :recovery, status: :unprocessable_content
+      return
+    end
+
+    if credentials[:password].blank? || credentials[:password_confirmation].blank? || credentials[:password] != credentials[:password_confirmation]
+      @error = "Yeni parola ve tekrarı aynı olmalıdır."
+      render :recovery, status: :unprocessable_content
+      return
+    end
+
+    @user.assign_attributes(password: credentials[:password], password_confirmation: credentials[:password_confirmation])
+    @user.authentication_version += 1
+    @user.password_reset_digest = nil
+    @user.password_reset_sent_at = nil
+    if @user.save
+      audit_security_event("password_recovery_completed", user_id: @user.id)
+      reset_session
+      redirect_to new_session_path, notice: "Parolanız güncellendi. Yeni parolanızla giriş yapın."
+    else
+      @error = @user.errors.full_messages.to_sentence
+      render :recovery, status: :unprocessable_content
+    end
   end
 
   def update

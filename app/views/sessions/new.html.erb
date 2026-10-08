@@ -48,6 +48,8 @@
     </div>
   <% end %>
 
+  <div class="auth-footer"><%= link_to "Parolamı unuttum / kurtarma kodu", password_recovery_path, class: "auth-footer-link" %></div>
+
   <% if User.count.zero? %>
     <div class="auth-footer">
       <%= link_to t("auth.no_account_link", default: "Henüz hesap yok mu? İlk hesabı oluşturun"), new_signup_path, class: "auth-footer-link" %>

@@ -1,0 +1,23 @@
+<div class="auth-form">
+  <h1 class="auth-title">Kurtarma Koduyla Parola Sıfırla</h1>
+  <p class="auth-subtitle">Daha önce profilinizde oluşturduğunuz tek kullanımlık kodu girin. Yeni parolanız en az 16 karakter olmalıdır.</p>
+  <% if @error.present? %><div class="form-errors" role="alert"><%= @error %></div><% end %>
+
+  <%= form_with scope: :user, url: recover_password_path, method: :post, class: "auth-form-inner" do |form| %>
+    <div class="form-field">
+      <%= label_tag :recovery_code, "Kurtarma kodu" %>
+      <%= password_field_tag :recovery_code, nil, required: true, autocomplete: "off", class: "form-input" %>
+    </div>
+    <div class="form-field">
+      <%= form.label :password, "Yeni parola" %>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", class: "form-input", minlength: 16, maxlength: 72 %>
+    </div>
+    <div class="form-field">
+      <%= form.label :password_confirmation, "Yeni parola tekrarı" %>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", class: "form-input", minlength: 16, maxlength: 72 %>
+    </div>
+    <%= form.submit "Parolayı Güncelle", class: "btn btn-primary btn-block" %>
+  <% end %>
+
+  <div class="auth-footer"><%= link_to "Girişe dön", new_session_path %></div>
+</div>
