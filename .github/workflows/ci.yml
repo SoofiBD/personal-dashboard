@@ -12,6 +12,7 @@ concurrency:
 
 env:
   RAILS_ENV: test
+  # shortcut: jobs pin ubuntu-24.04 because setup-ruby has no 3.3.6 build for ubuntu-26.04 (ubuntu-latest); unpin when it does
   RUBY_VERSION: "3.3.6"
   POSTGRES_DB: personal_dashboard_test
   POSTGRES_USER: personal_dashboard
@@ -26,7 +27,7 @@ jobs:
   # ──────────────────────────────────────────────
   lint:
     name: Lint & Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -53,7 +54,7 @@ jobs:
   # ──────────────────────────────────────────────
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     services:
@@ -110,7 +111,7 @@ jobs:
 
   pdf-worker:
     name: PDF Worker Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -131,41 +132,13 @@ jobs:
         working-directory: pdf_worker
         run: python -m unittest discover -s tests -v
 
-  chartdb:
-    name: ChartDB Tests and Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    defaults:
-      run:
-        working-directory: modules/chartdb
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
-          cache-dependency-path: modules/chartdb/package-lock.json
-
-      - name: Install locked dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Run tests
-        run: npm run test:ci
-
-      - name: Build production assets
-        run: npm run build
 
   # ──────────────────────────────────────────────
   # 3. Security Checks
   # ──────────────────────────────────────────────
   security:
     name: Security Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -201,8 +174,8 @@ jobs:
   # ──────────────────────────────────────────────
   pr-status:
     name: PR Status Check
-    runs-on: ubuntu-latest
-    needs: [lint, test, pdf-worker, chartdb, security]
+    runs-on: ubuntu-24.04
+    needs: [lint, test, pdf-worker, security]
     if: always()
     steps:
       - name: Check all jobs passed
@@ -210,13 +183,11 @@ jobs:
           if [ "${{ needs.lint.result }}" != "success" ] || \
              [ "${{ needs.test.result }}" != "success" ] || \
              [ "${{ needs.pdf-worker.result }}" != "success" ] || \
-             [ "${{ needs.chartdb.result }}" != "success" ] || \
              [ "${{ needs.security.result }}" != "success" ]; then
             echo "❌ One or more checks failed:"
             echo "  Lint:     ${{ needs.lint.result }}"
             echo "  Test:     ${{ needs.test.result }}"
             echo "  PDF:      ${{ needs.pdf-worker.result }}"
-            echo "  ChartDB:  ${{ needs.chartdb.result }}"
             echo "  Security: ${{ needs.security.result }}"
             exit 1
           fi

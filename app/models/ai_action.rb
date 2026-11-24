@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class AiAction < ApplicationRecord
-  ACTION_TYPES = %w[finance.create_expense finance.create_income finance.update_transaction finance.delete_transaction notes.create notes.update notes.delete learning.update_item learning.record_attempt learning.create_program gym.create_program gym.record_body_metric gym.schedule_workout memory.remember memory.forget documents.update_content].freeze
   STATUSES = %w[pending approved rejected executed failed expired].freeze
   MAX_REVIEW_PAYLOAD_BYTES = 64.kilobytes
 
   belongs_to :user
 
-  validates :action_type, inclusion: {in: ACTION_TYPES}
+  validates :action_type, inclusion: {in: ->(_action) { AiTool.action_types }}
   validates :status, inclusion: {in: STATUSES}
   validates :summary, presence: true, length: {maximum: 500}
   validate :payload_must_fit_review

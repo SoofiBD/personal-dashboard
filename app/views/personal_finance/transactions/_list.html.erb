@@ -1,0 +1,66 @@
+<div class="finance-list">
+  <% if transactions.any? %>
+    <% transactions.each do |transaction| %>
+      <article class="finance-item-row">
+        <div class="transaction-left">
+          <div class="transaction-type-icon <%= transaction.kind %>">
+            <%= finance_svg_icon(transaction.kind == "expense" ? "expense" : "income") %>
+          </div>
+          <div class="transaction-meta">
+            <div class="transaction-category">
+              <%= transaction.category&.name || t("app.common.uncategorized", default: "Kategorisiz") %>
+              <% if transaction.recurring_rule_id.present? %>
+                <span class="recurring-badge" title="<%= t('transactions.recurrence.badge_title', default: 'Recurring transaction') %>"><%= finance_svg_icon("recurring", class: "icon-xs") %><%= t("transactions.recurrence.badge", default: "Tekrarlayan") %></span>
+              <% end %>
+              <% if transaction.note.present? %>
+                <span style="font-weight: normal; color: var(--text-muted); font-size: 0.85rem; margin-left: 0.35rem;">— <%= transaction.note %></span>
+              <% end %>
+            </div>
+            <% if transaction.tags.any? %>
+              <div class="transaction-tag-list" aria-label="<%= t('transactions.tags', default: 'Etiketler') %>">
+                <% transaction.tags.order(:name).each do |tag| %><span class="transaction-tag"><%= tag.name %></span><% end %>
+              </div>
+            <% end %>
+            <div class="transaction-submeta">
+              <span><%= l(transaction.occurred_on, format: "%d %b %Y") rescue transaction.occurred_on %></span>
+              <span>•</span>
+              <span class="badge-pill badge-pill-subtle"><%= transaction.account&.name || t("app.common.account", default: "Hesap") %></span>
+              <% if transaction.category&.color.present? %>
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: <%= transaction.category.color %>;" title="<%= transaction.category.name %>"></span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="transaction-right">
+          <strong class="transaction-amount <%= transaction.kind == "expense" ? "value-negative" : "value-positive" %>">
+            <%= transaction.kind == "expense" ? "−" : "+" %><%= account_currency transaction.amount, transaction.account %>
+          </strong>
+          <div class="transaction-actions">
+            <% if transaction.recurring_rule_id.present? %>
+              <%= link_to edit_finance_recurring_rule_path(transaction.recurring_rule_id), class: "action-btn", title: t("recurring_rules.manage", default: "Planı Yönet") do %>
+                <%= finance_svg_icon("recurring") %>
+              <% end %>
+            <% end %>
+            <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
+              <%= finance_svg_icon("edit") %>
+            <% end %>
+            <%= button_to finance_transaction_path(transaction), method: :delete, data: { confirm: t("app.common.confirm_delete", default: "Bu işlemi silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
+              <%= finance_svg_icon("trash") %>
+            <% end %>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  <% else %>
+    <div class="empty-state">
+      <% if local_assigns[:filters_active] && filters_active %>
+        <p><%= t("transactions.empty_filtered", default: "Seçilen filtrelere uygun işlem bulunamadı.") %></p>
+        <%= link_to t("transactions.filters.clear", default: "Filtreleri Temizle"), finance_transactions_path, class: "button button-secondary button-sm" %>
+      <% else %>
+        <p><%= t("transactions.empty_state", default: t("app.common.empty_state", default: "Kayıtlı bir finansal işlem bulunmuyor.")) %></p>
+        <%= link_to t("dashboard.add_transaction", default: "Yeni İşlem Ekle"), new_finance_transaction_path, class: "button button-secondary button-sm" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,14 +1,14 @@
 # Startup and build efficiency
 
-The hub waits for Rails /up and database readiness. ChartDB and Stirling
-start concurrently; their health checks remain enabled, but do not block
-the hub. Opening an editor before it is ready can temporarily return a
+The hub waits for Rails /up and database readiness. Stirling
+starts concurrently; its health check remains enabled, but does not block
+the hub. Opening the editor before it is ready can temporarily return a
 gateway error; retry when that service is healthy.
 
 Web owns database preparation. Jobs starts after web becomes healthy,
 avoiding concurrent migrations and a duplicate Rails boot for db:prepare.
 Short startup health-check intervals detect readiness promptly; steady-state
-intervals remain unchanged for editors and workers.
+intervals remain unchanged for the editor and workers.
 
 Use docker compose --env-file .env.local up -d for ordinary startup.
 Use --build when image contents or dependencies change. Development Rails

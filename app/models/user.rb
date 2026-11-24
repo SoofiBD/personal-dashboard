@@ -29,14 +29,8 @@ class User < ApplicationRecord
   has_many :finance_savings_goals, class_name: "PersonalFinance::SavingsGoal", dependent: :destroy
   has_many :finance_purchase_plans, class_name: "PersonalFinance::PurchasePlan", dependent: :destroy
   has_many :document_conversions, class_name: "PersonalFinance::DocumentConversion", dependent: :destroy
-  has_many :notes, class_name: "Notes::Note", dependent: :destroy
-  has_many :note_links, class_name: "Notes::NoteLink", dependent: :destroy
   has_many :learning_items, class_name: "Learning::Item", dependent: :destroy
   has_many :learning_attempts, class_name: "Learning::Attempt", dependent: :destroy
-  has_many :gym_routines, class_name: "PersonalGym::Routine", dependent: :destroy
-  has_many :gym_workouts, class_name: "PersonalGym::Workout", dependent: :destroy
-  has_many :gym_body_metrics, class_name: "PersonalGym::BodyMetric", dependent: :destroy
-  has_many :gym_schedule_entries, class_name: "PersonalGym::ScheduleEntry", dependent: :destroy
   has_many :ai_memories, dependent: :destroy
   has_many :ai_conversations, dependent: :destroy
   has_many :ai_actions, dependent: :destroy
@@ -74,10 +68,6 @@ class User < ApplicationRecord
   end
 
   def can_manage_finances?
-    owner? || editor?
-  end
-
-  def can_manage_notes?
     owner? || editor?
   end
 

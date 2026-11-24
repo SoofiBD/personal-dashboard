@@ -5,17 +5,6 @@ class HomeController < ApplicationController
     @hide_sidebar = true
     @modules = [
       {
-        key: "notes",
-        title_key: "home.modules.notes.title",
-        default_title: "Notlar",
-        description_key: "home.modules.notes.description",
-        default_description: "Markdown notları, etiketler, arama ve notlar arası bağlantılar için kişisel bilgi alanı.",
-        path: notes_root_path,
-        badge_key: "home.modules.notes.badge",
-        default_badge: "Knowledge",
-        icon: "notes"
-      },
-      {
         key: "learning",
         title_key: "learning.title",
         default_title: "Learning Studio",
@@ -36,17 +25,6 @@ class HomeController < ApplicationController
         badge_key: "home.modules.finance.badge",
         default_badge: "Core",
         icon: "dashboard"
-      },
-      {
-        key: "gym",
-        title_key: "gym.module",
-        default_title: "Spor Salonu",
-        description_key: "gym.module_description",
-        default_description: "Antrenman planları, canlı seanslar ve ilerleme takibi.",
-        path: gym_root_path,
-        badge_key: "gym.module_badge",
-        default_badge: "Fitness",
-        icon: "gym"
       },
       {
         key: "markitdown",
@@ -71,10 +49,5 @@ class HomeController < ApplicationController
         icon: "document"
       }
     ]
-    @modules << {
-      key: "database_tools", title_key: "database_tools.title", default_title: "ChartDB",
-      description_key: "database_tools.subtitle", default_description: "Veritabanı şeması tasarımı",
-      path: database_tools_path, badge_key: "database_tools.badge", default_badge: "SQL", icon: "vault"
-    }
   end
 end

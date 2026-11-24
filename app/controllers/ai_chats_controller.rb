@@ -29,9 +29,8 @@ class AiChatsController < ApplicationController
       return render json: {error: "Çok fazla istek gönderdiniz. Lütfen biraz sonra tekrar deneyin."}, status: :too_many_requests
     end
 
-    service = AiAssistantService.new(user: current_user)
-    response = service.ask(message)
-    render json: {response: response, pending_actions: AiAction.pending_for(current_user).count}
+    reply = AiAssistantService.new(user: current_user).ask(message)
+    render json: {response: reply, pending_actions: AiAction.pending_for(current_user).count}
   rescue AiAssistantService::Error => e
     audit_security_event("ai_chat_failed", error_class: e.class.name)
     render json: {error: e.message}, status: :service_unavailable

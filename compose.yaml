@@ -32,7 +32,6 @@ services:
       PDF_WORKER_URL: "http://pdf-worker:8000"
       PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY:?Set PDF_WORKER_API_KEY via --env-file .env.local}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      STIRLING_PDF_STATUS_URL: "http://stirling-pdf:8080/pdf-editor/api/v1/info/status"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -60,7 +59,6 @@ services:
       PDF_WORKER_URL: "http://pdf-worker:8000"
       PDF_WORKER_API_KEY: "${PDF_WORKER_API_KEY:?Set PDF_WORKER_API_KEY via --env-file .env.local}"
       GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
-      STIRLING_PDF_STATUS_URL: "http://stirling-pdf:8080/pdf-editor/api/v1/info/status"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -122,24 +120,6 @@ services:
       start_period: 30s
       start_interval: 2s
 
-  chartdb:
-    build:
-      context: ./modules/chartdb
-    expose:
-      - "80"
-    security_opt:
-      - no-new-privileges:true
-    mem_limit: 256m
-    cpus: 1.0
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 15s
-      start_interval: 1s
-    restart: unless-stopped
-
   gateway:
     image: caddy:2.8-alpine
     ports:
@@ -152,8 +132,6 @@ services:
       web:
         condition: service_healthy
       stirling-pdf:
-        condition: service_started
-      chartdb:
         condition: service_started
 
   db:

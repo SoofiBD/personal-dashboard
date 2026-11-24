@@ -22,7 +22,6 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
   - [Option A: Docker Compose (Recommended)](#option-a-docker-compose-recommended)
   - [Option B: Local Machine Setup](#option-b-local-machine-setup)
 - [Running Tests](#-running-tests)
-- [Database Design (ChartDB)](#database-design-chartdb)
 - [Environment Configuration](#-environment-configuration)
 - [Modular Architecture](#-modular-architecture)
 - [Contributing & Development](#-contributing--development)
@@ -32,19 +31,14 @@ A modern, self-hosted, modular personal dashboard application built with **Ruby 
 
 ## 💡 Overview & Architecture
 
-The application is engineered as a modular dashboard hub. While the initial focus is **Personal Finance Management**, the core host application is designed to easily plug in new domain modules (notes, developer tools, AI workflows, etc.) with clean domain boundaries.
+The application is engineered as a modular dashboard hub. While the initial focus is **Personal Finance Management**, the core host application is designed to easily plug in new domain modules (AI workflows, document tools, etc.) with clean domain boundaries.
 
 ```
 personal-dashboard/
-├── app/                  # Host application (shell layout, core settings, unified navigation)
-├── finance_module/       # Finance domain engine (models, controllers, views, migrations)
-├── notes_module/         # Markdown notes, tags, and note links
-├── learning_module/      # Learning plans, practice, and review tracking
-├── gym_module/           # Training plans, workouts, and body metrics
+├── app/                  # Rails app; domains live in personal_finance/ and learning/ namespaces
 ├── pdf_worker/           # Private PDF extraction and image processing
-├── db/                   # Database schemas and global migrations
+├── db/                   # Schemas, migrations, learning_content/
 ├── config/               # Rails routing and Caddy gateway configuration
-├── modules/chartdb/      # Database schema editor source and Docker build
 ├── compose.yaml          # Local development stack
 └── compose.production.yaml # Production HTTPS stack
 ```
@@ -53,35 +47,20 @@ personal-dashboard/
 
 ## ✨ Current Features
 
-### 💰 Personal Finance Engine (`finance_module`)
+### 💰 Personal Finance Engine (`PersonalFinance`)
 - **Interactive Financial Dashboard:** Overview of total balance, monthly income, expenses, and net cash flow.
 - **Budget Tracking & Management:** Set category budgets, monitor live progress with dynamic visual progress bars, and track remaining allowances.
 - **Transactions & Accounts:** Record and categorize expenses/incomes across bank accounts, cash, and credit cards.
 - **Category Analytics:** Clear insights into spending distribution and category breakdowns.
 
-### Database Design (ChartDB)
-- **Dashboard module:** Open Database Design from the workspace hub or module switcher.
-- **Schema workflows:** Create a diagram, import SQL/DBML, and export SQL through the three action cards. ChartDB also supports JSON backups and diagram image exports.
-- **Session-protected editor:** Caddy serves `/database-editor/` through dashboard authentication; ChartDB has no published host port.
-- **Browser storage:** Diagrams are stored in IndexedDB, scoped to the dashboard account, and must be backed up through ChartDB.
-- **Trimmed distribution:** Bundled examples, template galleries, datasets and preview images are removed. Editor icons, database logos and import help images remain.
-
-### 📝 Notes & Knowledge Base
-- **Local Markdown notes:** Write and keep notes in PostgreSQL without a separate editor service or client-side database.
-- **Search and tags:** Search titles, content, and tags; pin important notes and filter by tag.
-- **Bi-directional links between notes:** Use `[[Another note title]]` in a note to create an outgoing link and automatic backlink after saving.
-- **Interactive visualization:** Open **Bağlantı grafiği** to inspect note nodes and their relationships without adding a visualization library. Search, tag filters, pinned/linked filters, radial/grid layouts, zoom/pan/reset, degree-aware node sizing, relationship highlighting, and a keyboard-accessible note detail panel are included.
-- **Per-user privacy:** Notes and links are scoped to the signed-in account; viewers may read but cannot change them.
-
 ### 🤖 Interactive AI Workspace
-- **Gemini-backed assistant:** Uses the signed-in user's finance, notes, learning, gym, and document context for grounded analysis and planning.
+- **Gemini-backed assistant:** Uses the signed-in user's finance, learning, and document context for grounded analysis and planning.
 - **Reviewable actions:** Proposed changes remain pending until an owner or editor reviews the exact payload and approves it. Viewers cannot change workspace records through the assistant.
-- **Program planning:** Turns user-provided training routines or weekly/monthly learning plans into proposals; approval is required before records are created.
+- **Program planning:** Turns user-provided weekly/monthly learning plans into proposals; approval is required before records are created.
 - **Boundaries:** Dashboard data is accessed through user-scoped tools. The assistant does not autonomously move money, manage credentials, or execute arbitrary commands.
 
-### 📚 Learning and Training
+### 📚 Learning
 - **Learning:** Track plans, practice attempts, review dates, and unfinished work.
-- **Gym:** Maintain routines and weekly schedules, log sets and body weight, and review volume, streak, muscle-readiness, and exercise guidance.
 
 ### PDF extraction and MarkItDown
 
@@ -100,16 +79,8 @@ The project is evolving into an all-in-one personal workspace and life operating
 - [x] User profile customizations and localized preferences.
 - [x] Email password reset when SMTP is configured; reset tokens are stored as digests and redacted from gateway access logs.
 
-### 📝 Notes & Knowledge Base
-- [x] Markdown note-taking workspace with tag support.
-- [x] Fast title/content/tag search and pinning.
-- [x] Bi-directional links between notes.
-
-### 🛠️ Developer Tools & Database UI
-- [x] ChartDB schema designer with SQL/DBML import, SQL export and JSON backups.
-
 ### 🤖 Artificial Intelligence Integrations
-- [x] **Interactive AI Assistant:** User-scoped analysis and confirmation-gated proposals for finance, notes, learning, gym, and documents.
+- [x] **Interactive AI Assistant:** User-scoped analysis and confirmation-gated proposals for finance, learning, and documents.
 - [ ] **Automated Financial Monitoring:** Proactive anomaly detection and savings alerts without a prompt.
 - [ ] **Smart OCR & Categorization:** Auto-extract transaction details from receipts and photos.
 
@@ -172,7 +143,6 @@ docker compose --env-file .env.production -f compose.production.yaml up --build 
 ```
 
 Caddy obtains and renews TLS certificates for the configured domain. Do not expose the development `compose.yaml` stack beyond `127.0.0.1`.
-NAS management is outside this repository; this stack does not expose NAS access.
 
 Keep deployment runbooks and infrastructure notes outside the repository. Do not commit production credentials, private keys, recovery material, or host-specific configuration.
 
@@ -193,7 +163,7 @@ Keep deployment runbooks and infrastructure notes outside the repository. Do not
 
 ### Option B: Local Machine Setup
 
-This starts Rails only. ChartDB requires its separate service; use the Compose setup for the complete module system and authenticated gateway routes.
+This starts Rails only; use the Compose setup for the complete module system and authenticated gateway routes.
 
 1. **Clone and enter the directory:**
    ```bash
@@ -272,20 +242,15 @@ Use `.env.local` for development and Git-ignored `.env.production` for deploymen
 
 ### AI Assistant
 
-Set `GEMINI_API_KEY` in the runtime environment, then open **Yapay Zekâ Asistanı** to work with the authenticated user's finance, notes, learning, gym, and document data. Each user can choose a Gemini model under **Sağlayıcı ve model**. Actions are proposals until reviewed and approved in the dashboard; never put API keys in the browser or ChartDB configuration.
+Set `GEMINI_API_KEY` in the runtime environment, then open **Yapay Zekâ Asistanı** to work with the authenticated user's finance, learning, and document data. Each user can choose a Gemini model under **Sağlayıcı ve model**. Actions are proposals until reviewed and approved in the dashboard; never put API keys in the browser.
 
 After each production deployment or Gemini key rotation, run `docker compose --env-file .env.production -f compose.production.yaml exec web ./bin/docker-entrypoint ./bin/verify_production`. This verifies that the owner has a password, saved chat history can be replayed, and the configured Gemini model generates a response with the live key. The **Sağlayıcı ve model** page performs the live Gemini check and reports rejected keys, unavailable models, and exhausted quota. Password reset by email requires both an owner email address and SMTP settings; without them, use the interactive `dashboard:credentials:set` task from the server for recovery.
 
 ---
 
-## 🏛️ Modular Architecture
+## 🏛️ Architecture
 
-This project follows a clean **modular domain architecture**:
-- **Domain Decoupling:** New domain features (e.g., `notes_module/`, `tasks_module/`, `ai_module/`) can be added independently without cluttering core host logic.
-- **Isolated Migrations & Views:** Each module maintains its own controllers, views, data models, and migrations while sharing host layout and styling tokens.
-- **Service modules:** ChartDB runs as an internal service behind the authenticated Caddy gateway; Rails supplies its dashboard landing page and navigation.
-- **Storage boundaries:** Finance and document records use server storage. ChartDB diagrams use browser storage and require separate JSON backups. ChartDB analytics and cloud promotion are disabled.
-- **Knowledge-graph tooling:** Graphify is an optional, local developer tool; it is not bundled in the runtime image. See [Graphify development guide](docs/graphify.md).
+Standard Rails layout. Domains are namespaces: `PersonalFinance` and `Learning` under `app/{models,controllers,services,views}`.
 
 ---
 
@@ -302,54 +267,7 @@ Contributions, feature requests, and feedback are welcome!
 
 ## 📄 License
 
-Third-party components retain their own licenses. The bundled ChartDB source includes
-its [GNU AGPL v3 license](modules/chartdb/LICENSE). The Markdown editor bundle
+Third-party components retain their own licenses. The Markdown editor bundle
 (`frontend/md-editor`, served from `vendor/assets/javascripts/md-editor/`) is derived from
 [Paperling](https://github.com/Razee4315/Paperling) (Apache-2.0); see
 [frontend/md-editor/NOTICE.md](frontend/md-editor/NOTICE.md). No top-level `LICENSE` file is currently included in this repository.
-
-## Database Design (ChartDB)
-
-Open **Veritabanı Tasarımı / Database Design** from the hub or module menu, or visit
-`http://localhost:3000/database_tools`. The editor runs at `/database-editor/`.
-
-| Dashboard card | Action |
-| :--- | :--- |
-| Visual schema design | Opens the new-diagram dialog. |
-| Import schemas | Opens SQL/DBML import after a diagram is created or opened. |
-| Export SQL and backups | Opens SQL export after a diagram is created or opened. Use the editor menu for JSON backups and image exports. |
-
-ChartDB designs schemas and generates SQL. It does not execute SQL, manage live database
-records or provision database servers.
-
-### Storage and backups
-
-Diagrams stay in the current browser's IndexedDB, with separate namespaces for dashboard
-accounts. They do not automatically sync between devices and are **not included in dashboard
-or PostgreSQL backups**. Export JSON in ChartDB to back up or transfer your work. Clearing
-browser site data removes these local diagrams. Use separate browser profiles on shared devices;
-account namespaces prevent accidental mixing but are not a browser-storage security boundary.
-
-### Build and update
-
-Run from the dashboard root:
-
-```bash
-docker compose --env-file .env.local up -d --build chartdb gateway
-```
-
-Production uses the same module in `compose.production.yaml`:
-
-```bash
-docker compose --env-file .env.production -f compose.production.yaml up -d --build chartdb gateway
-```
-
-The image build runs ESLint, TypeScript and Vite. The Node build step allows a 4 GB heap;
-ensure the build host has sufficient memory. The running ChartDB service has a separate
-256 MB memory limit.
-
-The distribution excludes the upstream example gallery, template gallery, sample datasets
-and associated preview images. Required editor assets are retained. Analytics and ChartDB
-Cloud promotion are disabled, and no shared AI API key is embedded.
-
-For implementation details, see [modules/chartdb/README.md](modules/chartdb/README.md).

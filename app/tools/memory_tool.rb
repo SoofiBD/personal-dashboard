@@ -1,74 +1,69 @@
 # frozen_string_literal: true
 
-class MemoryTool
-  extend Langchain::ToolDefinition
+class MemoryTool < AiTool
+  CATEGORIES = %w[user_pref fact context reminder].freeze
+  ACTIONS = {
+    "memory.remember" => :apply_remember,
+    "memory.forget" => :apply_forget
+  }.freeze
 
-  def initialize(user:)
-    @user = user
-  end
-
-  define_function :remember, description: "Save key-value memory. Params: key, value, category" do
-    property :key, type: "string", description: "Memory key", required: true
-    property :value, type: "string", description: "Memory value", required: true
-    property :category, type: "string", description: "Category: user_pref, fact, context, reminder", required: true,
-      enum: %w[user_pref fact context reminder]
-  end
-
-  define_function :recall, description: "Get memory by key" do
-    property :key, type: "string", description: "Memory key", required: true
-  end
-
-  define_function :recall_by_category, description: "List memories in category" do
-    property :category, type: "string", description: "Category", required: true
-  end
-
-  define_function :forget, description: "Delete memory by key" do
-    property :key, type: "string", description: "Memory key", required: true
-  end
-
-  define_function :search_memories, description: "Search memory values" do
-    property :query, type: "string", description: "Search query", required: true
-  end
+  function :remember, "Propose saving a key-value memory the user explicitly asked to remember; user confirmation is required",
+    required: %i[key value category],
+    key: {type: "string", description: "Memory key"},
+    value: {type: "string", description: "Memory value"},
+    category: {type: "string", description: "Category", enum: CATEGORIES}
+  function :recall, "Get a memory by key",
+    required: %i[key],
+    key: {type: "string", description: "Memory key"}
+  function :recall_by_category, "List memories in a category",
+    required: %i[category],
+    category: {type: "string", description: "Category", enum: CATEGORIES}
+  function :forget, "Propose deleting a memory by key; user confirmation is required",
+    required: %i[key],
+    key: {type: "string", description: "Memory key"}
+  function :search_memories, "Search memory values",
+    required: %i[query],
+    query: {type: "string", description: "Search text"}
 
   def remember(key:, value:, category:)
-    action = AiAction.propose!(user: user, action_type: "memory.remember", payload: {key: key, value: value, category: category}, summary: "Asistan hafızasına kaydet: #{key}")
-    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
+    return {error: "Unknown category"} unless CATEGORIES.include?(category)
+
+    propose("memory.remember", {key: key, value: value, category: category}, "Asistan hafızasına kaydet: #{key}")
   end
 
   def recall(key:)
     memory = user.ai_memories.find_by(key: key)
-    return tool_response(content: {error: "Memory '#{key}' not found"}) unless memory
+    return {error: "Memory '#{key}' not found"} unless memory
 
-    tool_response(content: {key: memory.key, value: memory.value, category: memory.category,
-                            updated_at: memory.updated_at})
+    {key: memory.key, value: memory.value, category: memory.category, updated_at: memory.updated_at}
   end
 
   def recall_by_category(category:)
-    memories = user.ai_memories.by_category(category).recent.map do |m|
-      {key: m.key, value: m.value, updated_at: m.updated_at}
-    end
-    tool_response(content: memories)
+    user.ai_memories.by_category(category).recent.map { |m| {key: m.key, value: m.value, updated_at: m.updated_at} }
   end
 
   def forget(key:)
-    memory = user.ai_memories.find_by(key: key)
-    return tool_response(content: {error: "Memory '#{key}' not found"}) unless memory
-    action = AiAction.propose!(user: user, action_type: "memory.forget", payload: {key: key}, summary: "Asistan hafızasından sil: #{key}")
-    tool_response(content: {requires_confirmation: true, action_id: action.id, summary: action.summary})
+    return {error: "Memory '#{key}' not found"} unless user.ai_memories.exists?(key: key)
+
+    propose("memory.forget", {key: key}, "Asistan hafızasından sil: #{key}")
   end
 
   def search_memories(query:)
-    memories = user.ai_memories.where("value ILIKE ?", "%#{query}%").recent.limit(20).map do |m|
+    pattern = "%#{AiMemory.sanitize_sql_like(query.to_s)}%"
+    user.ai_memories.where("value ILIKE ?", pattern).recent.limit(20).map do |m|
       {key: m.key, value: m.value, category: m.category, updated_at: m.updated_at}
     end
-    tool_response(content: memories)
   end
 
-  private
+  def apply_remember(payload)
+    memory = user.ai_memories.find_or_initialize_by(key: payload.fetch("key"), category: payload.fetch("category"))
+    memory.update!(value: payload.fetch("value"))
+    {record_type: "memory", record_id: memory.id}
+  end
 
-  attr_reader :user
-
-  def tool_response(content:)
-    Langchain::ToolResponse.new(content: content.to_json)
+  def apply_forget(payload)
+    memory = user.ai_memories.find_by!(key: payload.fetch("key"))
+    memory.destroy!
+    {record_type: "memory", record_id: memory.id}
   end
 end

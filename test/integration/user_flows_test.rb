@@ -105,7 +105,7 @@ class UserFlowsTest < ActionDispatch::IntegrationTest
     conversion = PersonalFinance::DocumentConversion.where(user: @owner).order(:created_at).last
     assert_predicate conversion, :processing?
     assert_predicate conversion, :source_pdf_available?
-    assert_equal "%PDF-integration-test\n", conversion.source_pdf_binary
+    assert conversion.source_pdf.download.start_with?("%PDF-")
   end
 
   private

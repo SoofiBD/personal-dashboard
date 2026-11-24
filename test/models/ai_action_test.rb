@@ -7,9 +7,9 @@ class AiActionTest < ActiveSupport::TestCase
     user = User.dashboard_owner
     action = AiAction.propose!(
       user: user,
-      action_type: "gym.record_body_metric",
-      payload: {"weight_kg" => "75.0", "recorded_on" => Date.current.iso8601},
-      summary: "Vücut ağırlığı kaydet"
+      action_type: "learning.create_program",
+      payload: {"items" => [{"title" => "Week 1"}]},
+      summary: "Plan"
     )
     action.update!(expires_at: 1.minute.ago)
 
@@ -18,29 +18,28 @@ class AiActionTest < ActiveSupport::TestCase
     assert_equal "expired", action.reload.status
   end
 
-  test "approved body-weight proposal writes only the current users metric" do
+  test "approved learning proposal writes only the current users items" do
     user = User.dashboard_owner
     action = AiAction.propose!(
       user: user,
-      action_type: "gym.record_body_metric",
-      payload: {"weight_kg" => "74.5", "recorded_on" => Date.current.iso8601, "note" => "Sabah"},
-      summary: "Vücut ağırlığı kaydet"
+      action_type: "learning.create_program",
+      payload: {"items" => [{"title" => "Week 1"}]},
+      summary: "Plan"
     )
 
     result = AiActionExecutor.new(action).execute!
 
-    assert_equal "gym_body_metric", result[:record_type]
-    metric = user.gym_body_metrics.find(result[:record_id])
-    assert_equal 74.5, metric.weight_kg.to_f
+    assert_equal "learning_program", result[:record_type]
+    assert_equal ["Week 1"], user.learning_items.where(id: result[:record_ids]).pluck(:title)
     assert_equal "executed", action.reload.status
   end
 
-  test "viewer cannot execute a pending gym proposal" do
+  test "viewer cannot execute a pending finance proposal" do
     viewer = User.create!(name: "Viewer", email: "ai-viewer@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul")
-    action = AiAction.propose!(user: viewer, action_type: "gym.record_body_metric", payload: {"weight_kg" => "74.5", "recorded_on" => Date.current.iso8601}, summary: "Weight")
+    action = AiAction.propose!(user: viewer, action_type: "finance.create_expense", payload: {"amount" => "10", "category_name" => "Market", "description" => "Test"}, summary: "Expense")
 
     assert_raises(AiActionExecutor::Error) { AiActionExecutor.new(action).execute! }
-    assert_empty viewer.gym_body_metrics
+    assert_empty viewer.finance_transactions
     assert_equal "pending", action.reload.status
   end
 
@@ -48,5 +47,15 @@ class AiActionTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordInvalid) do
       AiAction.propose!(user: User.dashboard_owner, action_type: "documents.update_content", payload: {"markdown_content" => "x" * 65_536}, summary: "Large edit")
     end
+  end
+
+  test "approved practice attempt is saved for the item owner" do
+    user = User.dashboard_owner
+    item = user.learning_items.create!(title: "Heaps", track: "algorithms", kind: "topic", status: "active", difficulty: "medium", confidence: 0, estimated_minutes: 30)
+    proposal = LearningTool.new(user: user).record_attempt(item_id: item.id, outcome: "solved", minutes: 25, confidence: 4)
+
+    result = AiActionExecutor.new(AiAction.find(proposal[:action_id])).execute!
+
+    assert_equal user, Learning::Attempt.find(result[:record_id]).user
   end
 end

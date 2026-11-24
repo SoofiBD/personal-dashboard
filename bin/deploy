@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# Deploy a git ref on the production server. Run ON the server, in the app dir:
+#   cd /home/ubuntu/personal-dashboard && bin/deploy [ref]     (default: main)
+# Needs .env.production and secrets/ in the app dir (both untracked).
+# Never runs `down` or touches volumes.
+set -euo pipefail
+
+REF="${1:-main}"
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKUP_DIR="${BACKUP_DIR:-$HOME/backups}"
+cd "$APP_DIR"
+
+dc() { docker compose --env-file .env.production -f compose.production.yaml "$@"; }
+envval() { grep -E "^$1=" .env.production | tail -n1 | cut -d= -f2- | tr -d "\"'"; }
+
+[ -f .env.production ] || { echo "missing .env.production" >&2; exit 1; }
+[ -d secrets ] || { echo "missing secrets/" >&2; exit 1; }
+
+PROJECT="$(envval COMPOSE_PROJECT_NAME)"
+[ -n "$PROJECT" ] || { echo "set COMPOSE_PROJECT_NAME in .env.production (see docs/deploy.md)" >&2; exit 1; }
+DOMAIN="$(envval DASHBOARD_DOMAIN)"
+
+# An existing install must reuse its volumes. A wrong project name would start an empty DB.
+if ! docker volume inspect "${PROJECT}_postgres_data" >/dev/null 2>&1; then
+  if [ "${FIRST_INSTALL:-}" != "1" ]; then
+    echo "volume ${PROJECT}_postgres_data not found; COMPOSE_PROJECT_NAME wrong? (fresh server: FIRST_INSTALL=1)" >&2
+    exit 1
+  fi
+fi
+
+[ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "tracked files modified in $APP_DIR" >&2; exit 1; }
+PREV="$(git rev-parse HEAD 2>/dev/null || echo none)"
+# A full sha already present locally (rollback) needs no fetch; git cannot fetch short shas.
+# Branch names always fetch, so a stale local branch is never deployed.
+if [[ "$REF" =~ ^[0-9a-f]{40}$ ]] && git cat-file -e "$REF^{commit}" 2>/dev/null; then
+  git checkout --detach "$REF"
+else
+  git fetch --prune origin "$REF"
+  git checkout --detach FETCH_HEAD
+fi
+NEW="$(git rev-parse HEAD)"
+echo "== deploy ${PREV:0:7} -> ${NEW:0:7}"
+
+dc config -q
+
+echo "== start db"
+dc up -d --wait db
+
+echo "== backup"
+mkdir -p "$BACKUP_DIR"
+DUMP="$BACKUP_DIR/pre-${NEW:0:7}-$(date +%Y%m%d-%H%M%S).dump"
+# shellcheck disable=SC2016 # $VARS must expand inside the container
+dc exec -T db sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > "$DUMP.part"
+[ -s "$DUMP.part" ] || { echo "empty dump, abort" >&2; rm -f "$DUMP.part"; exit 1; }
+mv "$DUMP.part" "$DUMP"
+echo "backup: $DUMP"
+# keep the 14 newest dumps
+# shellcheck disable=SC2012 # names are ours
+ls -1t "$BACKUP_DIR"/pre-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
+
+echo "== build"
+dc build
+
+echo "== migrate"
+dc run --rm --no-deps web ./bin/rails db:prepare
+
+echo "== up"
+dc up -d --remove-orphans --wait --wait-timeout 300
+
+echo "== verify"
+dc exec -T web /rails/bin/docker-entrypoint ruby bin/verify_production
+[ -z "$DOMAIN" ] || curl -fsS -o /dev/null "https://$DOMAIN/up"
+
+cat <<EOF
+
+OK: ${NEW:0:7} is live.
+Roll back code:    cd $APP_DIR && bin/deploy $PREV
+Restore data (only if a migration damaged it; this REPLACES the DB):
+  docker compose --env-file .env.production -f compose.production.yaml stop web jobs
+  docker compose --env-file .env.production -f compose.production.yaml exec -T db sh -c 'pg_restore -U "\$POSTGRES_USER" -d "\$POSTGRES_DB" --clean --if-exists --no-owner' < $DUMP
+  bin/deploy $PREV
+EOF

@@ -43,11 +43,8 @@
 *.pem
 *.pem.bak
 
-# Built independently as the ChartDB service
-/modules/chartdb/
 /coverage/
 **/.pytest_cache/
 **/__pycache__/
 **/*.pyc
-/graphify-out/
 /pdf_worker/

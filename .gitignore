@@ -15,7 +15,6 @@
 /public/assets
 /coverage/
 **/.pytest_cache/
-/graphify-out/
 .DS_Store
 *.rdb
 .bundle/config
@@ -40,5 +39,3 @@ secrets/
 # Frontend node_modules
 frontend/md-editor/node_modules/
 
-# ChartDB - built in Docker, no need for node_modules locally
-modules/chartdb/node_modules/

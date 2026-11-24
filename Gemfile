@@ -70,4 +70,5 @@ end
 
 gem "pagy", "~> 43.0"
 gem "redcarpet"
-gem "langchainrb", "~> 0.19"
+# CSV left Ruby default gems in 3.4; used by finance CSV import/export.
+gem "csv", "~> 3.3"

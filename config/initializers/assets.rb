@@ -9,5 +9,5 @@ Rails.application.config.assets.version = "1.0"
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
-Rails.application.config.assets.precompile += %w[gym.js md-editor/md-editor.bundle.js md-editor/md-editor.css]
+Rails.application.config.assets.precompile += %w[md-editor/md-editor.bundle.js md-editor/md-editor.css md-editor/mermaid.min.js]
 Rails.application.config.assets.paths << Rails.root.join("vendor/assets/javascripts")

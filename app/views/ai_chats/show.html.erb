@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">YAPAY ZEKÂ ASİSTANI</p>
       <h1>Birlikte karar verelim.</h1>
-      <p class="page-subtitle">Asistan; finans, notlar, öğrenme ve antrenman alanlarındaki kendi verilerinle çalışır. Bir işlem yapmadan önce senden açık onay ister.</p>
+      <p class="page-subtitle">Asistan; finans, öğrenme ve doküman alanlarındaki kendi verilerinle çalışır. Bir işlem yapmadan önce senden açık onay ister.</p>
     </div>
     <div class="ai-assistant-header-actions">
       <%= link_to "Sağlayıcı ve model", ai_settings_path, class: "button button-secondary" %>
@@ -20,7 +20,7 @@
       <p>Yanıtlar paneldeki kendi hesabının verilerine dayanır; asistan eksik veriyi tahmin etmez.</p>
       <ul class="ai-assistant-capabilities">
         <li>Finans özeti, bütçe ve hesaplar</li>
-        <li>Notlar, öğrenme ve spor takibi</li>
+        <li>Öğrenme planları ve PDF dokümanları</li>
         <li>İstendiğinde taslak işlem önerileri</li>
       </ul>
       <p class="ai-assistant-note">Kayıt oluşturan veya güncelleyen her iş için önce onayını ister.</p>
@@ -74,7 +74,6 @@
       <div class="ai-assistant-prompts" aria-label="Örnek sorular">
         <button type="button" data-ai-prompt="Bu ay bütçem nasıl gidiyor?">Bütçemi özetle</button>
         <button type="button" data-ai-prompt="Son günlerdeki finans hareketlerimi analiz et.">Son hareketleri incele</button>
-        <button type="button" data-ai-prompt="Yeni spor programımı buraya yapıştıracağım. Katalogdaki hareketlerle günlere ayırıp onaya hazır bir rutin önerisi oluştur.">Spor programı ekle</button>
         <button type="button" data-ai-prompt="Eğitim programımı buraya yapıştıracağım. Bunu haftalık veya aylık tarihleri olan bir öğrenme planına dönüştür ve onaya hazırla.">Eğitim planı ekle</button>
         <button type="button" data-ai-prompt="Bugün panelimde dikkat etmem gerekenleri söyle.">Bugün ne önemli?</button>
       </div>
