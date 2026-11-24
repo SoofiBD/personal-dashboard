@@ -35,11 +35,9 @@ The application is engineered as a modular dashboard hub. While the initial focu
 
 ```
 personal-dashboard/
-├── app/                  # Host application (shell layout, core settings, unified navigation)
-├── finance_module/       # Finance domain engine (models, controllers, views, migrations)
-├── learning_module/      # Learning plans, practice, and review tracking
+├── app/                  # Rails app; domains live in personal_finance/ and learning/ namespaces
 ├── pdf_worker/           # Private PDF extraction and image processing
-├── db/                   # Database schemas and global migrations
+├── db/                   # Schemas, migrations, learning_content/
 ├── config/               # Rails routing and Caddy gateway configuration
 ├── compose.yaml          # Local development stack
 └── compose.production.yaml # Production HTTPS stack
@@ -49,7 +47,7 @@ personal-dashboard/
 
 ## ✨ Current Features
 
-### 💰 Personal Finance Engine (`finance_module`)
+### 💰 Personal Finance Engine (`PersonalFinance`)
 - **Interactive Financial Dashboard:** Overview of total balance, monthly income, expenses, and net cash flow.
 - **Budget Tracking & Management:** Set category budgets, monitor live progress with dynamic visual progress bars, and track remaining allowances.
 - **Transactions & Accounts:** Record and categorize expenses/incomes across bank accounts, cash, and credit cards.
@@ -250,11 +248,9 @@ After each production deployment or Gemini key rotation, run `docker compose --e
 
 ---
 
-## 🏛️ Modular Architecture
+## 🏛️ Architecture
 
-This project follows a clean **modular domain architecture**:
-- **Domain Decoupling:** New domain features (e.g., `tasks_module/`, `ai_module/`) can be added independently without cluttering core host logic.
-- **Isolated Migrations & Views:** Each module maintains its own controllers, views, data models, and migrations while sharing host layout and styling tokens.
+Standard Rails layout. Domains are namespaces: `PersonalFinance` and `Learning` under `app/{models,controllers,services,views}`.
 
 ---
 

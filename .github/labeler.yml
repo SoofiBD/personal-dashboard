@@ -3,7 +3,7 @@
 
 "module: finance":
   - changed-files:
-      - any-glob-to-any-file: "finance_module/**"
+      - any-glob-to-any-file: ["app/**/personal_finance/**", "lib/personal_finance*"]
 
 "type: test":
   - changed-files:

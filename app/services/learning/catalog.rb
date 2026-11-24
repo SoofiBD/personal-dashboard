@@ -1,6 +1,6 @@
 module Learning
   class Catalog
-    ROOT = Rails.root.join("learning_module/content")
+    ROOT = Rails.root.join("db/learning_content")
     def self.questions
       JSON.parse(ROOT.join("questions.json").read)
     end

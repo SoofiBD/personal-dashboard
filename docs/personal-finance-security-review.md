@@ -1,7 +1,7 @@
 # Finans modülü güvenlik incelemesi
 
 Tarih: 25 Ağustos 2026
-Kapsam: `finance_module/` ve host uygulamadaki kimlik doğrulama entegrasyonu.
+Kapsam: `app/**/personal_finance/` ve host uygulamadaki kimlik doğrulama entegrasyonu.
 
 ## Sonuç
 
