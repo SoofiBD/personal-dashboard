@@ -41,6 +41,7 @@ services:
         condition: service_healthy
       pdf-worker:
         condition: service_started
+    mem_limit: 1536m
     restart: unless-stopped
     networks: [edge, database, pdf, stirling]
     secrets:
@@ -74,6 +75,7 @@ services:
         condition: service_healthy
       pdf-worker:
         condition: service_healthy
+    mem_limit: 1g
     restart: unless-stopped
     networks: [database, pdf]
     secrets:
@@ -156,6 +158,7 @@ services:
         condition: service_healthy
       stirling-pdf:
         condition: service_started
+    mem_limit: 256m
     restart: unless-stopped
     networks: [edge, stirling]
 
@@ -172,6 +175,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    mem_limit: 1g
     restart: unless-stopped
     networks: [database]
     secrets:
