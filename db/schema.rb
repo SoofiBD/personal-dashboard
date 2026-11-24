@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
     t.index ["user_id", "status", "expires_at", "created_at"], name: "index_ai_actions_pending_lookup"
     t.index ["user_id", "status"], name: "index_ai_actions_on_user_id_and_status"
     t.index ["user_id"], name: "index_ai_actions_on_user_id"
-    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying, 'executed'::character varying, 'failed'::character varying, 'expired'::character varying]::text[])", name: "ai_actions_status_valid"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying::text, 'approved'::character varying::text, 'rejected'::character varying::text, 'executed'::character varying::text, 'failed'::character varying::text, 'expired'::character varying::text])", name: "ai_actions_status_valid"
   end
 
   create_table "ai_conversations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -366,115 +366,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
     t.index ["user_id"], name: "index_financial_accounts_on_user_id"
   end
 
-  create_table "gym_body_metrics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.date "recorded_on", null: false
-    t.decimal "weight_kg", precision: 6, scale: 2, null: false
-    t.text "note"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id", "recorded_on"], name: "index_gym_body_metrics_on_user_id_and_recorded_on", unique: true
-    t.index ["user_id"], name: "index_gym_body_metrics_on_user_id"
-    t.check_constraint "weight_kg > 20::numeric AND weight_kg <= 500::numeric", name: "gym_body_metrics_weight_range"
-  end
-
-  create_table "gym_exercises", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name", null: false
-    t.string "slug", null: false
-    t.string "category", default: "strength", null: false
-    t.string "logging_mode", default: "reps", null: false
-    t.string "muscle_group"
-    t.string "equipment"
-    t.jsonb "muscles", default: [], null: false
-    t.boolean "unilateral", default: false, null: false
-    t.boolean "bodyweight", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "instructions"
-    t.text "safety_notes"
-    t.string "demo_url"
-    t.index ["muscle_group"], name: "index_gym_exercises_on_muscle_group"
-    t.index ["slug"], name: "index_gym_exercises_on_slug", unique: true
-  end
-
-  create_table "gym_routine_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "routine_id", null: false
-    t.string "name", null: false
-    t.integer "position", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["routine_id"], name: "index_gym_routine_days_on_routine_id"
-  end
-
-  create_table "gym_routine_exercises", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "routine_day_id", null: false
-    t.uuid "exercise_id", null: false
-    t.integer "position", default: 0, null: false
-    t.integer "target_sets", default: 3, null: false
-    t.string "target_reps", default: "5"
-    t.decimal "target_weight", precision: 8, scale: 2
-    t.integer "target_duration_seconds"
-    t.string "progression_policy", default: "linear", null: false
-    t.string "warmup"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["exercise_id"], name: "index_gym_routine_exercises_on_exercise_id"
-    t.index ["routine_day_id"], name: "index_gym_routine_exercises_on_routine_day_id"
-  end
-
-  create_table "gym_routines", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "name", null: false
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_gym_routines_on_user_id"
-  end
-
-  create_table "gym_schedule_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "routine_day_id", null: false
-    t.date "scheduled_on", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["routine_day_id"], name: "index_gym_schedule_entries_on_routine_day_id"
-    t.index ["user_id", "routine_day_id", "scheduled_on"], name: "index_gym_schedule_entries_unique_day", unique: true
-    t.index ["user_id", "scheduled_on"], name: "index_gym_schedule_entries_on_user_id_and_scheduled_on"
-    t.index ["user_id"], name: "index_gym_schedule_entries_on_user_id"
-  end
-
-  create_table "gym_workout_sets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "workout_id", null: false
-    t.uuid "exercise_id", null: false
-    t.integer "position", default: 0, null: false
-    t.string "kind", default: "working", null: false
-    t.decimal "weight", precision: 8, scale: 2
-    t.integer "reps"
-    t.integer "duration_seconds"
-    t.decimal "distance_km", precision: 8, scale: 3
-    t.boolean "done", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["exercise_id"], name: "index_gym_workout_sets_on_exercise_id"
-    t.index ["workout_id", "exercise_id"], name: "index_gym_workout_sets_on_workout_id_and_exercise_id"
-    t.index ["workout_id"], name: "index_gym_workout_sets_on_workout_id"
-  end
-
-  create_table "gym_workouts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "routine_id"
-    t.string "status", default: "active", null: false
-    t.datetime "started_at", null: false
-    t.datetime "finished_at"
-    t.text "notes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["routine_id"], name: "index_gym_workouts_on_routine_id"
-    t.index ["started_at"], name: "index_gym_workouts_on_started_at"
-    t.index ["user_id", "status"], name: "index_gym_workouts_on_user_id_and_status"
-    t.index ["user_id"], name: "index_gym_workouts_on_user_id"
-  end
-
   create_table "invoice_parses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "document_conversion_id", null: false
     t.string "vendor"
@@ -520,30 +411,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
     t.index ["user_id", "source_key"], name: "index_learning_items_on_user_id_and_source_key", unique: true
     t.index ["user_id", "track", "status"], name: "index_learning_items_on_user_id_and_track_and_status"
     t.index ["user_id"], name: "index_learning_items_on_user_id"
-  end
-
-  create_table "note_links", force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "source_note_id", null: false
-    t.uuid "target_note_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["source_note_id", "target_note_id"], name: "index_note_links_on_source_note_id_and_target_note_id", unique: true
-    t.index ["source_note_id"], name: "index_note_links_on_source_note_id"
-    t.index ["target_note_id"], name: "index_note_links_on_target_note_id"
-    t.index ["user_id"], name: "index_note_links_on_user_id"
-  end
-
-  create_table "notes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "title", limit: 160, null: false
-    t.text "body", default: "", null: false
-    t.text "tag_list", default: "", null: false
-    t.boolean "pinned", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id", "updated_at"], name: "index_notes_on_user_id_and_updated_at"
-    t.index ["user_id"], name: "index_notes_on_user_id"
   end
 
   create_table "rate_limit_counters", force: :cascade do |t|
@@ -770,25 +637,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_000000) do
   add_foreign_key "finance_transactions", "financial_accounts"
   add_foreign_key "finance_transactions", "users"
   add_foreign_key "financial_accounts", "users"
-  add_foreign_key "gym_body_metrics", "users"
-  add_foreign_key "gym_routine_days", "gym_routines", column: "routine_id"
-  add_foreign_key "gym_routine_exercises", "gym_exercises", column: "exercise_id"
-  add_foreign_key "gym_routine_exercises", "gym_routine_days", column: "routine_day_id"
-  add_foreign_key "gym_routines", "users"
-  add_foreign_key "gym_schedule_entries", "gym_routine_days", column: "routine_day_id"
-  add_foreign_key "gym_schedule_entries", "users"
-  add_foreign_key "gym_workout_sets", "gym_exercises", column: "exercise_id"
-  add_foreign_key "gym_workout_sets", "gym_workouts", column: "workout_id"
-  add_foreign_key "gym_workouts", "gym_routines", column: "routine_id"
-  add_foreign_key "gym_workouts", "users"
   add_foreign_key "invoice_parses", "document_conversions"
   add_foreign_key "learning_attempts", "learning_items", column: "item_id"
   add_foreign_key "learning_attempts", "users"
   add_foreign_key "learning_items", "users"
-  add_foreign_key "note_links", "notes", column: "source_note_id"
-  add_foreign_key "note_links", "notes", column: "target_note_id"
-  add_foreign_key "note_links", "users"
-  add_foreign_key "notes", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
   add_foreign_key "solid_queue_batch_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
