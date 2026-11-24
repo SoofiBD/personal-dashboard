@@ -926,12 +926,6 @@ en:
     replace_all: Replace all
     preview_title: Live Preview
     preview_subtitle: Images and formatting render in real-time.
-    source_pdf_title: Source PDF
-    source_pdf_subtitle: Compare output with source document. Browser preview can also open in a new tab.
-    open_new_tab: Open in new tab
-    source_viewer_aria: Source PDF preview
-    pdf_not_supported: Your browser does not support PDF preview.
-    download_or_open_pdf: Download or open PDF
     summary_title: Processing summary
     summary_subtitle: Deterministic extraction results of the latest conversion.
     stat_pages: Pages
@@ -953,7 +947,6 @@ en:
     opt_yaml_frontmatter: Add YAML frontmatter
     opt_fix_hyphenation: Fix hyphenation and line breaks
     opt_detect_tables: Convert tables to Markdown
-    opt_min_image_dimension: Minimum image dimension
     processing_notice: PDF conversion is in progress. The page will refresh automatically when ready.
   pdf_tools:
     eyebrow: PDF TOOLS
@@ -982,10 +975,6 @@ en:
       security_signature:
         title: Security and signing
         description: Manage passwords, redaction, watermarks, and signing.
-    ai:
-      title: AI mode
-      description: The foundation for document summaries, Q&A, and classification is retained; it is disabled by default in the local system.
-      coming_soon: Coming soon
   profile:
     eyebrow: ACCOUNT & SECURITY
     title: Profile Preferences

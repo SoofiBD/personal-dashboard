@@ -931,12 +931,6 @@ tr:
     replace_all: Tümünü değiştir
     preview_title: Canlı Önizleme
     preview_subtitle: Görseller ve biçimlendirmeler anlık olarak işlenir.
-    source_pdf_title: Kaynak PDF
-    source_pdf_subtitle: Çıktıyı kaynak belgeyle karşılaştırın. Tarayıcı önizlemesi yeni sekmede de açılabilir.
-    open_new_tab: Yeni sekmede aç
-    source_viewer_aria: Kaynak PDF önizlemesi
-    pdf_not_supported: Tarayıcınız PDF önizlemesini desteklemiyor.
-    download_or_open_pdf: PDF’yi indir veya aç
     summary_title: İşleme özeti
     summary_subtitle: Son dönüşümün deterministik çıkarım sonuçları.
     stat_pages: Sayfa
@@ -958,7 +952,6 @@ tr:
     opt_yaml_frontmatter: YAML ön bilgisi ekle
     opt_fix_hyphenation: Satır sonu ve tireleri düzelt
     opt_detect_tables: Tabloları Markdown’a çevir
-    opt_min_image_dimension: Minimum görsel boyutu
     processing_notice: PDF dönüşümü işleniyor. Sonuç hazır olduğunda sayfa otomatik yenilenecek.
   pdf_tools:
     eyebrow: PDF ARAÇLARI
@@ -987,10 +980,6 @@ tr:
       security_signature:
         title: Güvenlik ve imza
         description: Parola, redaksiyon, filigran ve imzalama işlemlerini yönetin.
-    ai:
-      title: AI modu
-      description: Belge özeti, soru-cevap ve sınıflandırma için altyapı korunuyor; yerel sistemde varsayılan olarak kapalıdır.
-      coming_soon: Yakında
   profile:
     eyebrow: HESAP & GÜVENLİK
     title: Profil Tercihleri

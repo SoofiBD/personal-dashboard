@@ -80,17 +80,6 @@
       <div data-mde-app></div>
     </div>
   </section>
-  <% if @document_conversion.source_pdf_available? %>
-    <section class="panel document-source-panel" aria-labelledby="document-source-title">
-      <div class="panel-header">
-        <div><h2 id="document-source-title"><%= t("document_conversions.source_pdf_title", default: "Kaynak PDF") %></h2><p><%= t("document_conversions.source_pdf_subtitle", default: "Çıktıyı kaynak belgeyle karşılaştırın. Tarayıcı önizlemesi yeni sekmede de açılabilir.") %></p></div>
-        <%= link_to t("document_conversions.open_new_tab", default: "Yeni sekmede aç"), source_pdf_finance_document_conversion_path(@document_conversion), class: "button button-secondary button-compact", target: "_blank", rel: "noopener" %>
-      </div>
-      <object class="document-source-viewer" data="<%= source_pdf_finance_document_conversion_path(@document_conversion) %>" type="application/pdf" aria-label="<%= t("document_conversions.source_viewer_aria", default: "Kaynak PDF önizlemesi") %>">
-        <p><%= t("document_conversions.pdf_not_supported", default: "Tarayıcınız PDF önizlemesini desteklemiyor.") %> <%= link_to t("document_conversions.download_or_open_pdf", default: "PDF’yi indir veya aç"), source_pdf_finance_document_conversion_path(@document_conversion) %>.</p>
-      </object>
-    </section>
-  <% end %>
   <% stats = @document_conversion.processing_stats || {} %>
   <section class="panel document-stats-panel" aria-labelledby="document-stats-title">
     <div class="panel-header"><div><h2 id="document-stats-title"><%= t("document_conversions.summary_title", default: "İşleme özeti") %></h2><p><%= t("document_conversions.summary_subtitle", default: "Son dönüşümün deterministik çıkarım sonuçları.") %></p></div></div>

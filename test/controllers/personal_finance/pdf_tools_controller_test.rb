@@ -11,7 +11,6 @@ class PersonalFinance::PdfToolsControllerTest < PersonalFinance::IntegrationTest
     assert_response :success
     assert_select "h1", text: "PDF Çalışma Alanı"
     assert_select ".pdf-tools-hero .pdf-tools-status", text: /Hazır|Bekleniyor/
-    assert_select "#pdf-tools-ai-title", text: "AI modu"
     assert_select "a[href='/pdf-editor/add-text']", text: "Aracı aç"
     assert_select "a[href='/pdf-editor/merge-pdfs']", text: "Aracı aç"
     assert_select "a[href='/pdf-editor/compress-pdf']", text: "Aracı aç"
@@ -24,7 +23,6 @@ class PersonalFinance::PdfToolsControllerTest < PersonalFinance::IntegrationTest
     assert_response :success
     assert_select "h1", text: "PDF Workspace"
     assert_select ".pdf-tools-hero .pdf-tools-status", text: /Ready|Waiting/
-    assert_select "#pdf-tools-ai-title", text: "AI mode"
   end
 
   test "opens the PDF workspace before finance onboarding is complete" do

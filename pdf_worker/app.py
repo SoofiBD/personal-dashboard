@@ -1,3 +1,4 @@
+import hmac
 import io
 import os
 import re
@@ -22,7 +23,6 @@ from PIL import Image, UnidentifiedImageError
 
 MAX_FILE_SIZE = 25 * 1024 * 1024
 MAX_PAGE_COUNT = 250
-MIN_IMAGE_DIMENSION = 100
 MAX_IMAGE_COUNT = 50
 MAX_EXTRACTED_IMAGE_BYTES = 20 * 1024 * 1024
 IMAGE_RENDER_PROFILES = {
@@ -56,7 +56,6 @@ async def verify_api_key(authorization: str = Depends(api_key_header)):
     token = authorization[7:]
     if not token or len(token) < 32:
         raise HTTPException(status_code=401, detail="Invalid API key")
-    import hmac
     if not hmac.compare_digest(token, _get_api_key()):
         raise HTTPException(status_code=401, detail="Invalid API key")
 
@@ -69,19 +68,15 @@ def _validate_env():
     _get_api_key()
 
 
-class ZipImage(BaseModel):
+class ExportImage(BaseModel):
     filename: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
     data_base64: str
 
 
-class ZipExport(BaseModel):
+class Export(BaseModel):
     markdown_content: str = Field(max_length=10_000_000)
     source_filename: str = Field(max_length=255)
-    images: list[ZipImage] = Field(max_length=MAX_IMAGE_COUNT)
-
-
-class HtmlExport(ZipExport):
-    pass
+    images: list[ExportImage] = Field(max_length=MAX_IMAGE_COUNT)
 
 
 @app.get("/health")
@@ -93,24 +88,24 @@ def health():
 async def crop_image(file: UploadFile = File(...), left: int = Form(...), top: int = Form(...), width: int = Form(...), height: int = Form(...), _: None = Depends(verify_api_key)):
     payload = await file.read(MAX_EXTRACTED_IMAGE_BYTES + 1)
     if len(payload) > MAX_EXTRACTED_IMAGE_BYTES:
-        raise HTTPException(413, "Image is too large")
+        raise HTTPException(413, "Görsel en fazla 20 MB olabilir.")
     try:
         with Image.open(io.BytesIO(payload)) as source:
             if source.format not in {"PNG", "JPEG", "WEBP", "GIF"} or source.width * source.height > 40_000_000:
-                raise HTTPException(422, "Unsupported image")
+                raise HTTPException(422, "Desteklenmeyen görsel.")
             if min(left, top) < 0 or min(width, height) < 1 or left + width > source.width or top + height > source.height:
-                raise HTTPException(422, "Crop is outside the image")
+                raise HTTPException(422, "Kırpma alanı görsel sınırları içinde olmalı.")
             output = io.BytesIO()
             source.crop((left, top, left + width, top + height)).save(output, format=source.format)
             return Response(output.getvalue(), media_type=Image.MIME[source.format])
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
-        raise HTTPException(422, "Invalid image")
+        raise HTTPException(422, "Geçersiz görsel.")
 
 
 @app.post("/convert")
 async def convert(
     file: UploadFile = File(...), custom_notes: str = Form(default=""), annotation_mode: str = Form(default="both"),
-    extract_images_enabled: bool = Form(default=True), min_image_dimension: int = Form(default=MIN_IMAGE_DIMENSION), image_quality: str = Form(default="high"),
+    extract_images_enabled: bool = Form(default=True), image_quality: str = Form(default="high"),
     strip_headers_footers: bool = Form(default=True), bind_captions_enabled: bool = Form(default=True),
     extract_annotations_enabled: bool = Form(default=True), include_yaml_frontmatter: bool = Form(default=True),
     fix_hyphenation_enabled: bool = Form(default=True), detect_tables: bool = Form(default=True),
@@ -123,29 +118,26 @@ async def convert(
         raise HTTPException(status_code=422, detail="Yüklenen dosya geçerli bir PDF değil.")
     if annotation_mode not in {"section", "inline", "both"}:
         raise HTTPException(status_code=422, detail="Geçersiz anotasyon modu.")
-    if not 50 <= min_image_dimension <= 500:
-        raise HTTPException(status_code=422, detail="Minimum görsel boyutu 50 ile 500 piksel arasında olmalıdır.")
     if image_quality not in IMAGE_RENDER_PROFILES:
         raise HTTPException(status_code=422, detail="Geçersiz görsel kalite profili.")
 
     started_at = time.perf_counter()
     try:
-        document = fitz.open(stream=contents, filetype="pdf")
-        page_count = document.page_count
-        if page_count > MAX_PAGE_COUNT:
-            raise HTTPException(status_code=422, detail="PDF en fazla 250 sayfa olabilir.")
-        running_artifacts = find_running_artifacts(document) if strip_headers_footers else []
-        annotations = extract_annotations(document) if extract_annotations_enabled else []
-        images = extract_images(document, min_image_dimension, image_quality) if extract_images_enabled else []
-        heading_candidates = find_heading_candidates(document)
-        chart_rects = chart_rects_by_page(images)
-        tables = extract_tables(document, chart_rects) if detect_tables else []
-        markdown = extract_layout_text(document, chart_rects)
+        with fitz.open(stream=contents, filetype="pdf") as document:
+            page_count = document.page_count
+            if page_count > MAX_PAGE_COUNT:
+                raise HTTPException(status_code=422, detail="PDF en fazla 250 sayfa olabilir.")
+            running_artifacts = find_running_artifacts(document) if strip_headers_footers else []
+            annotations = extract_annotations(document) if extract_annotations_enabled else []
+            images = extract_images(document, image_quality) if extract_images_enabled else []
+            heading_candidates = find_heading_candidates(document)
+            chart_rects = chart_rects_by_page(images)
+            tables = extract_tables(document, chart_rects) if detect_tables else []
+            markdown = extract_layout_text(document, chart_rects)
         parser = "pymupdf"
         if not markdown:
             markdown = MarkItDown().convert_stream(io.BytesIO(contents), file_extension=".pdf").text_content.strip()
             parser = "markitdown"
-        document.close()
     except HTTPException:
         raise
     except Exception as error:
@@ -182,7 +174,7 @@ async def convert(
 
 
 @app.post("/export-zip")
-def export_zip(payload: ZipExport, _: None = Depends(verify_api_key)):
+def export_zip(payload: Export, _: None = Depends(verify_api_key)):
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(f"{safe_stem(payload.source_filename)}.md", payload.markdown_content)
@@ -196,7 +188,7 @@ def export_zip(payload: ZipExport, _: None = Depends(verify_api_key)):
 
 
 @app.post("/export-html")
-def export_html(payload: HtmlExport, _: None = Depends(verify_api_key)):
+def export_html(payload: Export, _: None = Depends(verify_api_key)):
     image_data = {}
     for image in payload.images:
         try:
@@ -411,7 +403,7 @@ def unwrap_soft_breaks(markdown):
     return "\n\n".join(cleaned_blocks)
 
 
-def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
+def extract_images(document, image_quality="high"):
     """Extract figures only from rendered, caption-bounded PDF page regions.
 
     PDF object extraction is deliberately not used here: a visible figure may
@@ -422,7 +414,7 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION, image_qual
     images = []
     extracted_bytes = 0
     for page_number, page in enumerate(document, start=1):
-        for snapshot in extract_visual_snapshots(page, page_number, min_image_dimension, image_quality):
+        for snapshot in extract_visual_snapshots(page, page_number, image_quality):
             snapshot_data = snapshot.pop("data")
             if len(images) >= MAX_IMAGE_COUNT or extracted_bytes + len(snapshot_data) > MAX_EXTRACTED_IMAGE_BYTES:
                 return images
@@ -433,7 +425,7 @@ def extract_images(document, min_image_dimension=MIN_IMAGE_DIMENSION, image_qual
     return images
 
 
-def extract_visual_snapshots(page, page_number, min_image_dimension=MIN_IMAGE_DIMENSION, image_quality="high"):
+def extract_visual_snapshots(page, page_number, image_quality="high"):
     """Render captioned figures as screenshots so no PDF layer is lost."""
     captions = find_caption_blocks(page)
     if not captions:

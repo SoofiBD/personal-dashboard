@@ -14,8 +14,7 @@
     </div>
   </div>
 
-  <%# A native submit is intentional here: Safari can treat Turbo's multipart redirect as a download. %>
-  <%= form_with model: @document_conversion, url: finance_document_conversions_path, multipart: true, class: "document-upload-form", data: { turbo: false } do |form| %>
+  <%= form_with model: @document_conversion, url: finance_document_conversions_path, multipart: true, class: "document-upload-form" do |form| %>
     <%= render "personal_finance/shared/errors", record: @document_conversion %>
     <div class="form-group">
       <%= label_tag :pdf_file, t("document_conversions.pdf_file_label", default: "PDF dosyası") %>
@@ -51,7 +50,7 @@
           <div class="document-history-main"><strong><%= conversion.source_filename %></strong><span><%= l(conversion.created_at, format: :short) %></span></div>
           <div class="document-history-actions">
             <span class="document-status document-status--<%= conversion.status %>"><%= conversion.status == "completed" ? t("document_conversions.status_ready", default: "Hazır") : conversion.status == "failed" ? t("document_conversions.status_failed", default: "Başarısız") : t("document_conversions.status_processing", default: "İşleniyor") %></span>
-            <%= link_to t("document_conversions.open", default: "Aç"), finance_document_conversion_path(conversion), class: "button button-secondary button-compact" if conversion.completed? %>
+            <%= link_to t("document_conversions.open", default: "Aç"), finance_document_conversion_path(conversion), class: "button button-secondary button-compact" %>
             <%= button_to t("document_conversions.delete", default: "Sil"), finance_document_conversion_path(conversion), method: :delete, class: "button button-danger button-compact", form: {data: {turbo_confirm: t("document_conversions.delete_confirm", default: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?")}} %>
           </div>
         </article>

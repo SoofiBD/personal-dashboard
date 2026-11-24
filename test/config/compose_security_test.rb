@@ -65,4 +65,18 @@ class ComposeSecurityTest < ActiveSupport::TestCase
     assert_operator source.scan("read_only: true").length, :>=, 2
     assert_operator source.scan("cap_drop:").length, :>=, 3
   end
+
+  # Puma and Rack buffer uploads/large POST bodies to Dir.tmpdir. On a
+  # read-only root they fail with a header-less 500 that Safari saves as an
+  # empty "document_conversions" download.
+  test "read-only Rails containers buffer request bodies on their tmpfs" do
+    services = YAML.safe_load(Rails.root.join("compose.production.yaml").read, aliases: true).fetch("services")
+
+    %w[web jobs].each do |name|
+      service = services.fetch(name)
+      tmpdir = service.dig("environment", "TMPDIR")
+      assert tmpdir, "#{name} needs TMPDIR"
+      assert service.fetch("tmpfs").any? { |mount| mount.split(":").first == tmpdir }, "#{name} TMPDIR must be a tmpfs mount"
+    end
+  end
 end

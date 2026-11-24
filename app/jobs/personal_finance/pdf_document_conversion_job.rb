@@ -12,7 +12,7 @@ module PersonalFinance
       return unless conversion.processing?
 
       result = PdfConversionClient.new.convert(
-        pdf_data: conversion.source_pdf_binary,
+        pdf_data: conversion.source_pdf.download,
         filename: conversion.source_filename,
         custom_notes: conversion.custom_notes,
         annotation_mode: annotation_mode,
