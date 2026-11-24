@@ -16,9 +16,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+    <%= tag.meta name: "mde-mermaid-url", content: asset_path("md-editor/mermaid.min.js") if controller_path == "personal_finance/document_conversions" && action_name == "show" %>
     <%= stylesheet_link_tag "application", nonce: csp_nonce %>
+    <%= stylesheet_link_tag "learning", nonce: csp_nonce if controller_path == "learning/workspace" %>
+    <%= stylesheet_link_tag "document_image_editor", nonce: csp_nonce if controller_path == "personal_finance/document_conversions" && action_name == "show" %>
     <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js", defer: true, integrity: "sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt", crossorigin: "anonymous", nonce: csp_nonce %>
-    <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true, integrity: "sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF", crossorigin: "anonymous", nonce: csp_nonce %>
+    <% if %w[personal_finance/dashboard personal_finance/cash_flow_forecasts personal_finance/spending_reports].include?(controller_path) %>
+      <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js", defer: true, integrity: "sha384-JUh163oCRItcbPme8pYnROHQMC6fNKTBWtRG3I3I0erJkzNgL7uxKlNwcrcFKeqF", crossorigin: "anonymous", nonce: csp_nonce %>
+    <% end %>
     <%= javascript_include_tag "application", defer: true, nonce: csp_nonce %>
     <%= yield :module_js %>
   </head>

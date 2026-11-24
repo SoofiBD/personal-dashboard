@@ -6,4 +6,8 @@ set -eu
 cd "$(dirname "$0")"
 npm ci --no-audit --no-fund
 npm run build
+# Mermaid is loaded lazily by the browser, so ship its prebuilt UMD file next to the bundle.
+cp node_modules/mermaid/dist/mermaid.min.js ../../vendor/assets/javascripts/md-editor/mermaid.min.js
+# Vite emits the CSS next to the JS; the pipeline serves it from vendor/assets/stylesheets.
+mv ../../vendor/assets/javascripts/md-editor/md-editor.css ../../vendor/assets/stylesheets/md-editor/md-editor.css
 echo "OK: vendor/assets/javascripts/md-editor/ updated - commit the result."
