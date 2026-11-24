@@ -48,8 +48,17 @@ class AiTool
   attr_reader :user
 
   def propose(action_type, payload, summary)
-    action = AiAction.propose!(user: user, action_type: action_type, payload: payload, summary: summary)
+    action = AiAction.propose!(user: user, action_type: action_type, payload: payload, summary: summary.to_s.first(500))
     {requires_confirmation: true, action_id: action.id, summary: action.summary}
+  end
+
+  # Applies at once, without the approval card. Still goes through AiAction so the write is logged
+  # and uses the same #apply path as approved actions. Use only for additive, easily undone writes.
+  def perform(action_type, payload, summary)
+    action = AiAction.propose!(user: user, action_type: action_type, payload: payload, summary: summary.to_s.first(500))
+    {done: true, summary: action.summary}.merge(AiActionExecutor.new(action).execute!)
+  rescue AiActionExecutor::Error => e
+    {error: e.message}
   end
 
   def require_finance_permission!

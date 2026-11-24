@@ -5,27 +5,43 @@ class FinanceTool < AiTool
     "finance.create_expense" => :apply_create_expense,
     "finance.create_income" => :apply_create_income,
     "finance.update_transaction" => :apply_update_transaction,
-    "finance.delete_transaction" => :apply_delete_transaction
+    "finance.delete_transaction" => :apply_delete_transaction,
+    "finance.create_subscription" => :apply_create_subscription,
+    "finance.delete_subscription" => :apply_delete_subscription
   }.freeze
 
   function :get_monthly_summary, "Current month expense/income totals by category"
   function :list_accounts, "All active accounts with balances"
+  function :list_categories, "Expense and income category names; use these exact names when recording transactions"
   function :get_recent_transactions, "Transactions from the last N days (default 7, max 90)",
     days: {type: "integer", description: "Number of days"}
   function :get_budget_status, "Budget vs actual for the current budget period"
-  function :list_subscriptions, "Active subscriptions with costs"
+  function :list_subscriptions, "Active subscriptions with ids and costs"
   function :get_debts, "Active debts overview"
   function :get_savings_goals, "Savings goals with progress"
-  function :create_expense, "Propose a new expense on the active account; user confirmation is required",
+  function :create_expense, "Record an expense immediately (no confirmation step)",
     required: %i[amount category_name description],
     amount: {type: "number", description: "Positive amount"},
-    category_name: {type: "string", description: "Existing expense category name"},
-    description: {type: "string", description: "Description"}
-  function :create_income, "Propose a new income on the active account; user confirmation is required",
+    category_name: {type: "string", description: "Exact expense category name from list_categories"},
+    description: {type: "string", description: "Description"},
+    occurred_on: {type: "string", description: "Date YYYY-MM-DD, default today, not in the future"},
+    account_name: {type: "string", description: "Account name from list_accounts, default the first active account"}
+  function :create_income, "Record an income immediately (no confirmation step)",
     required: %i[amount category_name description],
     amount: {type: "number", description: "Positive amount"},
-    category_name: {type: "string", description: "Existing income category name"},
-    description: {type: "string", description: "Description"}
+    category_name: {type: "string", description: "Exact income category name from list_categories"},
+    description: {type: "string", description: "Description"},
+    occurred_on: {type: "string", description: "Date YYYY-MM-DD, default today, not in the future"},
+    account_name: {type: "string", description: "Account name from list_accounts, default the first active account"}
+  function :create_subscription, "Add a recurring subscription immediately (no confirmation step)",
+    required: %i[name amount billing_interval],
+    name: {type: "string", description: "Subscription name, e.g. Netflix"},
+    amount: {type: "number", description: "Positive amount per billing interval"},
+    billing_interval: {type: "string", enum: %w[monthly yearly], description: "monthly or yearly"},
+    renewal_on: {type: "string", description: "Next renewal date YYYY-MM-DD, optional"}
+  function :delete_subscription, "Propose removing a subscription; user confirmation is required",
+    required: %i[id],
+    id: {type: "string", description: "Subscription UUID from list_subscriptions"}
   function :update_transaction, "Propose updating a non-transfer transaction; user confirmation is required",
     required: %i[id],
     id: {type: "string", description: "Transaction UUID"},
@@ -55,6 +71,10 @@ class FinanceTool < AiTool
     user.financial_accounts.active.map do |account|
       {name: account.name, kind: account.kind, balance: account.current_balance.to_f, currency: account.currency}
     end
+  end
+
+  def list_categories
+    user.finance_categories.order(:name).pluck(:kind, :name).group_by(&:first).transform_values { |rows| rows.map(&:last) }
   end
 
   def get_recent_transactions(days: 7)
@@ -91,7 +111,7 @@ class FinanceTool < AiTool
 
   def list_subscriptions
     user.finance_subscriptions.active.map do |s|
-      {name: s.name, amount: s.amount.to_f, interval: s.billing_interval, monthly_cost: s.monthly_cost.to_f, renewal: s.renewal_on}
+      {id: s.id, name: s.name, amount: s.amount.to_f, interval: s.billing_interval, monthly_cost: s.monthly_cost.to_f, renewal: s.renewal_on}
     end
   end
 
@@ -108,12 +128,31 @@ class FinanceTool < AiTool
     end
   end
 
-  def create_expense(amount:, category_name:, description:)
-    propose_transaction("expense", amount, category_name, description)
+  def create_expense(amount:, category_name:, description:, occurred_on: nil, account_name: nil)
+    record_transaction("expense", amount, category_name, description, occurred_on, account_name)
   end
 
-  def create_income(amount:, category_name:, description:)
-    propose_transaction("income", amount, category_name, description)
+  def create_income(amount:, category_name:, description:, occurred_on: nil, account_name: nil)
+    record_transaction("income", amount, category_name, description, occurred_on, account_name)
+  end
+
+  def create_subscription(name:, amount:, billing_interval:, renewal_on: nil)
+    return {error: "No permission to edit finances"} unless user.can_manage_finances?
+    return {error: "Amount must be positive"} unless amount.to_d.positive?
+    return {error: "billing_interval must be monthly or yearly"} unless %w[monthly yearly].include?(billing_interval)
+    renewal = parse_date(renewal_on)
+    return {error: "renewal_on must be YYYY-MM-DD"} if renewal_on.present? && renewal.nil?
+
+    payload = {name: name.to_s.strip.first(100), amount: amount, billing_interval: billing_interval, renewal_on: renewal&.iso8601}.compact
+    label = (billing_interval == "monthly") ? "aylık" : "yıllık"
+    perform("finance.create_subscription", payload, "Abonelik: #{payload[:name]} · #{amount} #{label}")
+  end
+
+  def delete_subscription(id:)
+    subscription = user.finance_subscriptions.find_by(id: id)
+    return {error: "Subscription not found"} unless subscription
+
+    propose("finance.delete_subscription", {id: subscription.id}, "Aboneliği sil: #{subscription.name} · #{subscription.amount}")
   end
 
   def update_transaction(id:, amount: nil, description: nil, occurred_on: nil)
@@ -154,16 +193,34 @@ class FinanceTool < AiTool
     {record_type: "transaction", record_id: transaction.id}
   end
 
+  def apply_create_subscription(payload)
+    require_finance_permission!
+    subscription = user.finance_subscriptions.create!(payload.slice("name", "amount", "billing_interval", "renewal_on"))
+    {record_type: "subscription", record_id: subscription.id}
+  end
+
+  def apply_delete_subscription(payload)
+    require_finance_permission!
+    subscription = user.finance_subscriptions.find(payload.fetch("id"))
+    subscription.destroy!
+    {record_type: "subscription", record_id: subscription.id}
+  end
+
   private
 
-  def propose_transaction(kind, amount, category_name, description)
+  def record_transaction(kind, amount, category_name, description, occurred_on, account_name)
     return {error: "No permission to edit finances"} unless user.can_manage_finances?
     return {error: "Amount must be positive"} unless amount.to_d.positive?
-    return {error: "Unknown #{kind} category '#{category_name}'"} unless find_category(category_name, kind)
-    return {error: "No active account"} unless find_default_account
+    unless find_category(category_name, kind)
+      return {error: "Unknown #{kind} category '#{category_name}'", available_categories: list_categories.fetch(kind, [])}
+    end
+    date = occurred_on.present? ? parse_date(occurred_on) : Date.current
+    return {error: "occurred_on must be YYYY-MM-DD and not in the future"} if date.nil? || date > Date.current
+    return {error: "Unknown account '#{account_name}'", available_accounts: list_accounts.map { |a| a[:name] }} unless find_account(account_name)
 
     label = (kind == "expense") ? "Gider" : "Gelir"
-    propose("finance.create_#{kind}", {amount: amount, category_name: category_name, description: description}, "#{label}: #{amount} · #{category_name} · #{description}")
+    payload = {amount: amount, category_name: category_name, description: description.to_s.first(500), occurred_on: date.iso8601, account_name: account_name.presence}.compact
+    perform("finance.create_#{kind}", payload, "#{label}: #{amount} · #{category_name} · #{description} · #{date.iso8601}")
   end
 
   def create_transaction(kind, payload)
@@ -171,9 +228,16 @@ class FinanceTool < AiTool
     amount = BigDecimal(payload.fetch("amount").to_s)
     raise AiActionExecutor::Error, "Tutar sıfırdan büyük olmalıdır." unless amount.positive?
     category = find_category(payload.fetch("category_name"), kind) || raise(ActiveRecord::RecordNotFound)
-    account = find_default_account || raise(ActiveRecord::RecordNotFound)
-    transaction = user.finance_transactions.create!(kind: kind, amount: amount, category: category, account: account, occurred_on: Date.current, note: payload.fetch("description"))
+    account = find_account(payload["account_name"]) || raise(ActiveRecord::RecordNotFound)
+    occurred_on = parse_date(payload["occurred_on"]) || Date.current
+    transaction = user.finance_transactions.create!(kind: kind, amount: amount, category: category, account: account, occurred_on: occurred_on, note: payload.fetch("description"))
     {record_type: "transaction", record_id: transaction.id}
+  end
+
+  def parse_date(value)
+    Date.iso8601(value.to_s)
+  rescue Date::Error
+    nil
   end
 
   def editable_transaction(payload)
@@ -190,8 +254,8 @@ class FinanceTool < AiTool
     PersonalFinance::Category.find_by(user: user, name: name, kind: kind)
   end
 
-  # shortcut: proposals carry no account, so the first active account is used; add an account param when users have several.
-  def find_default_account
-    PersonalFinance::Account.find_by(user: user, is_active: true)
+  def find_account(name)
+    accounts = PersonalFinance::Account.where(user: user, is_active: true)
+    name.present? ? accounts.find_by(name: name) : accounts.order(:created_at).first
   end
 end
