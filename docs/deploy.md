@@ -26,7 +26,7 @@ sudo ls -l /etc/sudoers.d/                         # leftover 90-ocarun-recovery
 cd /home/ubuntu/personal-dashboard && git remote -v  # server must be able to fetch from GitHub
 ```
 
-Memory assumption: limits are web 1.5g, jobs 1g, pdf-worker 1.5g, stirling 2g, db 1g, gateway 256m = 7.25g worst case. Comfortable on 4 OCPU / 24 GB A1. Fits 2 OCPU / 12 GB. Tight on 8 GB. Compare with `docker stats` before relying on it.
+Memory: limits are web 1.5g, jobs 1g, pdf-worker 1.5g, stirling 2g, db 1g, gateway 256m = 7.25g worst case. The production VM (2026-11) has 1 OCPU / 5.8 GB and actual use is about 1.7 GB, so the limits are caps that are never all reached at once. Builds on 1 CPU take several minutes; the old containers keep serving until `== up`.
 
 If `/etc/sudoers.d/90-ocarun-recovery` exists and the recovery is over, remove it (`sudo rm`) after confirming it is the temporary one. Passwordless sudo for a recovery user is a standing hole.
 
