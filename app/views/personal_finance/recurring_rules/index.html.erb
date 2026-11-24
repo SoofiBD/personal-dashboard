@@ -27,7 +27,7 @@
           <% else %>
             <%= button_to t("recurring_rules.pause", default: "Duraklat"), pause_finance_recurring_rule_path(rule), method: :patch, class: "button button-secondary button-sm" %>
           <% end %>
-          <%= button_to t("recurring_rules.stop", default: "Durdur"), finance_recurring_rule_path(rule), method: :delete, data: { turbo_confirm: t("recurring_rules.confirm_stop", default: "Bu planı durdurmak istiyor musunuz? Önceki işlemler korunur.") }, class: "button button-danger button-sm" %>
+          <%= button_to t("recurring_rules.stop", default: "Durdur"), finance_recurring_rule_path(rule), method: :delete, data: { confirm: t("recurring_rules.confirm_stop", default: "Bu planı durdurmak istiyor musunuz? Önceki işlemler korunur.") }, class: "button button-danger button-sm" %>
         </div>
       </article>
     <% end %>

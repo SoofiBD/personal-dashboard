@@ -21,7 +21,7 @@
     <div class="panel-header"><div><h2><%= t("profile.mfa_title", default: "İki adımlı doğrulama") %></h2><p><%= t("profile.mfa_desc", default: "Parolanıza ek olarak doğrulama uygulaması kodu istenir.") %></p></div></div>
     <p class="security-status <%= @user.mfa_enabled? ? "is-enabled" : "" %>"><%= @user.mfa_enabled? ? t("profile.mfa_enabled", default: "Etkin") : t("profile.mfa_disabled", default: "Kapalı") %></p>
     <% if @user.mfa_enabled? %>
-      <%= button_to t("profile.disable_mfa", default: "MFA’yı Kapat"), mfa_path, method: :delete, class: "button button-secondary", data: {turbo_confirm: t("profile.confirm_disable_mfa", default: "İki adımlı doğrulamayı kapatmak istediğinizden emin misiniz?")} %>
+      <%= button_to t("profile.disable_mfa", default: "MFA’yı Kapat"), mfa_path, method: :delete, class: "button button-secondary", data: {confirm: t("profile.confirm_disable_mfa", default: "İki adımlı doğrulamayı kapatmak istediğinizden emin misiniz?")} %>
     <% else %>
       <%= link_to t("profile.setup_mfa", default: "MFA’yı Kur"), mfa_path, class: "button button-primary" %>
     <% end %>

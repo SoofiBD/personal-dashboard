@@ -45,7 +45,7 @@
             <%= link_to edit_finance_transaction_path(transaction), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
-            <%= button_to finance_transaction_path(transaction), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu işlemi silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
+            <%= button_to finance_transaction_path(transaction), method: :delete, data: { confirm: t("app.common.confirm_delete", default: "Bu işlemi silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>

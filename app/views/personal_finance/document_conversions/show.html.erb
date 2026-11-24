@@ -10,7 +10,7 @@
   </div>
   <div class="page-header-actions">
     <%= link_to t("document_conversions.all_conversions", default: "Tüm dönüşümler"), finance_document_conversions_path, class: "button button-secondary" %>
-    <%= button_to t("document_conversions.delete_conversion", default: "Dönüşümü sil"), finance_document_conversion_path(@document_conversion), method: :delete, class: "button button-danger", form: {data: {turbo_confirm: t("document_conversions.delete_confirm", default: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?")}} %>
+    <%= button_to t("document_conversions.delete_conversion", default: "Dönüşümü sil"), finance_document_conversion_path(@document_conversion), method: :delete, class: "button button-danger", form: {data: {confirm: t("document_conversions.delete_confirm", default: "Bu dönüşüm, kaynak PDF ve çıkarılan görseller kalıcı olarak silinecek. Devam edilsin mi?")}} %>
   </div>
 </header>
 

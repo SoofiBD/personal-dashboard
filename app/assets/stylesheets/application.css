@@ -359,9 +359,6 @@ body::after {
 .document-workspace-actions button:disabled { cursor: wait; opacity: .65; }
 .document-workspace-feedback { min-height: 1.25rem; }
 
-.document-source-panel { display: grid; gap: .75rem; }
-.document-source-panel .panel-header { align-items: center; }
-.document-source-viewer { background: var(--surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); height: 42rem; width: 100%; }
 .document-stats-panel, .document-gallery-panel { margin-top: 1.5rem; }
 .document-stats-grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
 .document-stats-grid div { background: var(--surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: .75rem; }

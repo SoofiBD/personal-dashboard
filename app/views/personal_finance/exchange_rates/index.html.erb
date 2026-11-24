@@ -50,7 +50,7 @@
                 <%= link_to edit_finance_exchange_rate_path(rate), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
                   <%= finance_svg_icon("edit") %>
                 <% end %>
-                <%= button_to finance_exchange_rate_path(rate), method: :delete, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: {style: "display: inline;"}, data: {turbo_confirm: t("app.common.confirm_delete", default: "Bu kuru silmek istediğinizden emin misiniz?")} do %>
+                <%= button_to finance_exchange_rate_path(rate), method: :delete, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: {style: "display: inline;"}, data: {confirm: t("app.common.confirm_delete", default: "Bu kuru silmek istediğinizden emin misiniz?")} do %>
                   <%= finance_svg_icon("trash") %>
                 <% end %>
               </div>

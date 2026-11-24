@@ -31,7 +31,7 @@
               <%= month_field_tag :month, Date.current.strftime("%Y-%m"), required: true, class: "form-control", aria: {label: "#{template.name} #{t('budget_templates.source_month')}"} %>
               <%= submit_tag t("budget_templates.update_from_month"), class: "button button-secondary button-sm" %>
             <% end %>
-            <%= button_to t("app.common.delete"), finance_budget_template_path(template), method: :delete, data: {turbo_confirm: t("budget_templates.confirm_delete")}, class: "button button-danger button-sm" %>
+            <%= button_to t("app.common.delete"), finance_budget_template_path(template), method: :delete, data: {confirm: t("budget_templates.confirm_delete")}, class: "button button-danger button-sm" %>
           </div>
         <% end %>
       </article>

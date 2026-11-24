@@ -17,6 +17,15 @@ class PersonalFinance::AdditionalControllersTest < PersonalFinance::IntegrationT
     PersonalFinance::Category.create!(user: user, name: "Category #{SecureRandom.hex(3)}", kind: kind, color: "#2563EB", parent: parent)
   end
 
+  test "destroy buttons render data-confirm for the JS confirm handler" do
+    acct = account
+    cat = category
+    get finance_accounts_path
+    assert_select "form[action='#{finance_account_path(acct)}'] button[data-confirm]"
+    get finance_categories_path
+    assert_select "form[action='#{finance_category_path(cat)}'] button[data-confirm]"
+  end
+
   test "accounts create and reject invalid data" do
     assert_difference("PersonalFinance::Account.count", 1) do
       post finance_accounts_path, params: {account: {name: "Wallet", kind: "cash", opening_balance: 25, currency: "TRY"}}

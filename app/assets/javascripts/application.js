@@ -1169,6 +1169,11 @@
     });
   };
 
+  // button_to puts data-confirm on the button, form: {data:} on the form.
+  document.addEventListener("submit", (e) => {
+    const message = e.submitter?.dataset.confirm || e.target.dataset?.confirm;
+    if (message && !window.confirm(message)) e.preventDefault();
+  });
   document.addEventListener("DOMContentLoaded", init);
   document.addEventListener("turbo:before-cache", () => {
     delete document.body?.dataset.applicationInitialized;

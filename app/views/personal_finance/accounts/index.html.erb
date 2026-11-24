@@ -34,7 +34,7 @@
             <%= link_to edit_finance_account_path(account), class: "action-btn", title: t("app.common.edit") do %>
               <%= finance_svg_icon("edit") %>
             <% end %>
-            <%= button_to finance_account_path(account), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete") }, class: "action-btn delete", title: t("app.common.delete"), form: { style: "display: inline;" } do %>
+            <%= button_to finance_account_path(account), method: :delete, data: { confirm: t("app.common.confirm_delete") }, class: "action-btn delete", title: t("app.common.delete"), form: { style: "display: inline;" } do %>
               <%= finance_svg_icon("trash") %>
             <% end %>
           </div>

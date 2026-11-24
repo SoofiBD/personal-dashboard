@@ -53,7 +53,7 @@
         <%= link_to edit_finance_purchase_plan_path(plan), class: "action-btn", title: t("app.common.edit", default: "Düzenle") do %>
           <%= finance_svg_icon("edit") %>
         <% end %>
-        <%= button_to finance_purchase_plan_path(plan), method: :delete, data: { turbo_confirm: t("app.common.confirm_delete", default: "Bu planı silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
+        <%= button_to finance_purchase_plan_path(plan), method: :delete, data: { confirm: t("app.common.confirm_delete", default: "Bu planı silmek istediğinizden emin misiniz?") }, class: "action-btn delete", title: t("app.common.delete", default: "Sil"), form: { style: "display: inline;" } do %>
           <%= finance_svg_icon("trash") %>
         <% end %>
       </div>
