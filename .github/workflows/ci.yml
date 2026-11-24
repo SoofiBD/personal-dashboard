@@ -12,6 +12,7 @@ concurrency:
 
 env:
   RAILS_ENV: test
+  # shortcut: jobs pin ubuntu-24.04 because setup-ruby has no 3.3.6 build for ubuntu-26.04 (ubuntu-latest); unpin when it does
   RUBY_VERSION: "3.3.6"
   POSTGRES_DB: personal_dashboard_test
   POSTGRES_USER: personal_dashboard
@@ -26,7 +27,7 @@ jobs:
   # ──────────────────────────────────────────────
   lint:
     name: Lint & Static Analysis
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -53,7 +54,7 @@ jobs:
   # ──────────────────────────────────────────────
   test:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     services:
@@ -110,7 +111,7 @@ jobs:
 
   pdf-worker:
     name: PDF Worker Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -137,7 +138,7 @@ jobs:
   # ──────────────────────────────────────────────
   security:
     name: Security Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -173,7 +174,7 @@ jobs:
   # ──────────────────────────────────────────────
   pr-status:
     name: PR Status Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [lint, test, pdf-worker, security]
     if: always()
     steps:
