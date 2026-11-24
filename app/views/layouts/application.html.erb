@@ -35,13 +35,13 @@
           <div class="brand-wrapper">
             <div class="sidebar-module-selector" data-module-switcher>
               <div class="active-module-header">
-                <%= link_to (current_mod == :gym ? gym_root_path : current_mod == :notes ? notes_root_path : current_mod == :database_tools ? database_tools_path : current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
+                <%= link_to (current_mod == :pdf_tools ? finance_pdf_tools_path : (current_mod == :settings ? profile_path : finance_root_path)), class: "brand" do %>
                   <div class="brand-icon brand-icon--<%= current_mod %>">
-                    <%= finance_svg_icon(current_mod == :gym ? "gym" : current_mod == :notes ? "notes" : (current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault")), class: "icon-brand") %>
+                    <%= finance_svg_icon((current_mod == :pdf_tools ? "document" : (current_mod == :settings ? "settings" : "vault")), class: "icon-brand") %>
                   </div>
                   <div class="brand-text">
                     <span class="brand-title"><%= t("app.name", default: "Personal") %></span>
-                    <span class="brand-subtitle"><%= current_mod == :gym ? "SPOR SALONU" : current_mod == :notes ? t("notes.module", default: "NOTLAR") : current_mod == :database_tools ? t("database_tools.title") : current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
+                    <span class="brand-subtitle"><%= current_mod == :pdf_tools ? "PDF & DOKÜMAN" : (current_mod == :settings ? "ORTAK AYARLAR" : t("app.module", default: "Finance")) %></span>
                   </div>
                 <% end %>
                 <button type="button" class="module-switch-trigger" data-module-switch-toggle aria-expanded="false" aria-label="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>" title="<%= t("app.sidebar.module_switcher", default: "Modül Değiştir") %>">
@@ -62,21 +62,6 @@
                   <% end %>
                 <% end %>
 
-                <%= link_to notes_root_path, class: "module-dropdown-item #{'is-active' if current_mod == :notes}" do %>
-                  <div class="module-dropdown-icon icon-notes"><%= finance_svg_icon("notes") %></div>
-                  <div class="module-dropdown-info"><strong><%= t("notes.module", default: "Notlar") %></strong><span><%= t("notes.module_description", default: "Markdown, etiketler ve bağlantılar") %></span></div>
-                  <% if current_mod == :notes %><span class="module-active-dot" aria-hidden="true"></span><% end %>
-                <% end %>
-
-                <%= link_to gym_root_path, class: "module-dropdown-item #{'is-active' if current_mod == :gym}" do %>
-                  <div class="module-dropdown-icon icon-gym"><%= finance_svg_icon("gym") %></div>
-                  <div class="module-dropdown-info">
-                    <strong><%= t("gym.module", default: "Spor Salonu") %></strong>
-                    <span><%= t("gym.module_description", default: "Antrenman planları ve ilerleme") %></span>
-                  </div>
-                  <% if current_mod == :gym %><span class="module-active-dot" aria-hidden="true"></span><% end %>
-                <% end %>
-
                 <%= link_to finance_pdf_tools_path, class: "module-dropdown-item #{'is-active' if current_mod == :pdf_tools}" do %>
                   <div class="module-dropdown-icon icon-pdf"><%= finance_svg_icon("document") %></div>
                   <div class="module-dropdown-info">
@@ -88,11 +73,6 @@
                   <% end %>
                 <% end %>
 
-                <%= link_to database_tools_path, class: "module-dropdown-item #{'is-active' if current_mod == :database_tools}" do %>
-                  <div class="module-dropdown-icon"><%= finance_svg_icon("vault") %></div>
-                  <div class="module-dropdown-info"><strong><%= t("database_tools.title") %></strong><span><%= t("database_tools.badge") %></span></div>
-                  <% if current_mod == :database_tools %><span class="module-active-dot" aria-hidden="true"></span><% end %>
-                <% end %>
                 <div class="module-dropdown-divider"></div>
                 <%= link_to root_path, class: "module-dropdown-item #{'is-active' if current_page?(root_path)}" do %>
                   <div class="module-dropdown-icon icon-hub"><%= finance_svg_icon("overview") %></div>
@@ -106,40 +86,7 @@
           </div>
 
           <div class="sidebar-nav-groups">
-            <% if current_mod == :notes %>
-              <div class="sidebar-section">
-                <p class="sidebar-label"><%= t("notes.module", default: "NOTLAR") %></p>
-                <nav class="sidebar-nav">
-                  <%= finance_navigation_item t("notes.all", default: "Tüm notlar"), notes_root_path, "notes" %>
-                  <%= finance_navigation_item t("notes.graph", default: "Bağlantı grafiği"), graph_notes_notes_path, "chart" %>
-                  <% if current_panel_user.can_manage_notes? %>
-                    <%= finance_navigation_item t("notes.new", default: "Yeni not"), new_notes_note_path, "plus" %>
-                  <% end %>
-                  <%= finance_navigation_item t("app.sidebar.module_hub", default: "Çalışma Alanı (Hub)"), root_path, "overview" %>
-                </nav>
-              </div>
-            <% elsif current_mod == :gym %>
-              <!-- Spor Salonu Modülü -->
-              <div class="sidebar-section">
-                <p class="sidebar-label"><%= t("gym.sidebar.section_workspace", default: "ANTRENMAN") %></p>
-                <nav class="sidebar-nav">
-                  <%= finance_navigation_item t("gym.sidebar.dashboard", default: "Genel Bakış"), gym_root_path, "dashboard" %>
-                  <%= finance_navigation_item t("gym.sidebar.exercises", default: "Egzersizler"), gym_exercises_path, "gym" %>
-                  <%= finance_navigation_item t("gym.sidebar.routines", default: "Planlar"), gym_routines_path, "recurring" %>
-                  <%= finance_navigation_item t("gym.sidebar.workouts", default: "Geçmiş"), gym_workouts_path, "chart" %>
-                  <%= finance_navigation_item t("gym.sidebar.stats", default: "İstatistikler"), gym_stats_path, "chart" %>
-                </nav>
-              </div>
-            <% elsif current_mod == :database_tools %>
-              <div class="sidebar-section">
-                <p class="sidebar-label"><%= t("database_tools.title") %></p>
-                <nav class="sidebar-nav">
-                  <%= finance_navigation_item t("database_tools.title"), database_tools_path, "vault" %>
-                  <%= finance_navigation_item t("database_tools.open"), "/database-editor/", "edit", target: "_blank" %>
-                  <%= finance_navigation_item t("app.sidebar.module_hub"), root_path, "overview" %>
-                </nav>
-              </div>
-            <% elsif current_mod == :pdf_tools %>
+            <% if current_mod == :pdf_tools %>
               <!-- PDF & Doküman Modülü -->
               <div class="sidebar-section">
                 <p class="sidebar-label"><%= t("app.sidebar.section_pdf_workspace", default: "PDF & ÇALIŞMA ALANI") %></p>

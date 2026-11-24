@@ -42,7 +42,7 @@ services:
       pdf-worker:
         condition: service_started
     restart: unless-stopped
-    networks: [edge, database, pdf, stirling, chartdb]
+    networks: [edge, database, pdf, stirling]
     secrets:
       - rails_master_key
       - pdf_worker_api_key
@@ -140,25 +140,6 @@ services:
     restart: unless-stopped
     networks: [stirling]
 
-  chartdb:
-    build:
-      context: ./modules/chartdb
-    expose:
-      - "80"
-    security_opt:
-      - no-new-privileges:true
-    mem_limit: 256m
-    cpus: 1.0
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 15s
-      start_interval: 1s
-    restart: unless-stopped
-    networks: [chartdb]
-
   gateway:
     image: caddy:2.8-alpine
     ports:
@@ -175,10 +156,8 @@ services:
         condition: service_healthy
       stirling-pdf:
         condition: service_started
-      chartdb:
-        condition: service_started
     restart: unless-stopped
-    networks: [edge, stirling, chartdb]
+    networks: [edge, stirling]
 
   db:
     image: postgres:16-alpine
@@ -205,8 +184,6 @@ networks:
   pdf:
     internal: true
   stirling:
-    internal: true
-  chartdb:
     internal: true
 
 volumes:

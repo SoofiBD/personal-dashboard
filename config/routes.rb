@@ -3,9 +3,6 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", :as => :rails_health_check
   get "internal/pdf_editor_authorization" => "internal#pdf_editor_authorization"
-  resource :database_tools, only: :show
-  get "internal/database_editor_authorization" => "internal#database_editor_authorization"
-  get "database-editor/config.js" => "database_tools#configuration"
   resource :session, only: %i[new create destroy]
   resource :signup, controller: "signups", only: %i[new create]
   resource :mfa, controller: "mfa", only: %i[show destroy] do
@@ -30,13 +27,6 @@ Rails.application.routes.draw do
   post "password/recovery", to: "passwords#recover", as: :recover_password
 
   root to: "home#show"
-
-  scope :notes, module: :notes, as: :notes do
-    root to: "notes#index"
-    resources :notes do
-      get :graph, on: :collection
-    end
-  end
 
   scope :learning, module: :learning, as: :learning do
     root to: "workspace#index"
@@ -115,24 +105,6 @@ Rails.application.routes.draw do
     resources :purchase_plans do
       post :convert, on: :member
     end
-  end
-
-  scope :gym, module: :personal_gym, as: :gym do
-    root to: "dashboard#show"
-    post :seed_catalog, to: "exercises#seed"
-    resources :exercises, only: %i[index show new create]
-    resources :routines, except: :show do
-      post :seed_templates, on: :collection
-      resources :days, controller: :routine_days, only: %i[create destroy]
-      resources :plans, controller: :routine_exercises, only: %i[create update destroy]
-    end
-    resources :workouts, only: %i[index show create destroy] do
-      patch :finish, on: :member
-      resources :sets, controller: :workout_sets, only: %i[create update destroy]
-    end
-    resources :body_metrics, only: %i[create destroy]
-    resources :schedule_entries, only: %i[create destroy]
-    resource :stats, only: :show
   end
 
   match "locale/:locale", to: "locales#update", via: %i[get post], as: :change_locale

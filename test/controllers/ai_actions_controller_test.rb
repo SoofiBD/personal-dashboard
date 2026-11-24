@@ -3,7 +3,7 @@ require "test_helper"
 class AiActionsControllerTest < PersonalFinance::IntegrationTest
   test "viewer cannot reject a pending action" do
     viewer = User.create!(name: "Viewer", email: "ai-action-viewer@example.test", role: "viewer", currency: "TRY", time_zone: "Europe/Istanbul", password: TEST_PASSWORD, password_confirmation: TEST_PASSWORD, onboarded_at: Time.current)
-    action = AiAction.propose!(user: viewer, action_type: "gym.record_body_metric", payload: {"weight_kg" => "72", "recorded_on" => Date.current.iso8601}, summary: "Weight")
+    action = AiAction.propose!(user: viewer, action_type: "finance.create_expense", payload: {"amount" => "10", "category_name" => "Market", "description" => "Test"}, summary: "Expense")
     delete session_path
     post session_path, params: {identifier: viewer.email, password: TEST_PASSWORD}
 

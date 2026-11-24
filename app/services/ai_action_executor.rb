@@ -38,15 +38,9 @@ class AiActionExecutor
     when "finance.create_expense", "finance.create_income" then create_transaction!
     when "finance.update_transaction" then update_transaction!
     when "finance.delete_transaction" then delete_transaction!
-    when "notes.create" then create_note!
-    when "notes.update" then update_note!
-    when "notes.delete" then delete_note!
     when "learning.update_item" then update_learning_item!
     when "learning.record_attempt" then record_learning_attempt!
     when "learning.create_program" then create_learning_program!
-    when "gym.create_program" then create_gym_program!
-    when "gym.record_body_metric" then record_body_metric!
-    when "gym.schedule_workout" then schedule_workout!
     when "memory.remember" then remember!
     when "memory.forget" then forget!
     when "documents.update_content" then update_document_content!
@@ -66,14 +60,6 @@ class AiActionExecutor
     {record_type: "transaction", record_id: transaction.id}
   rescue ActiveRecord::RecordNotFound
     raise Error, "Kategori veya aktif hesap artık bulunamadı."
-  end
-
-  def create_note!
-    raise Error, "Bu hesap için not düzenleme yetkiniz yok." unless user.can_manage_notes?
-    payload = action.payload
-    note = user.notes.create!(title: payload.fetch("title"), body: payload.fetch("body"), tag_list: payload.fetch("tags", ""))
-    note.sync_links!
-    {record_type: "note", record_id: note.id}
   end
 
   def update_transaction!
@@ -98,25 +84,6 @@ class AiActionExecutor
     raise Error, "Finans hareketi artık bulunamadı."
   end
 
-  def update_note!
-    raise Error, "Bu hesap için not düzenleme yetkiniz yok." unless user.can_manage_notes?
-    note = user.notes.find_by!(id: action.payload.fetch("id"))
-    note.update!(action.payload.slice("title", "body", "tags", "pinned").compact_blank)
-    note.sync_links!
-    {record_type: "note", record_id: note.id}
-  rescue ActiveRecord::RecordNotFound
-    raise Error, "Not artık bulunamadı."
-  end
-
-  def delete_note!
-    raise Error, "Bu hesap için not düzenleme yetkiniz yok." unless user.can_manage_notes?
-    note = user.notes.find_by!(id: action.payload.fetch("id"))
-    note.destroy!
-    {record_type: "note", record_id: note.id}
-  rescue ActiveRecord::RecordNotFound
-    raise Error, "Not artık bulunamadı."
-  end
-
   def update_learning_item!
     item = user.learning_items.find_by!(id: action.payload.fetch("id"))
     item.update!(action.payload.slice("status", "confidence").compact_blank)
@@ -139,42 +106,6 @@ class AiActionExecutor
       user.learning_items.create!(attributes.slice("title", "track", "kind", "difficulty", "estimated_minutes", "target_on", "notes", "position").merge("status" => "planned", "confidence" => 0))
     end
     {record_type: "learning_program", record_ids: records.map(&:id), count: records.size}
-  end
-
-  def create_gym_program!
-    payload = action.payload
-    routine = user.gym_routines.create!(name: payload.fetch("name"), description: payload["description"])
-    payload.fetch("days").each_with_index do |day_data, day_index|
-      day = routine.days.create!(name: day_data.fetch("name"), position: day_index + 1)
-      day_data.fetch("exercises").each_with_index do |exercise_data, exercise_index|
-        exercise = PersonalGym::Exercise.find(exercise_data.fetch("exercise_id"))
-        day.routine_exercises.create!(
-          exercise: exercise, position: exercise_index + 1, target_sets: exercise_data.fetch("sets"),
-          target_reps: exercise_data["reps"], target_weight: exercise_data["weight"],
-          target_duration_seconds: exercise_data["duration_seconds"], progression_policy: exercise_data.fetch("progression_policy"),
-          warmup: exercise_data["warmup"]
-        )
-      end
-    end
-    {record_type: "gym_routine", record_id: routine.id}
-  rescue ActiveRecord::RecordNotFound
-    raise Error, "Programdaki bir hareket artık katalogda bulunamadı."
-  end
-
-  def record_body_metric!
-    payload = action.payload
-    metric = user.gym_body_metrics.find_or_initialize_by(recorded_on: payload.fetch("recorded_on"))
-    metric.update!(weight_kg: payload.fetch("weight_kg"), note: payload["note"])
-    {record_type: "gym_body_metric", record_id: metric.id}
-  end
-
-  def schedule_workout!
-    payload = action.payload
-    day = PersonalGym::RoutineDay.joins(:routine).find_by!(id: payload.fetch("routine_day_id"), gym_routines: {user_id: user.id})
-    entry = user.gym_schedule_entries.find_or_create_by!(routine_day: day, scheduled_on: payload.fetch("scheduled_on"))
-    {record_type: "gym_schedule_entry", record_id: entry.id}
-  rescue ActiveRecord::RecordNotFound
-    raise Error, "Planlanacak antrenman günü artık bulunamadı."
   end
 
   def remember!
