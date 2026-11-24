@@ -11,7 +11,7 @@ from fastapi import HTTPException
 from fastapi import UploadFile
 from PIL import Image
 
-from app import HtmlExport, ZipExport, ZipImage, _get_api_key, convert, crop_image, export_html, export_zip, extract_layout_text, is_valid_table
+from app import Export, ExportImage, _get_api_key, convert, crop_image, export_html, export_zip, extract_layout_text, is_valid_table
 
 
 def convert_pdf(document, annotation_mode="both", **options):
@@ -19,7 +19,7 @@ def convert_pdf(document, annotation_mode="both", **options):
     document.close()
     upload = UploadFile(filename="report.pdf", file=io.BytesIO(payload))
     defaults = {
-        "extract_images_enabled": True, "min_image_dimension": 100, "image_quality": "high", "strip_headers_footers": True,
+        "extract_images_enabled": True, "image_quality": "high", "strip_headers_footers": True,
         "bind_captions_enabled": True, "extract_annotations_enabled": True,
         "include_yaml_frontmatter": True, "fix_hyphenation_enabled": True, "detect_tables": True,
     }
@@ -166,14 +166,14 @@ class PdfWorkerTest(unittest.TestCase):
         self.assertEqual(1, result["stats"]["captions_bound"])
 
     def test_exports_markdown_and_images_as_zip(self):
-        response = export_zip(ZipExport(markdown_content="# Report", source_filename="report.pdf", images=[]))
+        response = export_zip(Export(markdown_content="# Report", source_filename="report.pdf", images=[]))
 
         archive = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(["report.md"], archive.namelist())
         self.assertEqual(b"# Report", archive.read("report.md"))
 
     def test_exports_sanitized_html_with_embedded_images(self):
-        payload = HtmlExport(markdown_content="# Report\n\n![Chart](images/chart.png)\n\n<script>alert(1)</script>", source_filename="report.pdf", images=[ZipImage(filename="chart.png", data_base64=base64.b64encode(b"png-data").decode("ascii"))])
+        payload = Export(markdown_content="# Report\n\n![Chart](images/chart.png)\n\n<script>alert(1)</script>", source_filename="report.pdf", images=[ExportImage(filename="chart.png", data_base64=base64.b64encode(b"png-data").decode("ascii"))])
 
         response = export_html(payload)
 

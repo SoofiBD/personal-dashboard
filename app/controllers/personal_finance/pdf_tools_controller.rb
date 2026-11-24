@@ -16,7 +16,7 @@ module PersonalFinance
         http.get(uri.request_uri)
       end
       response.is_a?(Net::HTTPSuccess) && response.body.include?("UP")
-    rescue URI::InvalidURIError, SocketError, Net::OpenTimeout, Net::ReadTimeout, Errno::ECONNREFUSED
+    rescue URI::InvalidURIError, SocketError, Net::OpenTimeout, Net::ReadTimeout, SystemCallError, IOError
       false
     end
   end

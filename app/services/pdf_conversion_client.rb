@@ -3,11 +3,12 @@ require "json"
 require "base64"
 require "stringio"
 
+# HTTP client for pdf_worker. The contract is documented in pdf_worker/README.md;
+# the worker validates every input itself, so this client only transports.
 class PdfConversionClient
   class Error < StandardError; end
 
-  MAX_PDF_SIZE = 25.megabytes
-  MAX_MARKDOWN_SIZE = 10.megabytes
+  UNAVAILABLE = "PDF servisine bağlanılamadı. Lütfen kısa süre sonra tekrar deneyin."
 
   def initialize(base_url: ENV.fetch("PDF_WORKER_URL", "http://pdf-worker:8000"), api_key: worker_api_key)
     @base_uri = URI(base_url)
@@ -15,96 +16,63 @@ class PdfConversionClient
   end
 
   def convert(pdf_data:, filename:, custom_notes:, annotation_mode:, conversion_options: {})
-    validate_pdf!(pdf_data, filename)
-    raise Error, "Geçersiz anotasyon modu." unless %w[section inline both].include?(annotation_mode)
-
-    request = Net::HTTP::Post.new(endpoint("/convert"))
-    request["Authorization"] = "Bearer #{@api_key}" if @api_key
+    request = Net::HTTP::Post.new(@base_uri + "/convert")
     request.set_form(
       [
-        ["file", StringIO.new(pdf_data), {filename: safe_filename(filename), content_type: "application/pdf"}],
+        ["file", StringIO.new(pdf_data), {filename: File.basename(filename.to_s), content_type: "application/pdf"}],
         ["custom_notes", custom_notes.to_s],
         ["annotation_mode", annotation_mode],
         *conversion_options.map { |key, value| [key.to_s, value.to_s] }
       ],
       "multipart/form-data"
     )
-
-    response = http.request(request)
-    if response.code.to_i == 422
-      detail = JSON.parse(response.body)["detail"]
-      raise Error, detail.truncate(300) if detail.is_a?(String)
-    end
-    raise Error, "PDF dönüştürme servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)
-
-    body = JSON.parse(response.body)
+    body = JSON.parse(perform(request))
     raise Error, "PDF dönüştürme servisi geçersiz bir yanıt verdi." unless body["markdown_content"].is_a?(String)
 
-    {
-      markdown_content: body.fetch("markdown_content"),
-      processing_stats: body.fetch("stats", {}),
-      assets: body.fetch("images", [])
-    }
+    {markdown_content: body["markdown_content"], processing_stats: body.fetch("stats", {}), assets: body.fetch("images", [])}
   rescue JSON::ParserError
     raise Error, "PDF dönüştürme servisi geçersiz bir yanıt verdi."
-  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED
-    raise Error, "PDF dönüştürme servisine bağlanılamadı. Lütfen kısa süre sonra tekrar deneyin."
   end
 
-  def export_zip(markdown_content:, source_filename:, assets:)
-    raise Error, "Markdown çıktısı çok büyük." if markdown_content.to_s.bytesize > MAX_MARKDOWN_SIZE
-
-    request = Net::HTTP::Post.new(endpoint("/export-zip"))
+  # format: :zip or :html
+  def export(format, markdown_content:, source_filename:, assets:)
+    request = Net::HTTP::Post.new(@base_uri + "/export-#{format}")
     request["Content-Type"] = "application/json"
-    request["Authorization"] = "Bearer #{@api_key}" if @api_key
     request.body = JSON.generate(
-      markdown_content: markdown_content,
-      source_filename: safe_filename(source_filename),
+      markdown_content: markdown_content.to_s,
+      source_filename: File.basename(source_filename.to_s),
       images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.binary_data)} }
     )
-    response = http.request(request)
-    raise Error, "ZIP dışa aktarma servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)
-
-    response.body
-  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED
-    raise Error, "ZIP dışa aktarma servisine bağlanılamadı. Lütfen kısa süre sonra tekrar deneyin."
-  end
-
-  def export_html(markdown_content:, source_filename:, assets:)
-    raise Error, "Markdown çıktısı çok büyük." if markdown_content.to_s.bytesize > MAX_MARKDOWN_SIZE
-
-    request = Net::HTTP::Post.new(endpoint("/export-html"))
-    request["Content-Type"] = "application/json"
-    request["Authorization"] = "Bearer #{@api_key}" if @api_key
-    request.body = JSON.generate(
-      markdown_content: markdown_content,
-      source_filename: safe_filename(source_filename),
-      images: assets.map { |asset| {filename: asset.filename, data_base64: Base64.strict_encode64(asset.binary_data)} }
-    )
-    response = http.request(request)
-    raise Error, "HTML dışa aktarma servisi şu anda kullanılamıyor." unless response.is_a?(Net::HTTPSuccess)
-
-    response.body
-  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED
-    raise Error, "HTML dışa aktarma servisine bağlanılamadı."
+    perform(request)
   end
 
   def crop_image(asset:, bounds:)
-    request = Net::HTTP::Post.new(endpoint("/crop-image"))
-    request["Authorization"] = "Bearer #{@api_key}" if @api_key
+    request = Net::HTTP::Post.new(@base_uri + "/crop-image")
     request.set_form([
       ["file", StringIO.new(asset.file.download), {filename: asset.filename, content_type: asset.content_type}],
       *bounds.map { |key, value| [key.to_s, value.to_s] }
     ], "multipart/form-data")
-    response = http.request(request)
-    raise Error, "Görsel kırpılamadı. Seçimi kontrol edip tekrar deneyin." unless response.is_a?(Net::HTTPSuccess)
-
-    response.body
-  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED
-    raise Error, "Görsel servisine bağlanılamadı. Lütfen tekrar deneyin."
+    perform(request)
   end
 
   private
+
+  # Returns the response body. 413/422 details from the worker are
+  # user-facing Turkish strings; anything else gets a generic message.
+  def perform(request)
+    request["Authorization"] = "Bearer #{@api_key}" if @api_key
+    response = Net::HTTP.start(@base_uri.host, @base_uri.port, open_timeout: 5, read_timeout: 180) { |http| http.request(request) }
+    return response.body if response.is_a?(Net::HTTPSuccess)
+
+    detail = begin
+      JSON.parse(response.body.to_s)["detail"]
+    rescue JSON::ParserError
+      nil
+    end
+    raise Error, (detail.is_a?(String) && %w[413 422].include?(response.code)) ? detail.truncate(300) : UNAVAILABLE
+  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, IOError
+    raise Error, UNAVAILABLE
+  end
 
   # Docker secrets are mounted as files in production.  Keep the environment
   # variable as the first choice so local development remains straightforward.
@@ -116,24 +84,5 @@ class PdfConversionClient
     return if path.blank? || !File.file?(path)
 
     File.read(path).strip.presence
-  end
-
-  def validate_pdf!(pdf_data, filename)
-    raise Error, "Lütfen bir PDF dosyası seçin." if pdf_data.blank?
-    raise Error, "PDF dosyası en fazla 25 MB olabilir." if pdf_data.bytesize > MAX_PDF_SIZE
-    raise Error, "Yalnızca PDF dosyaları kabul edilir." unless File.extname(filename.to_s).casecmp?(".pdf")
-    raise Error, "Yüklenen dosya geçerli bir PDF görünmüyor." unless pdf_data.start_with?("%PDF-")
-  end
-
-  def endpoint(path)
-    @base_uri + path
-  end
-
-  def http
-    Net::HTTP.start(@base_uri.host, @base_uri.port, open_timeout: 5, read_timeout: 180)
-  end
-
-  def safe_filename(filename)
-    File.basename(filename.to_s).presence || "document.pdf"
   end
 end

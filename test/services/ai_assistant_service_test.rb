@@ -3,122 +3,79 @@
 require "test_helper"
 
 class AiAssistantServiceTest < ActiveSupport::TestCase
-  test "uses the saved Gemini model" do
-    user = User.dashboard_owner
-    user.update!(ai_model: "gemini-3.7-flash")
-    captured = nil
+  setup do
+    @user = User.dashboard_owner
+  end
 
-    with_env("GEMINI_API_KEY", "test-gemini-key") do
-      replacement = lambda do |**options|
-        captured = options
-        Object.new
+  test "uses the saved Gemini model or the default for blank and shut down models" do
+    @user.update!(ai_model: "gemini-3.7-flash")
+    assert_equal "gemini-3.7-flash", AiAssistantService.model_for(@user)
+
+    @user.update!(ai_model: "gemini-2.0-flash")
+    assert_equal "gemini-3.6-flash", AiAssistantService.model_for(@user)
+
+    @user.update!(ai_model: nil)
+    assert_equal "gemini-3.6-flash", AiAssistantService.model_for(@user)
+  end
+
+  test "runs a requested tool and sends the model turn back with its thought signature" do
+    model_turn = {"role" => "model", "parts" => [
+      {"functionCall" => {"id" => "call-1", "name" => "get_overview", "args" => {}}, "thoughtSignature" => "sig-abc"}
+    ]}
+    requests = []
+    replies = [
+      {"candidates" => [{"content" => model_turn}]},
+      {"candidates" => [{"content" => {"role" => "model", "parts" => [{"text" => "thinking", "thought" => true}, {"text" => "Bakiye hazır."}]}}]}
+    ]
+
+    reply = AiGeminiClient.stub(:generate, ->(model:, body:) { requests << JSON.parse(body.to_json) and replies.shift }) do
+      AiAssistantService.new(user: @user).ask("Özet ver")
+    end
+
+    assert_equal "Bakiye hazır.", reply
+    assert_equal "gemini-3.6-flash", AiAssistantService.model_for(@user)
+    second = requests.last.fetch("contents")
+    assert_equal model_turn, second[-2]
+    response = second[-1].dig("parts", 0, "functionResponse")
+    assert_equal "user", second[-1]["role"]
+    assert_equal %w[call-1 get_overview], response.values_at("id", "name")
+    assert response.dig("response", "result", "finance").key?("total_balance")
+    assert_includes requests.first.dig("tools", 0, "functionDeclarations").map { |f| f["name"] }, "get_overview"
+    assert_equal %w[user assistant], @user.ai_conversations.order(:created_at).pluck(:role)
+  end
+
+  test "replays saved history with Gemini roles" do
+    AiConversation.create!(user: @user, role: "user", content: "Hello")
+    AiConversation.create!(user: @user, role: "assistant", content: "Hi")
+    sent = nil
+
+    AiGeminiClient.stub(:generate, ->(model:, body:) { sent = body[:contents] and {"candidates" => [{"content" => {"parts" => [{"text" => "Ok"}]}}]} }) do
+      AiAssistantService.new(user: @user).ask("Next")
+    end
+
+    assert_equal %w[user model user], sent.map { |c| c[:role] }
+  end
+
+  test "a failing tool call is reported to the model instead of failing the chat" do
+    replies = [{"candidates" => [{"content" => {"parts" => [{"functionCall" => {"name" => "get_learning_item", "args" => {}}}]}}]}]
+    sent = nil
+    generate = lambda do |model:, body:|
+      sent = body[:contents]
+      replies.shift || {"candidates" => [{"content" => {"parts" => [{"text" => "Sorry"}]}}]}
+    end
+
+    reply = AiGeminiClient.stub(:generate, generate) { AiAssistantService.new(user: @user).ask("Hi") }
+
+    assert_equal "Sorry", reply
+    assert_equal({error: "Function get_learning_item failed"}, sent.last.dig(:parts, 0, :functionResponse, :response, :result))
+  end
+
+  test "maps Gemini errors to user-facing messages" do
+    {unauthorized: AiProviderStatus::MESSAGES.fetch(:unauthorized), bad_request: AiAssistantService::GENERIC_ERROR}.each do |code, message|
+      error = AiGeminiClient.stub(:generate, ->(**) { raise AiGeminiClient::Error.new(code) }) do
+        assert_raises(AiAssistantService::Error) { AiAssistantService.new(user: @user).ask("Hello") }
       end
-      with_constructor_stub(Langchain::LLM::GoogleGemini, replacement) do
-        AiAssistantService.new(user: user)
-      end
+      assert_equal message, error.message
     end
-
-    assert_equal "gemini-3.7-flash", captured.dig(:default_options, :chat_model)
-  end
-
-  test "uses the active default for blank or shut down Gemini models" do
-    user = User.dashboard_owner
-    user.update!(ai_model: "gemini-2.0-flash")
-    captured = nil
-
-    with_env("GEMINI_API_KEY", "test-gemini-key") do
-      replacement = lambda do |**options|
-        captured = options
-        Object.new
-      end
-      with_constructor_stub(Langchain::LLM::GoogleGemini, replacement) do
-        AiAssistantService.new(user: user)
-      end
-    end
-
-    assert_equal "gemini-3.6-flash", captured.dig(:default_options, :chat_model)
-  end
-
-  test "builds the LangChain assistant with supported options" do
-    user = User.dashboard_owner
-    service = with_env("GEMINI_API_KEY", "test-gemini-key") do
-      AiAssistantService.new(user: user)
-    end
-    captured = nil
-    assistant = Object.new
-
-    with_constructor_stub(Langchain::Assistant, ->(**options) {
-      captured = options
-      assistant
-    }) do
-      assert_same assistant, service.send(:build_assistant, "Instructions")
-    end
-
-    assert_equal false, captured[:parallel_tool_calls]
-    assert_not_includes captured.keys, :max_turns
-  end
-
-  test "replays a saved reply using Gemini's model role" do
-    user = User.dashboard_owner
-    AiConversation.create!(user: user, role: "user", content: "Hello")
-    AiConversation.create!(user: user, role: "assistant", content: "Hi")
-    service = with_env("GEMINI_API_KEY", "test-gemini-key") { AiAssistantService.new(user: user) }
-    assistant = service.send(:build_assistant, "Instructions")
-
-    service.send(:replay_conversation_history, assistant)
-
-    assert_equal %w[user model], assistant.messages.map(&:role)
-  end
-
-  test "converts Gemini client errors into the assistant error handled by the controller" do
-    user = User.dashboard_owner
-    service = with_env("GEMINI_API_KEY", "test-gemini-key") do
-      AiAssistantService.new(user: user)
-    end
-    assistant = Object.new
-    assistant.define_singleton_method(:add_message) { |role:, content:| }
-    assistant.define_singleton_method(:add_message_and_run!) { |content:| raise StandardError, "provider request failed" }
-    service.define_singleton_method(:build_assistant) { |_instructions| assistant }
-
-    error = AiProviderStatus.stub(:check, AiProviderStatus::Result.new(code: :ok, message: "Gemini bağlantısı çalışıyor.")) do
-      assert_raises(AiAssistantService::Error) { service.ask("Summarize my budget") }
-    end
-
-    assert_equal "Asistan isteği tamamlayamadı. Lütfen tekrar deneyin.", error.message
-  end
-
-  test "reports a rejected Gemini key instead of a generic error" do
-    user = User.dashboard_owner
-    service = with_env("GEMINI_API_KEY", "test-gemini-key") { AiAssistantService.new(user: user) }
-    assistant = Object.new
-    assistant.define_singleton_method(:add_message) { |role:, content:| }
-    assistant.define_singleton_method(:add_message_and_run!) { |content:| raise StandardError, "provider request failed" }
-    service.define_singleton_method(:build_assistant) { |_instructions| assistant }
-
-    status = AiProviderStatus::Result.new(code: :unauthorized, message: AiProviderStatus::MESSAGES.fetch(:unauthorized))
-    error = AiProviderStatus.stub(:check, status) do
-      assert_raises(AiAssistantService::Error) { service.ask("Hello") }
-    end
-
-    assert_equal status.message, error.message
-  end
-
-  private
-
-  def with_constructor_stub(klass, replacement)
-    original = klass.method(:new)
-    constructor = replacement.respond_to?(:call) ? replacement : ->(**_options) { replacement }
-    klass.define_singleton_method(:new, &constructor)
-    yield
-  ensure
-    klass.define_singleton_method(:new, original)
-  end
-
-  def with_env(key, value)
-    previous = ENV[key]
-    ENV[key] = value
-    yield
-  ensure
-    previous.nil? ? ENV.delete(key) : ENV[key] = previous
   end
 end

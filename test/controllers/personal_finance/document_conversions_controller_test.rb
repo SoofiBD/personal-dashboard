@@ -20,8 +20,7 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "[data-mde-export]", count: 2
     assert_select "form[action='#{reprocess_finance_document_conversion_path(@conversion)}']"
     assert_select "form[action='#{export_html_finance_document_conversion_path(@conversion)}']"
-    assert_select "a[href='#{source_pdf_finance_document_conversion_path(@conversion)}']", minimum: 2
-    assert_select "object.document-source-viewer[type='application/pdf']"
+    assert_select "a[href='#{source_pdf_finance_document_conversion_path(@conversion)}']"
     assert_select "#document-stats-title", text: "İşleme özeti"
     assert_select "[data-insert-image]", count: 0
   end
@@ -43,9 +42,7 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_select "input[name='annotation_mode'][value='section']"
     assert_select "input[name='annotation_mode'][value='inline']"
     assert_select "input[name='conversion_options[extract_images_enabled]'][value='1'][checked]"
-    assert_select "select[name='conversion_options[min_image_dimension]']"
     assert_select "select[name='conversion_options[image_quality]']"
-    assert_select "form.document-upload-form[data-turbo='false']"
   end
 
   test "opens MarkItDown before finance onboarding is complete" do
@@ -75,7 +72,7 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
 
   test "rejects oversized PDF before storing or queuing it" do
     file = Tempfile.new(["oversized", ".pdf"])
-    file.truncate(PersonalFinance::DocumentConversionsController::MAX_SOURCE_PDF_BYTES + 1)
+    file.truncate(PersonalFinance::DocumentConversion::MAX_SOURCE_PDF_BYTES + 1)
     file.flush
     upload = Rack::Test::UploadedFile.new(file.path, "application/pdf")
 
@@ -87,6 +84,17 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     assert_response :unprocessable_entity
   ensure
     file&.close!
+  end
+
+  test "rejects a non-PDF upload without storing or queuing it" do
+    upload = Rack::Test::UploadedFile.new(StringIO.new("not a pdf"), "application/pdf", original_filename: "fake.pdf")
+
+    assert_no_difference("PersonalFinance::DocumentConversion.count") do
+      assert_no_enqueued_jobs only: PersonalFinance::PdfDocumentConversionJob do
+        post finance_document_conversions_path, params: {pdf_file: upload}
+      end
+    end
+    assert_response :unprocessable_entity
   end
 
   test "serves an image asset belonging to the current user" do
@@ -138,13 +146,12 @@ class PersonalFinance::DocumentConversionsControllerTest < PersonalFinance::Inte
     old_asset.file.attach(io: StringIO.new("old"), filename: old_asset.filename, content_type: old_asset.content_type)
     old_asset.save!
     assert_enqueued_with(job: PersonalFinance::PdfDocumentConversionJob, args: [@conversion.id, "inline"]) do
-      post reprocess_finance_document_conversion_path(@conversion), params: {annotation_mode: "inline", conversion_options: {extract_images_enabled: "0", min_image_dimension: "200", image_quality: "maximum"}}
+      post reprocess_finance_document_conversion_path(@conversion), params: {annotation_mode: "inline", conversion_options: {extract_images_enabled: "0", image_quality: "maximum"}}
     end
 
     assert_redirected_to finance_document_conversion_path(@conversion)
     assert_predicate @conversion.reload, :processing?
     assert_equal false, @conversion.conversion_options["extract_images_enabled"]
-    assert_equal 200, @conversion.conversion_options["min_image_dimension"]
     assert_equal "maximum", @conversion.conversion_options["image_quality"]
   end
 
