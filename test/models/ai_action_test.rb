@@ -48,4 +48,14 @@ class AiActionTest < ActiveSupport::TestCase
       AiAction.propose!(user: User.dashboard_owner, action_type: "documents.update_content", payload: {"markdown_content" => "x" * 65_536}, summary: "Large edit")
     end
   end
+
+  test "approved practice attempt is saved for the item owner" do
+    user = User.dashboard_owner
+    item = user.learning_items.create!(title: "Heaps", track: "algorithms", kind: "topic", status: "active", difficulty: "medium", confidence: 0, estimated_minutes: 30)
+    proposal = LearningTool.new(user: user).record_attempt(item_id: item.id, outcome: "solved", minutes: 25, confidence: 4)
+
+    result = AiActionExecutor.new(AiAction.find(proposal[:action_id])).execute!
+
+    assert_equal user, Learning::Attempt.find(result[:record_id]).user
+  end
 end
