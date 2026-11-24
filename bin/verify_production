@@ -8,8 +8,7 @@ owner = User.dashboard_owner_record
 abort "Dashboard owner or password is missing." unless owner&.password_digest.present?
 
 service = AiAssistantService.new(user: owner)
-assistant = service.send(:build_assistant, "Verification")
-service.send(:replay_conversation_history, assistant)
+service.send(:history_contents)
 
 status = AiProviderStatus.check(model: AiAssistantService.model_for(owner))
 abort status.message unless status.available?
