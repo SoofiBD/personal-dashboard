@@ -239,7 +239,7 @@ class FinanceTool < AiTool
     return {error: "Account already shows #{current}"} if current == target
 
     propose("finance.set_account_balance", {account_name: account.name, balance: target.to_s},
-      "Bakiye düzeltmesi: #{account.name} · #{current} → #{target} (#{(target - current).positive? ? "+" : ""}#{target - current})")
+      "Bakiye düzeltmesi: #{account.name} · #{current} → #{target} (fark #{target - current})")
   end
 
   def apply_create_expense(payload) = create_transaction("expense", payload)
