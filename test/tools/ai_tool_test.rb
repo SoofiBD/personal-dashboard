@@ -90,4 +90,53 @@ class AiToolTest < ActiveSupport::TestCase
     AiActionExecutor.new(AiAction.find(removal[:action_id])).execute!
     assert_not user.finance_subscriptions.exists?(subscription.id)
   end
+
+  test "debt is added at once with installments derived from the monthly payment" do
+    user = User.dashboard_owner
+    tool = FinanceTool.new(user: user)
+
+    loan = tool.call("create_debt", {"name" => "İhtiyaç kredisi", "total_amount" => 34_200, "monthly_payment" => 5700, "next_payment_on" => "2026-12-15"})
+    personal = tool.call("create_debt", {"name" => "Kişisel borç", "total_amount" => 26_000})
+
+    assert loan[:done], loan.inspect
+    debt = user.finance_debts.find(loan[:record_id])
+    assert_equal [34_200, 34_200, 5700, 6, Date.new(2026, 12, 15)], [debt.total_amount, debt.remaining_amount, debt.monthly_payment, debt.remaining_installments, debt.next_payment_on]
+    assert_equal [0, 0], user.finance_debts.find(personal[:record_id]).then { |d| [d.monthly_payment, d.remaining_installments] }
+    assert_equal debt.id, tool.get_debts.find { |d| d[:name] == "İhtiyaç kredisi" }[:id]
+    assert_match(/remaining_amount/, tool.create_debt(name: "x", total_amount: 10, remaining_amount: 20)[:error])
+  end
+
+  test "debt update waits for approval" do
+    user = User.dashboard_owner
+    debt = user.finance_debts.create!(name: "Kredi", total_amount: 27_000, remaining_amount: 27_000, monthly_payment: 9000, remaining_installments: 3)
+    tool = FinanceTool.new(user: user)
+
+    proposal = tool.call("update_debt", {"id" => debt.id, "remaining_amount" => 9800, "remaining_installments" => 1})
+    assert proposal[:requires_confirmation]
+    assert_match(/27000.*9800/, proposal[:summary])
+    assert_equal 27_000, debt.reload.remaining_amount
+
+    AiActionExecutor.new(AiAction.find(proposal[:action_id])).execute!
+    assert_equal [9800, 1], debt.reload.then { |d| [d.remaining_amount, d.remaining_installments] }
+    assert_equal "No change supplied", tool.update_debt(id: debt.id)[:error]
+  end
+
+  test "account balance correction waits for approval and books the difference" do
+    user = User.dashboard_owner
+    account = user.financial_accounts.create!(name: "Banka", kind: "bank", opening_balance: 12_000, currency: "TRY", is_active: true)
+    tool = FinanceTool.new(user: user)
+
+    proposal = tool.call("set_account_balance", {"account_name" => "Banka", "balance" => 30_000})
+    assert proposal[:requires_confirmation]
+    assert_equal 12_000, account.current_balance
+
+    AiActionExecutor.new(AiAction.find(proposal[:action_id])).execute!
+    assert_equal 30_000, account.current_balance
+    assert_equal ["income", 18_000], user.finance_transactions.order(:created_at).last.then { |t| [t.kind, t.amount] }
+
+    lower = tool.set_account_balance(account_name: "Banka", balance: 25_000)
+    AiActionExecutor.new(AiAction.find(lower[:action_id])).execute!
+    assert_equal 25_000, account.current_balance
+    assert_match(/already/, tool.set_account_balance(account_name: "Banka", balance: 25_000)[:error])
+  end
 end
