@@ -7,7 +7,10 @@ class FinanceTool < AiTool
     "finance.update_transaction" => :apply_update_transaction,
     "finance.delete_transaction" => :apply_delete_transaction,
     "finance.create_subscription" => :apply_create_subscription,
-    "finance.delete_subscription" => :apply_delete_subscription
+    "finance.delete_subscription" => :apply_delete_subscription,
+    "finance.create_debt" => :apply_create_debt,
+    "finance.update_debt" => :apply_update_debt,
+    "finance.set_account_balance" => :apply_set_account_balance
   }.freeze
 
   function :get_monthly_summary, "Current month expense/income totals by category"
@@ -17,7 +20,7 @@ class FinanceTool < AiTool
     days: {type: "integer", description: "Number of days"}
   function :get_budget_status, "Budget vs actual for the current budget period"
   function :list_subscriptions, "Active subscriptions with ids and costs"
-  function :get_debts, "Active debts overview"
+  function :get_debts, "Active debts with ids"
   function :get_savings_goals, "Savings goals with progress"
   function :create_expense, "Record an expense immediately (no confirmation step)",
     required: %i[amount category_name description],
@@ -51,6 +54,28 @@ class FinanceTool < AiTool
   function :delete_transaction, "Propose deleting a non-transfer transaction; user confirmation is required",
     required: %i[id],
     id: {type: "string", description: "Transaction UUID"}
+
+  function :create_debt, "Add a debt or loan immediately (no confirmation step)",
+    required: %i[name total_amount],
+    name: {type: "string", description: "Debt name, e.g. Kişisel borç or İhtiyaç kredisi"},
+    total_amount: {type: "number", description: "Total amount to repay"},
+    remaining_amount: {type: "number", description: "Amount still owed, default total_amount"},
+    monthly_payment: {type: "number", description: "Monthly installment, 0 if there is no installment plan"},
+    remaining_installments: {type: "integer", description: "Installments left, default remaining_amount / monthly_payment rounded up"},
+    next_payment_on: {type: "string", description: "Next payment date YYYY-MM-DD, optional"},
+    interest_rate: {type: "number", description: "Interest rate percent, optional"}
+  function :update_debt, "Propose updating an existing debt; user confirmation is required",
+    required: %i[id],
+    id: {type: "string", description: "Debt UUID from get_debts"},
+    name: {type: "string", description: "New name"},
+    remaining_amount: {type: "number", description: "New amount still owed"},
+    monthly_payment: {type: "number", description: "New monthly installment"},
+    remaining_installments: {type: "integer", description: "New number of installments left"},
+    next_payment_on: {type: "string", description: "New next payment date YYYY-MM-DD"}
+  function :set_account_balance, "Propose correcting an account to a stated balance with one adjustment transaction; user confirmation is required",
+    required: %i[account_name balance],
+    account_name: {type: "string", description: "Account name from list_accounts"},
+    balance: {type: "number", description: "The balance the account should show"}
 
   def get_monthly_summary
     range = Date.current.all_month
@@ -117,7 +142,7 @@ class FinanceTool < AiTool
 
   def get_debts
     user.finance_debts.active.map do |d|
-      {name: d.name, remaining: d.remaining_amount.to_f, monthly: d.monthly_payment.to_f, interest: d.interest_rate.to_f, next_payment: d.next_payment_on}
+      {id: d.id, name: d.name, remaining: d.remaining_amount.to_f, installments_left: d.remaining_installments, monthly: d.monthly_payment.to_f, interest: d.interest_rate.to_f, next_payment: d.next_payment_on}
     end
   end
 
@@ -173,6 +198,50 @@ class FinanceTool < AiTool
     propose("finance.delete_transaction", {id: transaction.id}, "Finans hareketini sil: #{transaction.amount} · #{transaction_label(transaction)}")
   end
 
+  def create_debt(name:, total_amount:, remaining_amount: nil, monthly_payment: nil, remaining_installments: nil, next_payment_on: nil, interest_rate: nil)
+    return {error: "No permission to edit finances"} unless user.can_manage_finances?
+    total = total_amount.to_d
+    remaining = (remaining_amount || total_amount).to_d
+    monthly = monthly_payment.to_d
+    return {error: "total_amount must be positive"} unless total.positive?
+    return {error: "remaining_amount must be between 0 and total_amount"} unless remaining.between?(0, total)
+    return {error: "monthly_payment must not be negative"} if monthly.negative?
+    next_payment = parse_date(next_payment_on)
+    return {error: "next_payment_on must be YYYY-MM-DD"} if next_payment_on.present? && next_payment.nil?
+    installments = remaining_installments&.to_i
+    installments ||= monthly.positive? ? (remaining / monthly).ceil : 0
+    return {error: "remaining_installments must not be negative"} if installments.negative?
+
+    payload = {name: name.to_s.strip.first(100), total_amount: total.to_s, remaining_amount: remaining.to_s, monthly_payment: monthly.to_s,
+               remaining_installments: installments, next_payment_on: next_payment&.iso8601, interest_rate: interest_rate&.to_d&.to_s}.compact
+    plan = monthly.positive? ? " · #{monthly} x #{installments} ay" : ""
+    perform("finance.create_debt", payload, "Borç: #{payload[:name]} · kalan #{remaining}#{plan}")
+  end
+
+  def update_debt(id:, name: nil, remaining_amount: nil, monthly_payment: nil, remaining_installments: nil, next_payment_on: nil)
+    debt = user.finance_debts.active.find_by(id: id)
+    return {error: "Debt not found"} unless debt
+    return {error: "next_payment_on must be YYYY-MM-DD"} if next_payment_on.present? && parse_date(next_payment_on).nil?
+    changes = {name: name&.to_s&.strip&.first(100), remaining_amount: remaining_amount&.to_d&.to_s, monthly_payment: monthly_payment&.to_d&.to_s,
+               remaining_installments: remaining_installments&.to_i, next_payment_on: next_payment_on.presence}.compact
+    return {error: "No change supplied"} if changes.empty?
+
+    described = changes.map { |field, value| "#{field}: #{debt.public_send(field)} → #{value}" }.join(", ")
+    propose("finance.update_debt", changes.merge(id: debt.id), "Borcu güncelle: #{debt.name} · #{described}")
+  end
+
+  def set_account_balance(account_name:, balance:)
+    return {error: "No permission to edit finances"} unless user.can_manage_finances?
+    account = PersonalFinance::Account.find_by(user: user, is_active: true, name: account_name)
+    return {error: "Unknown account '#{account_name}'", available_accounts: list_accounts.map { |a| a[:name] }} unless account
+    current = account.current_balance
+    target = balance.to_d
+    return {error: "Account already shows #{current}"} if current == target
+
+    propose("finance.set_account_balance", {account_name: account.name, balance: target.to_s},
+      "Bakiye düzeltmesi: #{account.name} · #{current} → #{target} (fark #{target - current})")
+  end
+
   def apply_create_expense(payload) = create_transaction("expense", payload)
 
   def apply_create_income(payload) = create_transaction("income", payload)
@@ -204,6 +273,31 @@ class FinanceTool < AiTool
     subscription = user.finance_subscriptions.find(payload.fetch("id"))
     subscription.destroy!
     {record_type: "subscription", record_id: subscription.id}
+  end
+
+  def apply_create_debt(payload)
+    require_finance_permission!
+    debt = user.finance_debts.create!(payload.slice("name", "total_amount", "remaining_amount", "monthly_payment", "remaining_installments", "next_payment_on", "interest_rate"))
+    {record_type: "debt", record_id: debt.id}
+  end
+
+  def apply_update_debt(payload)
+    require_finance_permission!
+    debt = user.finance_debts.active.find(payload.fetch("id"))
+    debt.update!(payload.slice("name", "remaining_amount", "monthly_payment", "remaining_installments", "next_payment_on"))
+    {record_type: "debt", record_id: debt.id}
+  end
+
+  # Recomputes the difference at approval time, so transactions added meanwhile do not skew the result.
+  def apply_set_account_balance(payload)
+    require_finance_permission!
+    account = find_account(payload.fetch("account_name")) || raise(ActiveRecord::RecordNotFound)
+    difference = BigDecimal(payload.fetch("balance").to_s) - account.current_balance
+    raise AiActionExecutor::Error, "Hesap zaten bu bakiyeyi gösteriyor." if difference.zero?
+
+    transaction = user.finance_transactions.create!(kind: difference.positive? ? "income" : "expense", amount: difference.abs,
+      account: account, occurred_on: Date.current, note: "Bakiye düzeltmesi (asistan)")
+    {record_type: "transaction", record_id: transaction.id}
   end
 
   private
